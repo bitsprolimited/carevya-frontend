@@ -58,8 +58,7 @@ const communities: readonly CommunityBlock[] = [
     waitlist: "50+ Care Seekers joined CareVYA's waitlist",
     waitlistMobile: "50+ Families joined CareVYA's waitlist",
     imageSrc: assets.communityFamily,
-    imageAlt:
-      "A multi-generational family laughing together outdoors",
+    imageAlt: "A multi-generational family laughing together outdoors",
   },
   {
     id: "caregivers",
@@ -92,14 +91,16 @@ const themeMap = {
   blue: {
     label: "text-brand-blue",
     iconWrap: "bg-brand-blue/10 text-brand-blue",
-    check: "bg-emerald text-on-media",
+    checkWrap: "bg-emerald/20 text-emerald-dark",
+    cardWash: "to-surface-lavender/80",
     footer: "bg-surface-lavender",
     footerIcon: "bg-brand-blue text-on-media",
   },
   green: {
     label: "text-emerald-dark",
     iconWrap: "bg-emerald/15 text-emerald-dark",
-    check: "bg-emerald text-on-media",
+    checkWrap: "bg-emerald/20 text-emerald-dark",
+    cardWash: "to-emerald/10",
     footer: "bg-emerald/10",
     footerIcon: "bg-emerald-dark text-on-media",
   },
@@ -112,28 +113,33 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
   return (
     <article
       id={block.id === "families" ? "for-you" : "for-me"}
-      className="flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-background p-5 shadow-sm sm:rounded-[1.75rem] sm:p-6 md:p-7"
+      className={cn(
+        "relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border",
+        "bg-gradient-to-br from-background via-background shadow-md",
+        theme.cardWash,
+        "sm:rounded-[2rem]",
+      )}
     >
-      <div className="flex items-center gap-3">
-        <span
-          className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-xl sm:size-11",
-            theme.iconWrap,
-          )}
-        >
-          {block.id === "caregivers" ? (
-            <>
-              <Gem aria-hidden className="size-5 lg:hidden" />
-              <Icon aria-hidden className="hidden size-5 lg:block" />
-            </>
-          ) : (
-            <Icon aria-hidden className="size-5" />
-          )}
-        </span>
-        <div>
+      <div className="flex flex-1 flex-col px-5 pt-5 pb-6 sm:px-7 sm:pt-7 sm:pb-8 lg:px-10 lg:pt-10 lg:pb-9">
+        <div className="flex items-center gap-3">
+          <span
+            className={cn(
+              "flex size-11 shrink-0 items-center justify-center rounded-xl",
+              theme.iconWrap,
+            )}
+          >
+            {block.id === "caregivers" ? (
+              <>
+                <Gem aria-hidden className="size-5 lg:hidden" />
+                <Icon aria-hidden className="hidden size-5 lg:block" />
+              </>
+            ) : (
+              <Icon aria-hidden className="size-5" />
+            )}
+          </span>
           <p
             className={cn(
-              "text-[0.65rem] font-bold tracking-[0.12em] uppercase sm:text-xs",
+              "text-[0.7rem] font-bold tracking-[0.1em] uppercase sm:text-xs",
               theme.label,
             )}
           >
@@ -141,49 +147,51 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
             <span className="hidden lg:inline">{block.labelDesktop}</span>
           </p>
         </div>
+
+        <h3 className="mt-5 text-[1.35rem] font-bold leading-tight tracking-tight text-navy sm:mt-6 sm:text-2xl lg:text-[1.65rem]">
+          {block.title}
+        </h3>
+
+        <p className="mt-3 hidden text-[0.95rem] leading-relaxed text-muted lg:block">
+          {block.body}
+        </p>
+
+        <ul className="mt-6 flex flex-1 flex-col gap-5 lg:mt-8 lg:gap-6">
+          {block.features.map((feature) => (
+            <li key={feature.title} className="flex gap-3.5">
+              <span
+                className={cn(
+                  "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full",
+                  theme.checkWrap,
+                )}
+              >
+                <Check aria-hidden className="size-3.5 stroke-[2.75]" />
+              </span>
+              <p className="text-[0.95rem] leading-relaxed text-muted">
+                <span className="font-bold text-navy">{feature.title}: </span>
+                {feature.description}
+              </p>
+            </li>
+          ))}
+        </ul>
       </div>
 
-      <h3 className="mt-4 text-xl font-bold tracking-tight text-navy sm:text-2xl">
-        {block.title}
-      </h3>
-      <p className="mt-2 hidden text-sm leading-relaxed text-muted lg:block lg:text-[0.95rem]">
-        {block.body}
-      </p>
-
-      <ul className="mt-5 flex flex-1 flex-col gap-4">
-        {block.features.map((feature) => (
-          <li key={feature.title} className="flex gap-3">
-            <span
-              className={cn(
-                "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full",
-                theme.check,
-              )}
-            >
-              <Check aria-hidden className="size-3 stroke-[3]" />
-            </span>
-            <p className="text-sm leading-relaxed text-muted">
-              <span className="font-bold text-navy">{feature.title}: </span>
-              {feature.description}
-            </p>
-          </li>
-        ))}
-      </ul>
-
+      {/* Full-bleed footer bar (Figma web) */}
       <div
         className={cn(
-          "mt-6 flex items-center gap-3 rounded-2xl px-3.5 py-3 sm:px-4",
+          "mt-auto flex items-center gap-3.5 border-t border-border/60 px-5 py-4 sm:gap-4 sm:px-7 sm:py-5 lg:px-10 lg:py-5",
           theme.footer,
         )}
       >
         <span
           className={cn(
-            "flex size-9 shrink-0 items-center justify-center rounded-full",
+            "flex size-10 shrink-0 items-center justify-center rounded-full shadow-sm",
             theme.footerIcon,
           )}
         >
-          <Users aria-hidden className="size-4" />
+          <Users aria-hidden className="size-4.5" />
         </span>
-        <p className="text-sm font-semibold text-navy">
+        <p className="text-sm font-bold text-navy sm:text-[0.95rem]">
           <span className="lg:hidden">{block.waitlistMobile}</span>
           <span className="hidden lg:inline">{block.waitlist}</span>
         </p>
@@ -202,7 +210,7 @@ function CommunityImage({
   priority?: boolean;
 }) {
   return (
-    <div className="relative aspect-[4/5] h-full min-h-[280px] overflow-hidden rounded-[1.5rem] sm:rounded-[1.75rem] lg:aspect-auto lg:min-h-[28rem]">
+    <div className="relative aspect-[4/5] h-full min-h-[280px] overflow-hidden rounded-[1.75rem] shadow-md sm:rounded-[2rem] lg:aspect-auto lg:min-h-[28rem]">
       <Image
         src={src}
         alt={alt}
@@ -238,10 +246,6 @@ export function OneStandardSection() {
           </h2>
         </div>
 
-        {/*
-          Mobile order: card → image → card → image
-          Desktop zigzag: card | image / image | card
-        */}
         <div className="mt-10 grid grid-cols-1 gap-5 md:mt-12 md:gap-6 lg:grid-cols-2 lg:gap-7">
           <div className="order-1 lg:order-1">
             <CommunityCard block={families} />
