@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — One Standard headline one line on web
+
+- Section title stays on a single line from `lg` up (`whitespace-nowrap` + wider container).
+
 ### 2026-09-23 — Left fade stops at caregivers icon
 
 - Caregivers dissolve ends at the header icon left edge (mask + wash fully opaque from icon onward); no fade over the icon/content.
