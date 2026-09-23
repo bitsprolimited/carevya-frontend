@@ -1,9 +1,9 @@
 ---
-description: BitsPro CareNest frontend architecture — read before every implementation
+description: BitsPro CareVYA frontend architecture — read before every implementation
 alwaysApply: true
 ---
 
-# CareNest Frontend Architecture (BitsPro)
+# CareVYA Frontend Architecture (BitsPro)
 
 All application code lives in **`/frontend`**. Do not create app source outside that folder.
 
