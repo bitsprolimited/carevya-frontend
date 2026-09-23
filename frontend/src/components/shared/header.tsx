@@ -40,10 +40,10 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
           : "border-b border-border/80 bg-white/90 backdrop-blur-md",
       )}
     >
-      <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:h-[4.5rem] md:px-6 lg:px-8">
+      <div className="relative mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:h-[4.5rem] md:px-6 lg:px-8 xl:px-10">
         <Link
           href="/"
-          className="flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="relative z-10 flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span className="relative size-9 shrink-0 overflow-hidden rounded-full sm:size-10">
             <Image
@@ -78,7 +78,7 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
         <div
           role="tablist"
           aria-label="Audience"
-          className="hidden rounded-full bg-on-media p-1 shadow-sm md:inline-flex"
+          className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 rounded-full bg-on-media p-1 shadow-sm md:inline-flex"
         >
           {audienceTabs.map((tab) => {
             const isActive = audience === tab.id;
@@ -103,7 +103,7 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
           })}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="relative z-10 flex items-center gap-2">
           <Button
             type="button"
             className="hidden h-10 rounded-full px-5 md:inline-flex"

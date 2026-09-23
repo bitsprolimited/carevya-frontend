@@ -30,7 +30,7 @@ export function HeroSection() {
         <div className="relative z-10 flex min-h-[72svh] flex-col md:min-h-[100svh]">
           <SiteHeader variant="transparent" />
 
-          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-28 pt-4 md:justify-center md:gap-10 md:px-6 md:pb-14 md:pt-6 lg:px-8 lg:pb-16">
+          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-28 pt-4 md:justify-center md:gap-10 md:px-6 md:pb-14 md:pt-6 lg:px-8 lg:pb-16 xl:px-10">
             <div className="max-w-xl space-y-3 pt-2 md:max-w-2xl md:space-y-5 md:pt-0">
               <h1 className="text-[2rem] font-bold leading-[1.15] tracking-tight text-on-media sm:text-4xl md:text-5xl lg:text-6xl">
                 Find trusted care, closer to home.

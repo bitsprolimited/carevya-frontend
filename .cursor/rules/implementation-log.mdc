@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Hero header Figma positions
+
+- Absolutely centered Families/Carers pill; Join Waitlist stays flush right; logo left — matches Figma without shifting the pill.
+
 ### 2026-09-23 — Revert header CTA regroup
 
 - Restored centered Families/Carers pill + separate right Join Waitlist (undid right-cluster layout).
