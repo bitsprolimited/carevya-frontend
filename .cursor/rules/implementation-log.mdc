@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Header Join Waitlist further right
+
+- Grouped Families/Carers pill with Join Waitlist on the right so the CTA sits flush at the header’s right edge (Figma).
+
 ### 2026-09-23 — Hero brighter overlays
 
 - Lightened hero scrim gradients so the Cloudinary photo reads brighter while keeping left-side text readable.
