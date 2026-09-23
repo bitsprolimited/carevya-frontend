@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Protocol section (3 cards)
+
+- Implemented full CareVYA Protocol under hero: centered eyebrow + headline; 3 themed cards (Find / Know Who to Trust / Connect) with callout bars; `surface-gold` token; responsive `grid-cols-1 md:2 lg:3`.
+
 ### 2026-09-23 — CareVYA favicon
 
 - Replaced default Vercel `favicon.ico` with CareVYA logo as `src/app/icon.png` + `apple-icon.png` (from Cloudinary).

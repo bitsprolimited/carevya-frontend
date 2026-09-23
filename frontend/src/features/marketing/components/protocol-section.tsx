@@ -1,100 +1,205 @@
-"use client";
-
-import { Filter, QrCode } from "lucide-react";
-import { useState } from "react";
+import {
+  BadgeCheck,
+  IdCard,
+  Lock,
+  MessageCircle,
+  QrCode,
+  SlidersHorizontal,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const protocolSteps = [
+type ProtocolTheme = "blue" | "gold" | "green";
+
+type ProtocolStep = {
+  id: string;
+  index: string;
+  label: string;
+  title: string;
+  body: string;
+  callout: string;
+  theme: ProtocolTheme;
+  Icon: LucideIcon;
+  CalloutIcon: LucideIcon;
+  seal?: boolean;
+};
+
+const protocolSteps: readonly ProtocolStep[] = [
   {
     id: "find",
     index: "01",
     label: "FIND THE RIGHT CARE",
     title: "Care that fits your family",
-    body: "Connect with carers matched to your loved one's care needs, from mobility support and companionship to specialised and live-in care.",
-    callout: "Filter by neighborhood and medical competencies.",
+    body: "Connect with caregivers matched to your loved one's care needs, from mobility support and companionship to specialised and live-in care.",
+    callout: "Filter by neighborhood and medical competencies",
+    theme: "blue",
+    Icon: QrCode,
+    CalloutIcon: SlidersHorizontal,
   },
   {
-    id: "verify",
+    id: "trust",
     index: "02",
-    label: "VETTING & TRUST",
-    title: "Verified before they meet your family",
-    body: "Multi-layer checks — identity, background, skills, and interviews — so every connection starts from trust.",
-    callout: "Guaranteed verification on every CareVYA provider.",
+    label: "KNOW WHO TO TRUST",
+    title: "Triple-Layer Vetting",
+    body: "We verify every caregivers, so families can feel more confident about who they welcome into their loved one's life.",
+    callout: "Verification conducted",
+    theme: "gold",
+    Icon: BadgeCheck,
+    CalloutIcon: IdCard,
+    seal: true,
   },
   {
     id: "connect",
     index: "03",
     label: "CONNECT WITH PEACE",
-    title: "Stay close to every care moment",
-    body: "Tools that keep families informed and carers supported throughout the care journey.",
-    callout: "Care logs, updates, and direct family access.",
+    title: "Talk before you commit",
+    body: "Schedule discovery calls and stay updated through daily care logs. No surprises.",
+    callout: "Funds released only after family approval",
+    theme: "green",
+    Icon: MessageCircle,
+    CalloutIcon: Lock,
   },
 ] as const;
 
-export function ProtocolSection() {
-  const [active, setActive] = useState(0);
-  const step = protocolSteps[active] ?? protocolSteps[0];
+const themeStyles: Record<
+  ProtocolTheme,
+  {
+    label: string;
+    iconWrap: string;
+    icon: string;
+    callout: string;
+    calloutIcon: string;
+    calloutText: string;
+  }
+> = {
+  blue: {
+    label: "text-brand-blue",
+    iconWrap: "bg-brand-blue/10 text-brand-blue",
+    icon: "text-brand-blue",
+    callout: "bg-surface-lavender",
+    calloutIcon: "bg-brand-blue/10 text-brand-blue",
+    calloutText: "text-navy",
+  },
+  gold: {
+    label: "text-gold-deep",
+    iconWrap: "bg-surface-gold text-gold-deep",
+    icon: "text-gold-deep",
+    callout: "bg-surface-gold",
+    calloutIcon: "bg-gold/20 text-gold-deep",
+    calloutText: "text-gold-deep",
+  },
+  green: {
+    label: "text-emerald-dark",
+    iconWrap: "bg-emerald/10 text-emerald-dark",
+    icon: "text-emerald-dark",
+    callout: "bg-surface-lavender",
+    calloutIcon: "bg-emerald/15 text-emerald-dark",
+    calloutText: "text-navy",
+  },
+};
 
+function ProtocolCard({ step }: { step: ProtocolStep }) {
+  const styles = themeStyles[step.theme];
+  const { Icon, CalloutIcon } = step;
+
+  return (
+    <article
+      className={cn(
+        "relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-background p-5 shadow-sm md:p-6",
+      )}
+    >
+      {step.theme === "gold" ? (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-8 -right-6 size-28 rounded-full bg-surface-gold/90 blur-2xl"
+        />
+      ) : null}
+
+      <div className="relative flex items-start justify-between gap-3">
+        <p
+          className={cn(
+            "text-[0.7rem] font-bold tracking-[0.08em] uppercase sm:text-xs",
+            styles.label,
+          )}
+        >
+          {step.index} • {step.label}
+        </p>
+
+        {step.seal ? (
+          <div className="relative flex shrink-0 flex-col items-center">
+            <span
+              className={cn(
+                "flex size-10 items-center justify-center rounded-full border border-gold/40 bg-surface-gold shadow-sm",
+                styles.icon,
+              )}
+            >
+              <Icon aria-hidden className="size-5" />
+            </span>
+            <span className="mt-1 text-[0.55rem] font-semibold tracking-wide text-gold-deep uppercase">
+              Verified Seal
+            </span>
+          </div>
+        ) : (
+          <span
+            className={cn(
+              "flex size-9 shrink-0 items-center justify-center rounded-lg",
+              styles.iconWrap,
+            )}
+          >
+            <Icon aria-hidden className="size-4" />
+          </span>
+        )}
+      </div>
+
+      <h3 className="relative mt-5 text-xl font-bold tracking-tight text-navy md:text-[1.35rem]">
+        {step.title}
+      </h3>
+      <p className="relative mt-2 flex-1 text-sm leading-relaxed text-muted md:text-[0.95rem]">
+        {step.body}
+      </p>
+
+      <div
+        className={cn(
+          "relative mt-6 flex items-center gap-3 rounded-xl px-3.5 py-3",
+          styles.callout,
+        )}
+      >
+        <span
+          className={cn(
+            "flex size-8 shrink-0 items-center justify-center rounded-lg",
+            styles.calloutIcon,
+          )}
+        >
+          <CalloutIcon aria-hidden className="size-3.5" />
+        </span>
+        <p className={cn("text-sm font-medium leading-snug", styles.calloutText)}>
+          {step.callout}
+        </p>
+      </div>
+    </article>
+  );
+}
+
+export function ProtocolSection() {
   return (
     <section
       id="protocol"
-      className="bg-background px-4 pb-12 pt-8 md:px-6 md:pb-16 md:pt-14 lg:px-8"
+      className="bg-background px-4 pb-14 pt-10 md:px-6 md:pb-20 md:pt-16 lg:px-8"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <p className="text-xs font-bold tracking-[0.14em] text-brand-blue uppercase">
-          The CareVYA Protocol
-        </p>
-        <h2 className="mt-3 max-w-xl text-2xl font-bold tracking-tight text-navy md:text-3xl lg:text-4xl">
-          Find, verify and connect with care you can trust.
-        </h2>
-
-        <article className="mt-8 rounded-2xl border border-border bg-background p-5 shadow-sm md:mt-10 md:p-8">
-          <div className="flex items-start justify-between gap-3">
-            <p className="text-xs font-bold tracking-wide text-brand-blue uppercase">
-              {step.index} • {step.label}
-            </p>
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-brand-blue/10 text-brand-blue">
-              <QrCode aria-hidden className="size-4" />
-            </span>
-          </div>
-
-          <h3 className="mt-4 text-xl font-bold text-navy md:text-2xl">
-            {step.title}
-          </h3>
-          <p className="mt-2 text-sm leading-relaxed text-muted md:text-base">
-            {step.body}
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-xs font-bold tracking-[0.16em] text-brand-blue uppercase">
+            The CareVYA Protocol
           </p>
+          <h2 className="mt-3 text-2xl font-bold tracking-tight text-navy md:text-3xl lg:text-[2.15rem]">
+            Find, verify and connect with care you can trust.
+          </h2>
+        </div>
 
-          <div className="mt-6 flex items-start gap-3 rounded-xl bg-surface-lavender px-4 py-3">
-            <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-emerald/15 text-emerald-dark">
-              <Filter aria-hidden className="size-3.5" />
-            </span>
-            <p className="text-sm font-medium text-navy">{step.callout}</p>
-          </div>
-        </article>
-
-        <div
-          className="mt-6 flex items-center justify-center gap-2"
-          role="tablist"
-          aria-label="Protocol steps"
-        >
-          {protocolSteps.map((item, index) => {
-            const isActive = index === active;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                aria-label={`Show step ${item.index}: ${item.label}`}
-                className={cn(
-                  "size-2.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  isActive ? "bg-navy" : "bg-border hover:bg-muted",
-                )}
-                onClick={() => setActive(index)}
-              />
-            );
-          })}
+        <div className="mt-10 grid grid-cols-1 gap-5 md:mt-12 md:grid-cols-2 md:gap-6 lg:grid-cols-3">
+          {protocolSteps.map((step) => (
+            <ProtocolCard key={step.id} step={step} />
+          ))}
         </div>
       </div>
     </section>
