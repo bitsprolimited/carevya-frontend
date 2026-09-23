@@ -1,13 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import {
-  Check,
-  Gem,
-  Handshake,
-  Users,
-  type LucideIcon,
-} from "lucide-react";
+import { Check, Handshake, Users, type LucideIcon } from "lucide-react";
 import {
   useCallback,
   useEffect,
@@ -30,6 +24,8 @@ type CommunityFeature = {
 type CommunityBlock = {
   id: "families" | "caregivers";
   theme: "blue" | "green";
+  /** Families fade right; caregivers fade left (Figma zigzag). */
+  fadeSide: "left" | "right";
   Icon: LucideIcon;
   labelDesktop: string;
   labelMobile: string;
@@ -46,6 +42,7 @@ const communities: readonly CommunityBlock[] = [
   {
     id: "families",
     theme: "blue",
+    fadeSide: "right",
     Icon: Users,
     labelDesktop: "FOR FAMILIES & CARESEEKERS",
     labelMobile: "FOR FAMILIES & RELATIVES",
@@ -77,6 +74,7 @@ const communities: readonly CommunityBlock[] = [
   {
     id: "caregivers",
     theme: "green",
+    fadeSide: "left",
     Icon: Handshake,
     labelDesktop: "FOR PROFESSIONAL CAREGIVERS",
     labelMobile: "FOR PROFESSIONAL CARERS",
@@ -113,7 +111,7 @@ const themeMap = {
     label: "text-emerald-dark",
     iconWrap: "bg-emerald/15 text-emerald-dark",
     checkWrap: "bg-emerald/20 text-emerald-dark",
-    footer: "bg-emerald/10",
+    footer: "bg-surface-lavender/90",
     footerIcon: "bg-emerald-dark text-on-media",
   },
 } as const;
@@ -145,22 +143,39 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
   const { Icon } = block;
   const cardRef = useRef<HTMLElement>(null);
   const anchorRef = useRef<HTMLSpanElement>(null);
+  const iconRef = useRef<HTMLSpanElement>(null);
+  const fadesLeft = block.fadeSide === "left";
 
   const syncFadeStart = useCallback(() => {
     const card = cardRef.current;
-    const anchor = anchorRef.current;
     if (!card) return;
 
+    const cardRect = card.getBoundingClientRect();
+    if (cardRect.width === 0 || cardRect.height === 0) return;
+
+    if (fadesLeft) {
+      const icon = iconRef.current;
+      if (!icon) {
+        card.style.setProperty("--fade-start", "14%");
+        return;
+      }
+      const iconRect = icon.getBoundingClientRect();
+      const fadeStart = ((iconRect.left - cardRect.left) / cardRect.width) * 100;
+      card.style.setProperty(
+        "--fade-start",
+        `${String(Math.min(28, Math.max(8, fadeStart)))}%`,
+      );
+      return;
+    }
+
+    const anchor = anchorRef.current;
     if (!anchor) {
       card.style.setProperty("--fade-start", "86%");
       card.style.setProperty("--fade-y", "48%");
       return;
     }
 
-    const cardRect = card.getBoundingClientRect();
     const anchorRect = anchor.getBoundingClientRect();
-    if (cardRect.width === 0 || cardRect.height === 0) return;
-
     const fadeStart = ((anchorRect.right - cardRect.left) / cardRect.width) * 100;
     const fadeY = ((anchorRect.bottom - cardRect.top) / cardRect.height) * 100;
 
@@ -172,7 +187,7 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
       "--fade-y",
       `${String(Math.min(70, Math.max(30, fadeY)))}%`,
     );
-  }, []);
+  }, [fadesLeft]);
 
   useLayoutEffect(() => {
     syncFadeStart();
@@ -197,32 +212,27 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
       id={block.id === "families" ? "for-you" : "for-me"}
       style={
         {
-          "--fade-start": "86%",
+          "--fade-start": fadesLeft ? "14%" : "86%",
           "--fade-y": "48%",
         } as CSSProperties
       }
       className={cn(
         "community-card-fade-border relative flex h-full flex-col overflow-hidden rounded-[1.75rem]",
         block.theme === "green" && "community-card-fade-border--green",
+        fadesLeft && "community-card-fade-border--fade-left",
         "sm:rounded-[2rem]",
       )}
     >
       <div className="relative z-10 flex flex-1 flex-col px-5 pt-5 pb-6 sm:px-7 sm:pt-7 sm:pb-8 lg:px-10 lg:pt-10 lg:pb-9">
         <div className="flex items-center gap-3">
           <span
+            ref={iconRef}
             className={cn(
               "flex size-11 shrink-0 items-center justify-center rounded-xl",
               theme.iconWrap,
             )}
           >
-            {block.id === "caregivers" ? (
-              <>
-                <Gem aria-hidden className="size-5 lg:hidden" />
-                <Icon aria-hidden className="hidden size-5 lg:block" />
-              </>
-            ) : (
-              <Icon aria-hidden className="size-5" />
-            )}
+            <Icon aria-hidden className="size-5" />
           </span>
           <p
             className={cn(
@@ -239,7 +249,7 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
           {block.title}
         </h3>
 
-        <p className="mt-3 hidden text-[0.95rem] leading-relaxed text-muted lg:block">
+        <p className="mt-3 text-[0.95rem] leading-relaxed text-muted max-lg:hidden">
           {block.body}
         </p>
 

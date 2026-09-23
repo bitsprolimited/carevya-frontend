@@ -70,9 +70,10 @@ body {
   font-family: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Community cards: horizontal dissolve starts at --fade-start (end of "trusted") */
+/* Community cards: horizontal dissolve (direction via modifier) */
 .community-card-fade-border {
   --fade-start: 86%;
+  --fade-y: 48%;
   position: relative;
   isolation: isolate;
   border: none;
@@ -85,6 +86,7 @@ body {
     color-mix(in srgb, var(--surface-lavender) 55%, var(--surface-soft)) 100%
   );
   box-shadow: 0 12px 32px color-mix(in srgb, var(--navy) 7%, transparent);
+  /* Default: fade to the RIGHT (families card) */
   -webkit-mask-image: linear-gradient(
     to right,
     #000 0%,
@@ -103,16 +105,52 @@ body {
 
 .community-card-fade-border--green {
   background-image: linear-gradient(
-    to right,
+    to left,
     var(--background) 0%,
-    var(--background) 70%,
-    color-mix(in srgb, var(--emerald) 10%, var(--background)) 88%,
-    color-mix(in srgb, var(--emerald) 5%, var(--surface-soft)) 100%
+    var(--background) 62%,
+    color-mix(in srgb, var(--surface-lavender) 70%, var(--background)) 88%,
+    color-mix(in srgb, var(--surface-lavender) 40%, var(--surface-soft)) 100%
   );
 }
 
-/* Left solid; top follows fade-start; right stroke solid until ~trusted row then fades down */
-.community-card-fade-border::before {
+/* Caregivers: fade to the LEFT (mirror of families) */
+.community-card-fade-border--fade-left {
+  --fade-start: 14%;
+  background-image: linear-gradient(
+    to left,
+    var(--background) 0%,
+    var(--background) 62%,
+    var(--surface-lavender) 88%,
+    color-mix(in srgb, var(--surface-lavender) 55%, var(--surface-soft)) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.45) calc(var(--fade-start) - 4%),
+    #000 var(--fade-start),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.45) calc(var(--fade-start) - 4%),
+    #000 var(--fade-start),
+    #000 100%
+  );
+}
+
+.community-card-fade-border--fade-left.community-card-fade-border--green {
+  background-image: linear-gradient(
+    to left,
+    var(--background) 0%,
+    var(--background) 58%,
+    color-mix(in srgb, var(--emerald) 8%, var(--surface-lavender)) 86%,
+    color-mix(in srgb, var(--surface-lavender) 50%, var(--surface-soft)) 100%
+  );
+}
+
+/* Families (fade right): left solid; top/bottom; right stroke fades down from trusted row */
+.community-card-fade-border:not(.community-card-fade-border--fade-left)::before {
   content: "";
   pointer-events: none;
   position: absolute;
@@ -138,9 +176,42 @@ body {
     linear-gradient(
         to bottom,
         var(--border) 0%,
-        var(--border) var(--fade-y, 48%),
-        transparent calc(var(--fade-y, 48%) + 18%)
+        var(--border) var(--fade-y),
+        transparent calc(var(--fade-y) + 18%)
       )
       top right / 1px 100% no-repeat;
+}
+
+/* Caregivers (fade left): right solid; top/bottom from right; left stroke fades */
+.community-card-fade-border--fade-left::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+        to left,
+        var(--border) 0%,
+        var(--border) calc(100% - var(--fade-start)),
+        transparent 100%
+      )
+      top right / 100% 1px no-repeat,
+    linear-gradient(
+        to left,
+        var(--border) 0%,
+        var(--border) 70%,
+        transparent 100%
+      )
+      bottom right / 100% 1px no-repeat,
+    linear-gradient(var(--border), var(--border)) top right / 1px 100% no-repeat,
+    linear-gradient(
+        to bottom,
+        var(--border) 0%,
+        var(--border) 55%,
+        transparent 75%
+      )
+      top left / 1px 100% no-repeat;
 }
 
