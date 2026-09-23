@@ -9,6 +9,11 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — One Standard communities section
+
+- Added `OneStandardSection` under Protocol: zigzag desktop grid (card|image / image|card), mobile stack (card→image→card→image).
+- Cloudinary images `grandma_kids` + `grandma_daughter`; blue/green themed feature cards + waitlist footers; responsive labels for mobile vs desktop copy.
+
 ### 2026-09-23 — Protocol section (3 cards)
 
 - Implemented full CareVYA Protocol under hero: centered eyebrow + headline; 3 themed cards (Find / Know Who to Trust / Connect) with callout bars; `surface-gold` token; responsive `grid-cols-1 md:2 lg:3`.
