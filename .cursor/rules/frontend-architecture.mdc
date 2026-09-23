@@ -1,0 +1,68 @@
+---
+description: BitsPro CareNest frontend architecture — read before every implementation
+alwaysApply: true
+---
+
+# CareNest Frontend Architecture (BitsPro)
+
+All application code lives in **`/frontend`**. Do not create app source outside that folder.
+
+## Stack
+
+| Layer | Choice |
+|-------|--------|
+| Framework | Next.js App Router — Server Components by default |
+| Language | TypeScript `strict: true` — **zero `any`** |
+| Styling | Tailwind CSS + `clsx` / `tailwind-merge` |
+| Icons | Lucide React |
+| Forms | React Hook Form + Zod |
+| Server state | TanStack Query |
+| Client state | Zustand |
+| Motion | Framer Motion (layout, accordion, carousel) |
+| Images | Cloudinary URLs via `next/image` |
+
+## Directory layout (`frontend/src/`)
+
+```
+src/
+├── app/                 # Routes & layouts only
+│   ├── (auth)/
+│   ├── (marketing)/     # Landing, FAQ, waitlist
+│   ├── layout.tsx
+│   └── globals.css
+├── components/
+│   ├── ui/              # Primitives (Button, Card, Input, Accordion)
+│   └── shared/          # Header, Footer, Navbar
+├── features/            # Domain modules
+│   ├── waitlist/        # components, hooks, services, types
+│   ├── verification/
+│   └── faqs/
+├── lib/                 # fetch/axios wrappers, utils
+├── hooks/               # Global hooks
+└── types/               # Global TS defs
+```
+
+Feature-based: domain logic stays under `features/[name]/`; pages stay thin.
+
+## Responsive (mobile-first)
+
+- Write base Tailwind for mobile; scale with `md:`, `lg:`, `xl:`.
+- **Hero (lg+):** side-by-side layout; overlapping glassmorphism search card. **Mobile:** stack; full-width search.
+- **Community cards:** `grid grid-cols-1 lg:grid-cols-2 gap-8`.
+
+## Images & performance
+
+- Always `next/image` with explicit `sizes`, aspect-ratio wrappers, `priority` on above-the-fold hero.
+- Force WebP/AVIF in `next.config` (or `next.config.ts`).
+- Source assets from **Cloudinary**; use Cloudinary URLs in the app (no local heavy photo dumps for production imagery).
+
+## Workflow checklist (every change)
+
+1. **Component first** — reuse `src/components/ui` before new DOM/primitives.
+2. **Types** — no inline API response types; put schemas in `types/` or `features/[feature]/types`.
+3. **a11y** — `focus-visible:ring-2`, correct ARIA, brand-safe contrast.
+4. **Scope** — only touch `/frontend` unless explicitly asked otherwise.
+
+## After every implementation
+
+Update `.cursor/rules/implementation-log.mdc` before finishing (see that rule). Read it at the start of the next task so work is never duplicated or contradicted.

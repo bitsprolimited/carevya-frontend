@@ -1,0 +1,26 @@
+---
+description: Living implementation log — read before work; append after every implementation
+alwaysApply: true
+---
+
+# Implementation Log
+
+**Agent duty:** Before starting work, read this entire log. After finishing an implementation, append a dated entry below (newest first) with: what shipped, key paths touched, and what’s next / left incomplete. Keep entries short and factual.
+
+## Entries
+
+### 2026-09-23 — Frontend architecture scaffold
+
+- Scaffolded Next.js 16 (App Router) + TypeScript strict + Tailwind 4 in `/frontend` (pnpm).
+- Installed stack: clsx, tailwind-merge, lucide-react, RHF, Zod, TanStack Query, Zustand, Framer Motion.
+- Feature-based `src/`: `app/(marketing)`, `app/(auth)`, `components/ui` + `shared`, `features/{waitlist,verification,faqs}`, `lib`, `hooks`, `types`.
+- Brand tokens (navy / brand-blue / emerald), Cloudinary `next/image` remotePatterns + AVIF/WebP, Query provider, `cn` + `apiFetch`.
+- UI primitives: Button, Input, Card, Accordion (motion). Shared Header / Navbar / Footer.
+- Waitlist form + Zod types + stub `POST /api/waitlist`; verification grid + FAQ accordion wired on marketing home.
+- **Next:** Full landing page sections from designs (hero dual layout + glass search, protocol, community cards, final CTA); real Cloudinary asset URLs; persist waitlist beyond stub.
+
+### 2026-09-23 — Project rules bootstrapped
+
+- Added product context rule (CareVYA marketplace, Nigeria waitlist, design language).
+- Added frontend architecture rule (Next.js App Router, feature-based `src/`, Tailwind RWD, Cloudinary + `next/image`, `/frontend` only).
+- Added living implementation log rule.
