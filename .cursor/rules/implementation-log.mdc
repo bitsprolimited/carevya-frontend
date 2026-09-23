@@ -9,6 +9,11 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Hero waitlist card Figma match
+
+- Restyled `HeroWaitlistCard` to match Figma: frosted glass card, left-aligned black role pill (emerald active), single white email+CTA capsule, divider, left-aligned Nigeria line.
+- Tuned `glass` / `glass-deep` / added `glass-line` tokens in `globals.css`.
+
 ### 2026-09-23 — Brand rename: CareNest → CareVYA
 
 - Replaced CareNest naming in Cursor rules, package name (`carevya`), and README. Product name is CareVYA everywhere in docs/UI.

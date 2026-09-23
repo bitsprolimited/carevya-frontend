@@ -41,16 +41,23 @@ export function HeroWaitlistCard() {
   });
 
   return (
-    <div className="w-full max-w-xl rounded-3xl border border-on-media/15 bg-glass p-4 shadow-2xl backdrop-blur-xl sm:p-5 md:rounded-[1.75rem] md:p-6">
+    <div
+      className={cn(
+        "w-full max-w-[40rem] rounded-[2rem] border border-on-media/10",
+        "bg-glass p-6 shadow-2xl backdrop-blur-2xl",
+        "sm:p-8 md:rounded-[2.25rem]",
+      )}
+    >
       <form
-        className="flex flex-col gap-4"
+        className="flex flex-col gap-5 sm:gap-6"
         onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
         noValidate
       >
+        {/* Role toggle — left-aligned black pill, green active segment */}
         <div
           role="tablist"
           aria-label="Waitlist role"
-          className="inline-flex w-full max-w-sm rounded-full bg-glass-deep p-1"
+          className="inline-flex w-fit max-w-full items-center rounded-full bg-glass-deep p-1"
         >
           {roleOptions.map((option) => {
             const isActive = selectedRole === option.value;
@@ -61,13 +68,15 @@ export function HeroWaitlistCard() {
                 role="tab"
                 aria-selected={isActive}
                 className={cn(
-                  "flex-1 rounded-full px-3 py-2 text-sm font-semibold transition-colors",
+                  "rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors sm:px-5 sm:py-2.5",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-navy",
                   isActive
-                    ? "bg-emerald text-navy"
-                    : "bg-transparent text-on-media hover:text-on-media",
+                    ? "bg-emerald text-navy shadow-sm"
+                    : "bg-transparent text-on-media",
                 )}
-                onClick={() => form.setValue("role", option.value, { shouldDirty: true })}
+                onClick={() =>
+                  form.setValue("role", option.value, { shouldDirty: true })
+                }
               >
                 {option.label}
               </button>
@@ -75,24 +84,24 @@ export function HeroWaitlistCard() {
           })}
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-stretch sm:rounded-full sm:bg-white sm:p-1.5">
+        {/* Email + CTA — single white capsule at all breakpoints */}
+        <div className="flex min-h-14 items-center gap-2 rounded-full bg-on-media p-1.5 pl-4 sm:pl-5">
           <Input
             type="email"
             autoComplete="email"
             placeholder="Enter your email address..."
             aria-invalid={Boolean(form.formState.errors.email)}
             className={cn(
-              "h-12 rounded-full border-0 bg-white px-5 text-navy shadow-none",
+              "h-11 min-w-0 flex-1 border-0 bg-transparent px-0 text-sm text-navy shadow-none sm:text-base",
               "placeholder:text-muted",
-              "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0",
-              "sm:flex-1 sm:bg-transparent",
+              "focus-visible:ring-0 focus-visible:ring-offset-0",
             )}
             {...form.register("email")}
           />
           <Button
             type="submit"
             disabled={mutation.isPending}
-            className="h-12 shrink-0 rounded-full px-6 sm:px-5"
+            className="h-11 shrink-0 rounded-full px-4 text-sm sm:px-6 sm:text-base"
           >
             {mutation.isPending ? "Joining..." : "Join Waitlist"}
           </Button>
@@ -115,11 +124,14 @@ export function HeroWaitlistCard() {
             You&apos;re on the waitlist — we&apos;ll be in touch.
           </p>
         ) : null}
-      </form>
 
-      <p className="-mx-4 -mb-4 mt-4 rounded-b-3xl bg-on-media px-4 py-3 text-center text-xs font-medium text-navy sm:mx-0 sm:mb-0 sm:mt-4 sm:rounded-none sm:bg-transparent sm:px-0 sm:py-0 sm:text-sm sm:text-on-media md:rounded-[1.75rem]">
-        Designed for safer elderly care in Nigeria
-      </p>
+        {/* Divider + left-aligned Nigeria line */}
+        <div className="border-t border-glass-line pt-4 sm:pt-5">
+          <p className="text-left text-sm text-on-media">
+            Designed for safer elderly care in Nigeria
+          </p>
+        </div>
+      </form>
     </div>
   );
 }
