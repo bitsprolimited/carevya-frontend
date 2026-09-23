@@ -339,11 +339,11 @@ export function OneStandardSection() {
       className="bg-surface-soft px-4 py-12 md:px-6 md:py-16 lg:px-8 lg:py-20"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <div className="mx-auto max-w-2xl text-center">
+        <div className="mx-auto max-w-2xl text-center lg:max-w-none">
           <p className="text-xs font-bold tracking-[0.14em] text-brand-blue uppercase">
             Two Communities • One Standard
           </p>
-          <h2 className="mt-3 text-2xl font-bold tracking-tight text-navy md:text-3xl lg:text-[2.15rem]">
+          <h2 className="mt-3 text-2xl font-bold tracking-tight text-navy md:text-3xl lg:whitespace-nowrap lg:text-[2.15rem]">
             Built with equal respect for families &amp; caregivers
           </h2>
         </div>
