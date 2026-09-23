@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Header Join Waitlist to viewport right
+
+- Desktop Join Waitlist (arrow) pinned to the header’s right edge (`absolute`); Families pill stays centered.
+
 ### 2026-09-23 — Widen hero waitlist card on web
 
 - Desktop waitlist glass card scales to `lg:max-w-3xl` / `xl:max-w-4xl` so the email row overlaps the tablet under the caregiver’s chin (Figma).
