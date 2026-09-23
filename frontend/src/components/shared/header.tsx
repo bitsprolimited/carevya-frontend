@@ -78,7 +78,7 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
         <div
           role="tablist"
           aria-label="Audience"
-          className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 rounded-full bg-on-media p-1 shadow-sm md:inline-flex"
+          className="absolute left-[calc(50%+1.25rem)] top-1/2 hidden -translate-x-1/2 -translate-y-1/2 rounded-full bg-on-media p-1 shadow-sm md:inline-flex"
         >
           {audienceTabs.map((tab) => {
             const isActive = audience === tab.id;
