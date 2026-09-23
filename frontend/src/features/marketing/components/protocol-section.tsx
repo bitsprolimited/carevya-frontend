@@ -1,6 +1,5 @@
 import {
   BadgeCheck,
-  IdCard,
   QrCode,
   SlidersHorizontal,
   type LucideIcon,
@@ -47,7 +46,7 @@ const protocolSteps: readonly ProtocolStep[] = [
     callout: "Verification conducted",
     theme: "gold",
     Icon: BadgeCheck,
-    CalloutIcon: IdCard,
+    calloutIconSrc: assets.protocolTrustCalloutIcon,
     seal: true,
   },
   {
