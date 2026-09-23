@@ -14,6 +14,8 @@
   --surface-soft: #f0f5fb;
   --surface-lavender: #eef1f8;
   --surface-gold: #f5ebe0;
+  /* Verified Seal pill (Protocol card) */
+  --seal: #ffddb8;
   --muted: #5b6b7c;
   --border: #d7e0ea;
   --ring: #2563eb;
@@ -47,6 +49,7 @@
   --color-surface-soft: var(--surface-soft);
   --color-surface-lavender: var(--surface-lavender);
   --color-surface-gold: var(--surface-gold);
+  --color-seal: var(--seal);
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-ring: var(--ring);
