@@ -50,6 +50,14 @@ Feature-based: domain logic stays under `features/[name]/`; pages stay thin.
 - **Hero (lg+):** side-by-side layout; overlapping glassmorphism search card. **Mobile:** stack; full-width search.
 - **Community cards:** `grid grid-cols-1 lg:grid-cols-2 gap-8`.
 
+## Color tokens (mandatory)
+
+- **Source of truth:** `frontend/src/app/globals.css` (`:root` + `@theme inline`).
+- In components, use **token names** via Tailwind utilities — e.g. `bg-navy`, `text-navy-muted`, `bg-brand-blue`, `text-emerald`, `bg-surface-soft`, `border-border`, `text-muted`, `ring-ring`.
+- **Do not** hardcode hex/rgb/hsl in TSX/CSS modules (no `#ffffff`, `#0b1f3a`, etc.).
+- Need a new color? Add it to `globals.css` first (`:root` + `@theme`), then use the token name.
+- Opacity variants are fine: `bg-navy/90`, `text-white/75` (semantic aliases already in theme preferred over raw palette).
+
 ## Images & performance
 
 - Always `next/image` with explicit `sizes`, aspect-ratio wrappers, `priority` on above-the-fold hero.
@@ -60,8 +68,9 @@ Feature-based: domain logic stays under `features/[name]/`; pages stay thin.
 
 1. **Component first** — reuse `src/components/ui` before new DOM/primitives.
 2. **Types** — no inline API response types; put schemas in `types/` or `features/[feature]/types`.
-3. **a11y** — `focus-visible:ring-2`, correct ARIA, brand-safe contrast.
-4. **Scope** — only touch `/frontend` unless explicitly asked otherwise.
+3. **Colors** — tokens from `globals.css` only; no manual hex in components.
+4. **a11y** — `focus-visible:ring-2`, correct ARIA, brand-safe contrast.
+5. **Scope** — only touch `/frontend` unless explicitly asked otherwise.
 
 ## After every implementation
 
