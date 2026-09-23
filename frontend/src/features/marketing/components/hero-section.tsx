@@ -16,14 +16,14 @@ export function HeroSection() {
         className="object-cover object-[68%_center] sm:object-[72%_center] lg:object-right"
       />
 
-      {/* Readable scrim — stronger on the left / mobile, lighter over subjects */}
+      {/* Warm scrim — keeps photo readable without a blue cast over the glass card */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-r from-navy/85 via-navy/55 to-navy/25 md:from-navy/80 md:via-navy/45 md:to-transparent"
+        className="absolute inset-0 bg-gradient-to-r from-scrim/80 via-scrim/45 to-scrim/10 md:from-scrim/75 md:via-scrim/35 md:to-transparent"
       />
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-t from-navy/70 via-transparent to-navy/40 md:from-navy/50 md:to-navy/30"
+        className="absolute inset-0 bg-gradient-to-t from-scrim/65 via-transparent to-scrim/35 md:from-scrim/45 md:to-scrim/25"
       />
 
       <div className="relative z-10 flex min-h-[100svh] flex-col">

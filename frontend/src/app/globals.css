@@ -15,9 +15,15 @@
   --border: #d7e0ea;
   --ring: #2563eb;
   --danger: #dc2626;
-  --glass: #2a241f73;
+  /* Warm glass / gold (hero waitlist card) */
+  --glass: #2c241c99;
   --glass-deep: #0a0a0af2;
-  --glass-line: #ffffff33;
+  --glass-fill: #1a151280;
+  --gold: #d4a574;
+  --gold-bright: #e8c89a;
+  --gold-deep: #9a7043;
+  --gold-glow: #d4a57466;
+  --scrim: #1a1410;
   --on-media: #ffffff;
   --on-media-muted: #ffffffcc;
 }
@@ -39,7 +45,12 @@
   --color-danger: var(--danger);
   --color-glass: var(--glass);
   --color-glass-deep: var(--glass-deep);
-  --color-glass-line: var(--glass-line);
+  --color-glass-fill: var(--glass-fill);
+  --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
+  --color-gold-deep: var(--gold-deep);
+  --color-gold-glow: var(--gold-glow);
+  --color-scrim: var(--scrim);
   --color-on-media: var(--on-media);
   --color-on-media-muted: var(--on-media-muted);
   --font-sans: var(--font-plus-jakarta);

@@ -41,97 +41,116 @@ export function HeroWaitlistCard() {
   });
 
   return (
+    /* Outer shell: gold gradient border/glow (Figma warm glass edge) */
     <div
       className={cn(
-        "w-full max-w-[40rem] rounded-[2rem] border border-on-media/10",
-        "bg-glass p-6 shadow-2xl backdrop-blur-2xl",
-        "sm:p-8 md:rounded-[2.25rem]",
+        "w-full max-w-[40rem] rounded-[2rem] p-px shadow-2xl md:rounded-[2.25rem]",
+        "bg-gradient-to-br from-gold-bright/50 via-gold/20 to-gold-deep",
       )}
     >
-      <form
-        className="flex flex-col gap-5 sm:gap-6"
-        onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
-        noValidate
+      <div
+        className={cn(
+          "relative overflow-hidden rounded-[calc(2rem-1px)] p-6 sm:p-8 md:rounded-[calc(2.25rem-1px)]",
+          "bg-glass-fill backdrop-blur-2xl",
+        )}
       >
-        {/* Role toggle — left-aligned black pill, green active segment */}
+        {/* Warm gold wash along bottom / left — matches bronze glow in design */}
         <div
-          role="tablist"
-          aria-label="Waitlist role"
-          className="inline-flex w-fit max-w-full items-center rounded-full bg-glass-deep p-1"
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-gold-glow via-transparent to-transparent"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-gold/25 via-gold/5 to-transparent"
+        />
+
+        <form
+          className="relative z-10 flex flex-col gap-5 sm:gap-6"
+          onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+          noValidate
         >
-          {roleOptions.map((option) => {
-            const isActive = selectedRole === option.value;
-            return (
-              <button
-                key={option.value}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                className={cn(
-                  "rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors sm:px-5 sm:py-2.5",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-navy",
-                  isActive
-                    ? "bg-emerald text-navy shadow-sm"
-                    : "bg-transparent text-on-media",
-                )}
-                onClick={() =>
-                  form.setValue("role", option.value, { shouldDirty: true })
-                }
-              >
-                {option.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Email + CTA — single white capsule at all breakpoints */}
-        <div className="flex min-h-14 items-center gap-2 rounded-full bg-on-media p-1.5 pl-4 sm:pl-5">
-          <Input
-            type="email"
-            autoComplete="email"
-            placeholder="Enter your email address..."
-            aria-invalid={Boolean(form.formState.errors.email)}
-            className={cn(
-              "h-11 min-w-0 flex-1 border-0 bg-transparent px-0 text-sm text-navy shadow-none sm:text-base",
-              "placeholder:text-muted",
-              "focus-visible:ring-0 focus-visible:ring-offset-0",
-            )}
-            {...form.register("email")}
-          />
-          <Button
-            type="submit"
-            disabled={mutation.isPending}
-            className="h-11 shrink-0 rounded-full px-4 text-sm sm:px-6 sm:text-base"
+          <div
+            role="tablist"
+            aria-label="Waitlist role"
+            className="inline-flex w-fit max-w-full items-center rounded-full bg-glass-deep p-1"
           >
-            {mutation.isPending ? "Joining..." : "Join Waitlist"}
-          </Button>
-        </div>
+            {roleOptions.map((option) => {
+              const isActive = selectedRole === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  className={cn(
+                    "rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors sm:px-5 sm:py-2.5",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-navy",
+                    isActive
+                      ? "bg-emerald text-navy shadow-sm"
+                      : "bg-transparent text-on-media",
+                  )}
+                  onClick={() =>
+                    form.setValue("role", option.value, { shouldDirty: true })
+                  }
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
 
-        {form.formState.errors.email ? (
-          <p className="text-xs text-danger" role="alert">
-            {form.formState.errors.email.message}
-          </p>
-        ) : null}
+          <div className="flex min-h-14 items-center gap-2 rounded-full bg-on-media p-1.5 pl-4 sm:pl-5">
+            <Input
+              type="email"
+              autoComplete="email"
+              placeholder="Enter your email address..."
+              aria-invalid={Boolean(form.formState.errors.email)}
+              className={cn(
+                "h-11 min-w-0 flex-1 border-0 bg-transparent px-0 text-sm text-navy shadow-none sm:text-base",
+                "placeholder:text-muted",
+                "focus-visible:ring-0 focus-visible:ring-offset-0",
+              )}
+              {...form.register("email")}
+            />
+            <Button
+              type="submit"
+              disabled={mutation.isPending}
+              className="h-11 shrink-0 rounded-full px-4 text-sm sm:px-6 sm:text-base"
+            >
+              {mutation.isPending ? "Joining..." : "Join Waitlist"}
+            </Button>
+          </div>
 
-        {mutation.isError ? (
-          <p className="text-xs text-danger" role="alert">
-            Something went wrong. Please try again.
-          </p>
-        ) : null}
+          {form.formState.errors.email ? (
+            <p className="text-xs text-danger" role="alert">
+              {form.formState.errors.email.message}
+            </p>
+          ) : null}
 
-        {mutation.isSuccess ? (
-          <p className="text-xs font-medium text-emerald" role="status">
-            You&apos;re on the waitlist — we&apos;ll be in touch.
-          </p>
-        ) : null}
+          {mutation.isError ? (
+            <p className="text-xs text-danger" role="alert">
+              Something went wrong. Please try again.
+            </p>
+          ) : null}
 
-        {/* Divider + left-aligned Nigeria line */}
-        <div className="border-t border-glass-line pt-4 sm:pt-5">
-          <p className="text-left text-sm text-on-media">
-            Designed for safer elderly care in Nigeria
-          </p>
-        </div>
-      </form>
+          {mutation.isSuccess ? (
+            <p className="text-xs font-medium text-emerald" role="status">
+              You&apos;re on the waitlist — we&apos;ll be in touch.
+            </p>
+          ) : null}
+
+          {/* Gold gradient divider (Figma) */}
+          <div className="pt-1">
+            <div
+              aria-hidden
+              className="h-px w-full bg-gradient-to-r from-transparent via-gold-bright to-gold-deep/80"
+            />
+            <p className="pt-4 text-left text-sm text-on-media sm:pt-5">
+              Designed for safer elderly care in Nigeria
+            </p>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
