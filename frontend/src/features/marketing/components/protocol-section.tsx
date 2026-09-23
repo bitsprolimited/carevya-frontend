@@ -187,11 +187,11 @@ export function ProtocolSection() {
       className="bg-background px-4 pb-14 pt-10 md:px-6 md:pb-20 md:pt-16 lg:px-8"
     >
       <div className="mx-auto w-full max-w-6xl">
-        <div className="mx-auto max-w-2xl text-center">
+        <div className="mx-auto max-w-2xl text-center lg:max-w-none">
           <p className="text-xs font-bold tracking-[0.16em] text-brand-blue uppercase">
             The CareVYA Protocol
           </p>
-          <h2 className="mt-3 text-2xl font-bold tracking-tight text-navy md:text-3xl lg:text-[2.15rem]">
+          <h2 className="mt-3 text-2xl font-bold tracking-tight text-navy md:text-3xl lg:whitespace-nowrap lg:text-[2.15rem]">
             Find, verify and connect with care you can trust.
           </h2>
         </div>

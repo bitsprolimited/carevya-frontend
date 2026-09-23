@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Protocol headline one line on web
+
+- Protocol title stays on a single line from `lg` up (`whitespace-nowrap` + wider container).
+
 ### 2026-09-23 — Header Join Waitlist to viewport right
 
 - Desktop Join Waitlist (arrow) pinned to the header’s right edge (`absolute`); Families pill stays centered.
