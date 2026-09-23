@@ -68,7 +68,7 @@ export function WaitlistForm() {
       <Button
         type="submit"
         disabled={mutation.isPending}
-        className="w-full sm:w-auto"
+        className="w-full rounded-full sm:w-auto"
       >
         {mutation.isPending ? "Joining..." : "Join Waitlist"}
       </Button>

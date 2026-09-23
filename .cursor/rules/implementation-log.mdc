@@ -9,6 +9,14 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Hero section (web + mobile)
+
+- Full-bleed hero with Cloudinary background + logo; transparent `SiteHeader` (Families/Carers pill, Join Waitlist, mobile hamburger).
+- Glass waitlist card: Care Seeker / Caregivers toggle, email + Join Waitlist, Nigeria line; trust badges (Care verified / Family first).
+- Tokens added: `glass`, `glass-deep`, `on-media`, `on-media-muted` in `globals.css`. Assets in `lib/assets.ts`.
+- Paths: `features/marketing/components/hero-section.tsx`, `features/waitlist/components/hero-waitlist-card.tsx`, `components/shared/header.tsx`, marketing page/layout.
+- **Next:** Remaining landing sections (protocol, communities, final CTA) per Figma; refine logo if Cloudinary asset has black matte.
+
 ### 2026-09-23 — Color token rule added
 
 - Updated `frontend-architecture.mdc`: colors must come from `frontend/src/app/globals.css` token names (`navy`, `navy-muted`, `brand-blue`, etc.); no hardcoded hex in components. New colors → add to `globals.css` first.

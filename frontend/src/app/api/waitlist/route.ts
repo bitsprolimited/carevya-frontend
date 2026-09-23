@@ -11,7 +11,10 @@ export async function POST(request: Request) {
     json = await request.json();
   } catch {
     return NextResponse.json(
-      { success: false, message: "Invalid JSON body" } satisfies WaitlistJoinResponse,
+      {
+        success: false,
+        message: "Invalid JSON body",
+      } satisfies WaitlistJoinResponse,
       { status: 400 },
     );
   }

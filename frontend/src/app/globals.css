@@ -15,6 +15,10 @@
   --border: #d7e0ea;
   --ring: #2563eb;
   --danger: #dc2626;
+  --glass: #0b1f3acc;
+  --glass-deep: #0b1f3ae6;
+  --on-media: #ffffff;
+  --on-media-muted: #ffffffcc;
 }
 
 @theme inline {
@@ -32,6 +36,10 @@
   --color-border: var(--border);
   --color-ring: var(--ring);
   --color-danger: var(--danger);
+  --color-glass: var(--glass);
+  --color-glass-deep: var(--glass-deep);
+  --color-on-media: var(--on-media);
+  --color-on-media-muted: var(--on-media-muted);
   --font-sans: var(--font-plus-jakarta);
 }
 
