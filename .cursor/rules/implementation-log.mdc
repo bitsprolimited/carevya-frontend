@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Revert header CTA regroup
+
+- Restored centered Families/Carers pill + separate right Join Waitlist (undid right-cluster layout).
+
 ### 2026-09-23 — Header Join Waitlist further right
 
 - Grouped Families/Carers pill with Join Waitlist on the right so the CTA sits flush at the header’s right edge (Figma).

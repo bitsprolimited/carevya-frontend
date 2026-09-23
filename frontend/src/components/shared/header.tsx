@@ -75,38 +75,38 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
           </span>
         </Link>
 
-        <div className="flex items-center gap-3 sm:gap-4 lg:gap-5">
-          <div
-            role="tablist"
-            aria-label="Audience"
-            className="hidden rounded-full bg-on-media p-1 shadow-sm md:inline-flex"
-          >
-            {audienceTabs.map((tab) => {
-              const isActive = audience === tab.id;
-              return (
-                <Link
-                  key={tab.id}
-                  href={tab.href}
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => setAudience(tab.id)}
-                  className={cn(
-                    "rounded-full px-5 py-2 text-sm transition-colors",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                    isActive
-                      ? "font-bold text-navy"
-                      : "font-medium text-navy/50 hover:text-navy",
-                  )}
-                >
-                  {tab.label}
-                </Link>
-              );
-            })}
-          </div>
+        <div
+          role="tablist"
+          aria-label="Audience"
+          className="hidden rounded-full bg-on-media p-1 shadow-sm md:inline-flex"
+        >
+          {audienceTabs.map((tab) => {
+            const isActive = audience === tab.id;
+            return (
+              <Link
+                key={tab.id}
+                href={tab.href}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setAudience(tab.id)}
+                className={cn(
+                  "rounded-full px-5 py-2 text-sm transition-colors",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  isActive
+                    ? "font-bold text-navy"
+                    : "font-medium text-navy/50 hover:text-navy",
+                )}
+              >
+                {tab.label}
+              </Link>
+            );
+          })}
+        </div>
 
+        <div className="flex items-center gap-2">
           <Button
             type="button"
-            className="hidden h-10 shrink-0 rounded-full px-5 md:inline-flex"
+            className="hidden h-10 rounded-full px-5 md:inline-flex"
             onClick={scrollToWaitlist}
           >
             Join Waitlist
