@@ -206,15 +206,18 @@ export function Footer() {
           </ul>
         </div>
 
-        <div className="mt-10 flex flex-col gap-6 border-t border-white/10 pt-8 lg:mt-12 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
-          <div className="space-y-1 text-xs leading-relaxed text-white/55 sm:text-sm">
-            <p>© 2026 CareVYA Health Inc. All rights reserved.</p>
-            <p>Compassionate eldercare infrastructure.</p>
-          </div>
+        <div className="mt-10 flex flex-col gap-6 border-t border-white/10 pt-8 lg:mt-12 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+          <p className="text-xs leading-relaxed text-white/55 sm:text-sm lg:whitespace-nowrap">
+            © 2026 CareVYA Health Inc. All rights reserved.
+            <span className="mt-1 block lg:mt-0 lg:inline">
+              {" "}
+              Compassionate eldercare infrastructure.
+            </span>
+          </p>
 
           <nav
             aria-label="Legal"
-            className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/75"
+            className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/75 lg:shrink-0"
           >
             {legalLinks.map((link) => (
               <Link
