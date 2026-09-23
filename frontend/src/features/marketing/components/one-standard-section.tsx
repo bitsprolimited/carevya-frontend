@@ -79,6 +79,7 @@ const communities: readonly CommunityBlock[] = [
     theme: "green",
     fadeSide: "left",
     Icon: Handshake,
+    footerIconSrc: assets.communityFamilyWaitlistIcon,
     labelDesktop: "FOR PROFESSIONAL CAREGIVERS",
     labelMobile: "FOR PROFESSIONAL CARERS",
     title: "Dignity & Fair compensation",
