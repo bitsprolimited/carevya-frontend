@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Connect callout padlock icon
+
+- Replaced Lucide Lock on Connect callout with Cloudinary `padlock_ebijfk`.
+
 ### 2026-09-23 — Connect protocol Cloudinary icon
 
 - Replaced Lucide MessageCircle on “Connect with Peace” with Cloudinary `Contain_wpjjci` asset.

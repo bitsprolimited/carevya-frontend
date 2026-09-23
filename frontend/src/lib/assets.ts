@@ -12,4 +12,6 @@ export const assets = {
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1790174570/grannies_r9igmb.png",
   protocolConnectIcon:
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1790178868/Contain_wpjjci.png",
+  protocolConnectCalloutIcon:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1790179173/padlock_ebijfk.png",
 } as const;

@@ -1,7 +1,6 @@
 import {
   BadgeCheck,
   IdCard,
-  Lock,
   QrCode,
   SlidersHorizontal,
   type LucideIcon,
@@ -22,7 +21,8 @@ type ProtocolStep = {
   theme: ProtocolTheme;
   Icon?: LucideIcon;
   iconSrc?: string;
-  CalloutIcon: LucideIcon;
+  CalloutIcon?: LucideIcon;
+  calloutIconSrc?: string;
   seal?: boolean;
 };
 
@@ -59,7 +59,7 @@ const protocolSteps: readonly ProtocolStep[] = [
     callout: "Funds released only after family approval",
     theme: "green",
     iconSrc: assets.protocolConnectIcon,
-    CalloutIcon: Lock,
+    calloutIconSrc: assets.protocolConnectCalloutIcon,
   },
 ] as const;
 
@@ -102,7 +102,7 @@ const themeStyles: Record<
 
 function ProtocolCard({ step }: { step: ProtocolStep }) {
   const styles = themeStyles[step.theme];
-  const { Icon, CalloutIcon, iconSrc } = step;
+  const { Icon, CalloutIcon, iconSrc, calloutIconSrc } = step;
 
   return (
     <article
@@ -173,11 +173,21 @@ function ProtocolCard({ step }: { step: ProtocolStep }) {
       >
         <span
           className={cn(
-            "flex size-8 shrink-0 items-center justify-center rounded-lg",
+            "relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg",
             styles.calloutIcon,
           )}
         >
-          <CalloutIcon aria-hidden className="size-3.5" />
+          {calloutIconSrc ? (
+            <Image
+              src={calloutIconSrc}
+              alt=""
+              width={14}
+              height={14}
+              className="size-3.5 object-contain"
+            />
+          ) : CalloutIcon ? (
+            <CalloutIcon aria-hidden className="size-3.5" />
+          ) : null}
         </span>
         <p className={cn("text-sm font-medium leading-snug", styles.calloutText)}>
           {step.callout}
