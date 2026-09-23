@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Caregivers waitlist footer icon
+
+- Caregivers waitlist bar uses the same Cloudinary `arcticons_family-care` icon as Families.
+
 ### 2026-09-23 — Families waitlist footer icon
 
 - Replaced Lucide Users in Families waitlist bar with Cloudinary `arcticons_family-care`.
