@@ -45,7 +45,7 @@ export function HeroWaitlistCard() {
   return (
     <div
       className={cn(
-        "relative w-full max-w-[40rem] overflow-hidden rounded-[1.75rem] p-5 shadow-2xl sm:rounded-[2rem] sm:p-6 md:rounded-[2.25rem] md:p-8",
+        "relative w-full max-w-[40rem] overflow-hidden rounded-[1.75rem] p-5 shadow-2xl sm:rounded-[2rem] sm:p-6 md:max-w-none md:rounded-[2.25rem] md:p-8",
         "border border-on-media/30",
         /* Mobile: frosts into white section below; desktop: warm liquid glass */
         "bg-gradient-to-b from-on-media/20 via-on-media/35 to-on-media/85",

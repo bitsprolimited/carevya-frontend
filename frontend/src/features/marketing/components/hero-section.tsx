@@ -45,7 +45,7 @@ export function HeroSection() {
             {/* Desktop waitlist sits in-hero */}
             <div
               id="hero-waitlist"
-              className="mt-8 hidden w-full max-w-xl scroll-mt-24 md:mt-0 md:block"
+              className="mt-8 hidden w-full max-w-xl scroll-mt-24 md:mt-0 md:block md:max-w-2xl lg:max-w-3xl xl:max-w-4xl"
             >
               <HeroWaitlistCard />
             </div>
@@ -62,7 +62,7 @@ export function HeroSection() {
               <li className="inline-flex items-center gap-2">
                 <Heart
                   aria-hidden
-                  className="size-5 shrink-0 fill-emerald text-emerald"
+                  className="size-5 shrink-0 text-emerald"
                 />
                 Family, first.
               </li>
