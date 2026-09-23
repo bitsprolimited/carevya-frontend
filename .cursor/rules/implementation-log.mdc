@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Hero brighter overlays
+
+- Lightened hero scrim gradients so the Cloudinary photo reads brighter while keeping left-side text readable.
+
 ### 2026-09-23 — Footer copyright one line on web
 
 - Copyright + tagline stay on a single line from `lg` up (`whitespace-nowrap`); stacked on mobile.

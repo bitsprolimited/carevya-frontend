@@ -20,11 +20,11 @@ export function HeroSection() {
 
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-b from-scrim/55 via-scrim/40 to-scrim/75 md:bg-gradient-to-r md:from-scrim/75 md:via-scrim/35 md:to-transparent"
+          className="absolute inset-0 bg-gradient-to-b from-scrim/25 via-scrim/10 to-scrim/35 md:bg-gradient-to-r md:from-scrim/45 md:via-scrim/15 md:to-transparent"
         />
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-scrim/50 via-transparent to-scrim/30 md:from-scrim/45 md:to-scrim/25"
+          className="absolute inset-0 bg-gradient-to-t from-scrim/20 via-transparent to-scrim/15 md:from-scrim/20 md:to-scrim/10"
         />
 
         <div className="relative z-10 flex min-h-[72svh] flex-col md:min-h-[100svh]">
