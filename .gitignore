@@ -7,3 +7,8 @@ dist/
 !.env.example
 *.log
 .DS_Store
+
+# Cursor / agent local docs
+.cursor/rules/
+AGENTS.md
+CLAUDE.md
