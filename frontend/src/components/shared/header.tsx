@@ -18,9 +18,10 @@ type SiteHeaderProps = {
 };
 
 function scrollToWaitlist() {
-  document
-    .getElementById("hero-waitlist")
-    ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  const target =
+    document.getElementById("hero-waitlist-mobile") ??
+    document.getElementById("hero-waitlist");
+  target?.scrollIntoView({ behavior: "smooth", block: "center" });
 }
 
 export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {

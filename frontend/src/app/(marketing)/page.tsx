@@ -1,11 +1,13 @@
 import { FaqAccordion } from "@/features/faqs/components/faq-accordion";
 import { HeroSection } from "@/features/marketing/components/hero-section";
+import { ProtocolSection } from "@/features/marketing/components/protocol-section";
 import { VerificationGrid } from "@/features/verification/components/verification-grid";
 
 export default function MarketingHomePage() {
   return (
     <div className="flex flex-col">
       <HeroSection />
+      <ProtocolSection />
 
       <section
         id="verify"

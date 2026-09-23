@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm, type Resolver } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { joinWaitlist } from "@/features/waitlist/services/waitlist-service";
 import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import {
@@ -21,6 +22,7 @@ const roleOptions: { value: WaitlistRole; label: string }[] = [
 
 export function HeroWaitlistCard() {
   const increment = useWaitlistStore((state) => state.increment);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const form = useForm<HeroWaitlistInput>({
     resolver: zodResolver(heroWaitlistSchema) as Resolver<HeroWaitlistInput>,
@@ -43,34 +45,33 @@ export function HeroWaitlistCard() {
   return (
     <div
       className={cn(
-        "relative w-full max-w-[40rem] overflow-hidden rounded-[2rem] p-6 shadow-2xl sm:p-8 md:rounded-[2.25rem]",
-        /* Liquid frosted glass — photo shows through */
-        "border border-on-media/25",
-        "bg-gradient-to-b from-glass-liquid-top via-glass-liquid-mid to-glass-liquid-bottom",
+        "relative w-full max-w-[40rem] overflow-hidden rounded-[1.75rem] p-5 shadow-2xl sm:rounded-[2rem] sm:p-6 md:rounded-[2.25rem] md:p-8",
+        "border border-on-media/30",
+        /* Mobile: frosts into white section below; desktop: warm liquid glass */
+        "bg-gradient-to-b from-on-media/20 via-on-media/35 to-on-media/85",
         "backdrop-blur-2xl backdrop-saturate-150",
-        "supports-[backdrop-filter]:bg-glass-fill",
+        "md:border-on-media/25 md:from-glass-liquid-top md:via-glass-liquid-mid md:to-glass-liquid-bottom",
+        "md:supports-[backdrop-filter]:bg-glass-fill",
       )}
     >
-      {/* Soft top-left light rim (glass highlight) */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-br from-on-media/20 via-transparent to-transparent"
+        className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-br from-on-media/30 via-transparent to-transparent"
       />
-      {/* Subtle bronze depth toward bottom-right */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-tl from-gold-deep/20 via-transparent to-transparent"
+        className="pointer-events-none absolute inset-0 hidden rounded-[inherit] bg-gradient-to-tl from-gold-deep/20 via-transparent to-transparent md:block"
       />
 
       <form
-        className="relative z-10 flex flex-col gap-5 sm:gap-6"
+        className="relative z-10 flex flex-col gap-4 sm:gap-5 md:gap-6"
         onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
         noValidate
       >
         <div
           role="tablist"
           aria-label="Waitlist role"
-          className="inline-flex w-fit max-w-full items-center rounded-full bg-glass-deep p-1"
+          className="inline-flex w-full items-center rounded-full bg-glass-deep p-1 md:w-fit"
         >
           {roleOptions.map((option) => {
             const isActive = selectedRole === option.value;
@@ -81,7 +82,7 @@ export function HeroWaitlistCard() {
                 role="tab"
                 aria-selected={isActive}
                 className={cn(
-                  "rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors sm:px-5 sm:py-2.5",
+                  "flex-1 rounded-full px-3 py-2.5 text-sm font-semibold whitespace-nowrap transition-colors md:flex-none md:px-5",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-navy",
                   isActive
                     ? "bg-emerald text-navy shadow-sm"
@@ -97,14 +98,16 @@ export function HeroWaitlistCard() {
           })}
         </div>
 
-        <div className="flex min-h-14 items-center gap-2 rounded-full bg-on-media p-1.5 pl-4 sm:pl-5">
+        <div className="flex min-h-12 items-center gap-1.5 rounded-full bg-on-media p-1 pl-3.5 sm:min-h-14 sm:gap-2 sm:p-1.5 sm:pl-5">
           <Input
             type="email"
             autoComplete="email"
-            placeholder="Enter your email address..."
+            placeholder={
+              isDesktop ? "Enter your email address..." : "Enter mail"
+            }
             aria-invalid={Boolean(form.formState.errors.email)}
             className={cn(
-              "h-11 min-w-0 flex-1 border-0 bg-transparent px-0 text-sm text-navy shadow-none sm:text-base",
+              "h-10 min-w-0 flex-1 border-0 bg-transparent px-0 text-sm text-navy shadow-none sm:h-11 sm:text-base",
               "placeholder:text-muted",
               "focus-visible:ring-0 focus-visible:ring-offset-0",
             )}
@@ -113,7 +116,7 @@ export function HeroWaitlistCard() {
           <Button
             type="submit"
             disabled={mutation.isPending}
-            className="h-11 shrink-0 rounded-full px-4 text-sm sm:px-6 sm:text-base"
+            className="h-10 shrink-0 rounded-full px-3 text-xs sm:h-11 sm:px-5 sm:text-sm md:px-6 md:text-base"
           >
             {mutation.isPending ? "Joining..." : "Join Waitlist"}
           </Button>
@@ -137,15 +140,9 @@ export function HeroWaitlistCard() {
           </p>
         ) : null}
 
-        <div className="pt-1">
-          <div
-            aria-hidden
-            className="h-px w-full bg-gradient-to-r from-on-media/5 via-on-media/35 to-on-media/5"
-          />
-          <p className="pt-4 text-left text-sm text-on-media sm:pt-5">
-            Designed for safer elderly care in Nigeria
-          </p>
-        </div>
+        <p className="text-center text-xs font-medium text-navy md:text-left md:text-sm md:font-normal md:text-on-media">
+          Designed for safer elderly care in Nigeria
+        </p>
       </form>
     </div>
   );
