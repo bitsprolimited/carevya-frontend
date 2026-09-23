@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import {
   createContext,
   useContext,
@@ -62,9 +62,7 @@ export function Accordion({
 
   return (
     <AccordionContext.Provider value={{ openItemId, setOpenItemId }}>
-      <div className={cn("divide-y divide-border rounded-xl border border-border", className)}>
-        {children}
-      </div>
+      <div className={cn("flex flex-col gap-3", className)}>{children}</div>
     </AccordionContext.Provider>
   );
 }
@@ -86,7 +84,14 @@ export function AccordionItem({ id, children, className }: AccordionItemProps) {
     <AccordionItemContext.Provider
       value={{ id, triggerId, panelId, isOpen }}
     >
-      <div className={cn("bg-white", className)}>{children}</div>
+      <div
+        className={cn(
+          "overflow-hidden rounded-xl bg-surface-lavender",
+          className,
+        )}
+      >
+        {children}
+      </div>
     </AccordionItemContext.Provider>
   );
 }
@@ -107,7 +112,7 @@ export function AccordionTrigger({
         aria-expanded={isOpen}
         aria-controls={panelId}
         className={cn(
-          "flex w-full items-center justify-between gap-4 px-4 py-4 text-left text-sm font-semibold text-navy",
+          "flex w-full items-center justify-between gap-4 px-5 py-4 text-left text-sm font-medium text-navy sm:px-6 sm:py-5 sm:text-base",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
           className,
         )}
@@ -115,11 +120,11 @@ export function AccordionTrigger({
         {...props}
       >
         <span>{children}</span>
-        <ChevronDown
+        <ChevronRight
           aria-hidden
           className={cn(
-            "size-4 shrink-0 text-muted transition-transform",
-            isOpen && "rotate-180",
+            "size-4 shrink-0 text-navy transition-transform duration-200 sm:size-5",
+            isOpen && "rotate-90",
           )}
         />
       </button>
@@ -147,7 +152,13 @@ export function AccordionContent({
           transition={{ duration: 0.2, ease: "easeInOut" }}
           className="overflow-hidden"
         >
-          <div className={cn("px-4 pb-4 text-sm text-muted", className)} {...props}>
+          <div
+            className={cn(
+              "px-5 pb-5 text-sm leading-relaxed text-muted sm:px-6 sm:pb-6",
+              className,
+            )}
+            {...props}
+          >
             {children}
           </div>
         </motion.div>

@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — FAQ section Figma match
+
+- Restyled FAQs: centered title; pale lavender rounded rows with right chevron; updated 5 questions from Figma; Accordion defaults to collapsed cards with gap (no bordered stack).
+
 ### 2026-09-23 — Verification section Figma update
 
 - Rebuilt verify strip under One Standard: centered headline with emerald “We verify.”, new subtitle, 5 icon columns (Identity / Background / Experience / Family Feedback / CareVYA Verified) without card chrome.

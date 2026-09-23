@@ -10,7 +10,7 @@ import { FAQ_ITEMS } from "@/features/faqs/services/faq-data";
 
 export function FaqAccordion() {
   return (
-    <Accordion defaultValue={FAQ_ITEMS[0]?.id ?? null}>
+    <Accordion defaultValue={null}>
       {FAQ_ITEMS.map((item) => (
         <AccordionItem key={item.id} id={item.id}>
           <AccordionTrigger>{item.question}</AccordionTrigger>
