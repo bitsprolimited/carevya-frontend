@@ -2,11 +2,12 @@ import {
   BadgeCheck,
   IdCard,
   Lock,
-  MessageCircle,
   QrCode,
   SlidersHorizontal,
   type LucideIcon,
 } from "lucide-react";
+import Image from "next/image";
+import { assets } from "@/lib/assets";
 import { cn } from "@/lib/utils";
 
 type ProtocolTheme = "blue" | "gold" | "green";
@@ -19,7 +20,8 @@ type ProtocolStep = {
   body: string;
   callout: string;
   theme: ProtocolTheme;
-  Icon: LucideIcon;
+  Icon?: LucideIcon;
+  iconSrc?: string;
   CalloutIcon: LucideIcon;
   seal?: boolean;
 };
@@ -56,7 +58,7 @@ const protocolSteps: readonly ProtocolStep[] = [
     body: "Schedule discovery calls and stay updated through daily care logs. No surprises.",
     callout: "Funds released only after family approval",
     theme: "green",
-    Icon: MessageCircle,
+    iconSrc: assets.protocolConnectIcon,
     CalloutIcon: Lock,
   },
 ] as const;
@@ -100,7 +102,7 @@ const themeStyles: Record<
 
 function ProtocolCard({ step }: { step: ProtocolStep }) {
   const styles = themeStyles[step.theme];
-  const { Icon, CalloutIcon } = step;
+  const { Icon, CalloutIcon, iconSrc } = step;
 
   return (
     <article
@@ -125,7 +127,7 @@ function ProtocolCard({ step }: { step: ProtocolStep }) {
           {step.index} • {step.label}
         </p>
 
-        {step.seal ? (
+        {step.seal && Icon ? (
           <span
             className={cn(
               "relative inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-seal px-3 py-1.5 text-xs font-semibold text-gold-deep shadow-sm sm:px-3.5 sm:py-2 sm:text-sm",
@@ -137,11 +139,21 @@ function ProtocolCard({ step }: { step: ProtocolStep }) {
         ) : (
           <span
             className={cn(
-              "flex size-9 shrink-0 items-center justify-center rounded-lg",
+              "relative flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg",
               styles.iconWrap,
             )}
           >
-            <Icon aria-hidden className="size-4" />
+            {iconSrc ? (
+              <Image
+                src={iconSrc}
+                alt=""
+                width={16}
+                height={16}
+                className="size-4 object-contain"
+              />
+            ) : Icon ? (
+              <Icon aria-hidden className="size-4" />
+            ) : null}
           </span>
         )}
       </div>

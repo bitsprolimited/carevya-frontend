@@ -10,4 +10,6 @@ export const assets = {
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1790163936/grandma_daughter_zcamyc.png",
   waitlistCtaBackground:
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1790174570/grannies_r9igmb.png",
+  protocolConnectIcon:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1790178868/Contain_wpjjci.png",
 } as const;
