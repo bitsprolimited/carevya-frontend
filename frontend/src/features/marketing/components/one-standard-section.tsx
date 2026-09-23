@@ -28,6 +28,7 @@ type CommunityBlock = {
   fadeSide: "left" | "right";
   Icon?: LucideIcon;
   iconSrc?: string;
+  footerIconSrc?: string;
   labelDesktop: string;
   labelMobile: string;
   title: string;
@@ -45,6 +46,7 @@ const communities: readonly CommunityBlock[] = [
     theme: "blue",
     fadeSide: "right",
     iconSrc: assets.communityFamilyIcon,
+    footerIconSrc: assets.communityFamilyWaitlistIcon,
     labelDesktop: "FOR FAMILIES & CARESEEKERS",
     labelMobile: "FOR FAMILIES & RELATIVES",
     title: "Compassion you can lean on",
@@ -141,7 +143,7 @@ function renderDescription(
 
 function CommunityCard({ block }: { block: CommunityBlock }) {
   const theme = themeMap[block.theme];
-  const { Icon, iconSrc } = block;
+  const { Icon, iconSrc, footerIconSrc } = block;
   const cardRef = useRef<HTMLElement>(null);
   const anchorRef = useRef<HTMLSpanElement>(null);
   const iconRef = useRef<HTMLSpanElement>(null);
@@ -298,11 +300,21 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
       >
         <span
           className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-full shadow-sm",
+            "relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full shadow-sm",
             theme.footerIcon,
           )}
         >
-          <Users aria-hidden className="size-4.5" />
+          {footerIconSrc ? (
+            <Image
+              src={footerIconSrc}
+              alt=""
+              width={18}
+              height={18}
+              className="size-[1.125rem] object-contain"
+            />
+          ) : (
+            <Users aria-hidden className="size-4.5" />
+          )}
         </span>
         <p className="text-sm font-bold text-navy sm:text-[0.95rem]">
           <span className="lg:hidden">{block.waitlistMobile}</span>

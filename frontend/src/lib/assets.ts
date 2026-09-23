@@ -18,4 +18,6 @@ export const assets = {
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1790179734/verification_sfwvtb.png",
   communityFamilyIcon:
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1790180127/family_vrdxjj.png",
+  communityFamilyWaitlistIcon:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1790180264/arcticons_family-care_eime7m.png",
 } as const;
