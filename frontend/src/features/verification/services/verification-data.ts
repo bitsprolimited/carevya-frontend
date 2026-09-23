@@ -4,26 +4,26 @@ export const VERIFICATION_ITEMS: readonly VerificationItem[] = [
   {
     id: "identity",
     title: "Identity Check",
-    description: "Government ID and biometric confirmation for every provider.",
+    description: "Government ID verified",
   },
   {
     id: "background",
     title: "Background Check",
-    description: "Multi-layer screening before caregivers reach families.",
+    description: "Criminal record check",
   },
   {
     id: "experience",
-    title: "Experience & Skills",
-    description: "Verified training, specialties, and care competencies.",
+    title: "Experience Review",
+    description: "References verified",
   },
   {
     id: "family_feedback",
     title: "Family Feedback",
-    description: "Ongoing ratings from families who have used their care.",
+    description: "Real family reviews",
   },
   {
-    id: "periodic_review",
-    title: "Periodic Reviews",
-    description: "Continuous monitoring to keep standards high over time.",
+    id: "carevya_verified",
+    title: "CareVYA Verified",
+    description: "Trusted. Checked. Ready.",
   },
 ] as const;

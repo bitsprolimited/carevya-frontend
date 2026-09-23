@@ -1,37 +1,38 @@
 import {
+  Award,
   BadgeCheck,
-  ClipboardCheck,
+  Heart,
   IdCard,
-  MessagesSquare,
   ShieldCheck,
+  type LucideIcon,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import { VERIFICATION_ITEMS } from "@/features/verification/services/verification-data";
 import type { VerificationLayer } from "@/features/verification/types";
 
 const icons: Record<VerificationLayer, LucideIcon> = {
   identity: IdCard,
   background: ShieldCheck,
-  experience: ClipboardCheck,
-  family_feedback: MessagesSquare,
-  periodic_review: BadgeCheck,
+  experience: Award,
+  family_feedback: Heart,
+  carevya_verified: BadgeCheck,
 };
 
 export function VerificationGrid() {
   return (
-    <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+    <ul className="mx-auto grid w-full max-w-5xl grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-6 lg:gap-y-0">
       {VERIFICATION_ITEMS.map((item) => {
         const Icon = icons[item.id];
         return (
-          <li
-            key={item.id}
-            className="rounded-2xl border border-border bg-white p-4 text-center shadow-sm"
-          >
-            <span className="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-emerald/10 text-emerald-dark">
-              <Icon aria-hidden className="size-5" />
+          <li key={item.id} className="flex flex-col items-center text-center">
+            <span className="flex size-14 items-center justify-center rounded-full bg-emerald/15 text-emerald-dark sm:size-16">
+              <Icon aria-hidden className="size-6 sm:size-7" strokeWidth={1.75} />
             </span>
-            <p className="text-sm font-semibold text-navy">{item.title}</p>
-            <p className="mt-1 text-xs text-muted">{item.description}</p>
+            <p className="mt-4 text-sm font-bold text-navy sm:text-base">
+              {item.title}
+            </p>
+            <p className="mt-1.5 max-w-[11rem] text-xs leading-relaxed text-muted sm:text-sm">
+              {item.description}
+            </p>
           </li>
         );
       })}

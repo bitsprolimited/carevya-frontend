@@ -5,7 +5,7 @@ export const verificationLayerSchema = z.enum([
   "background",
   "experience",
   "family_feedback",
-  "periodic_review",
+  "carevya_verified",
 ]);
 
 export type VerificationLayer = z.infer<typeof verificationLayerSchema>;
