@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Fade starts at end of “trusted”
+
+- Community card fade now measures the end of the word **trusted** and sets `--fade-start` / `--fade-y` so the dissolve begins there and continues to the right (and the right stroke fades downward from that row).
+
 ### 2026-09-23 — Exact right-edge dissolve on community cards
 
 - No right border stroke; top/bottom borders fade out toward the right; card wash + soft overlay dissolves into `surface-soft` so the edge vanishes like Figma.

@@ -70,33 +70,48 @@ body {
   font-family: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Community cards: top/left/bottom stroke; right edge dissolves into section (Figma) */
+/* Community cards: horizontal dissolve starts at --fade-start (end of "trusted") */
 .community-card-fade-border {
+  --fade-start: 86%;
   position: relative;
   isolation: isolate;
   border: none;
   background-color: var(--background);
   background-image: linear-gradient(
-    100deg,
+    to right,
     var(--background) 0%,
-    var(--background) 52%,
-    var(--surface-lavender) 82%,
-    color-mix(in srgb, var(--surface-lavender) 40%, transparent) 100%
+    var(--background) 70%,
+    var(--surface-lavender) 88%,
+    color-mix(in srgb, var(--surface-lavender) 55%, var(--surface-soft)) 100%
   );
   box-shadow: 0 12px 32px color-mix(in srgb, var(--navy) 7%, transparent);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 var(--fade-start),
+    rgba(0, 0, 0, 0.45) calc(var(--fade-start) + 4%),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000 0%,
+    #000 var(--fade-start),
+    rgba(0, 0, 0, 0.45) calc(var(--fade-start) + 4%),
+    transparent 100%
+  );
 }
 
 .community-card-fade-border--green {
   background-image: linear-gradient(
-    100deg,
+    to right,
     var(--background) 0%,
-    var(--background) 52%,
-    color-mix(in srgb, var(--emerald) 12%, var(--background)) 82%,
-    color-mix(in srgb, var(--emerald) 6%, transparent) 100%
+    var(--background) 70%,
+    color-mix(in srgb, var(--emerald) 10%, var(--background)) 88%,
+    color-mix(in srgb, var(--emerald) 5%, var(--surface-soft)) 100%
   );
 }
 
-/* Top + bottom strokes that fade out before the right edge; solid left; no right */
+/* Left solid; top follows fade-start; right stroke solid until ~trusted row then fades down */
 .community-card-fade-border::before {
   content: "";
   pointer-events: none;
@@ -108,36 +123,24 @@ body {
     linear-gradient(
         to right,
         var(--border) 0%,
-        var(--border) 58%,
-        transparent 92%
+        var(--border) var(--fade-start),
+        transparent 100%
       )
       top left / 100% 1px no-repeat,
     linear-gradient(
         to right,
         var(--border) 0%,
-        var(--border) 58%,
-        transparent 92%
+        var(--border) 70%,
+        transparent 100%
       )
       bottom left / 100% 1px no-repeat,
-    linear-gradient(var(--border), var(--border)) top left / 1px 100% no-repeat;
-}
-
-/* Soft dissolve into the section background on the right */
-.community-card-fade-border::after {
-  content: "";
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 2;
-  width: min(42%, 11rem);
-  border-radius: inherit;
-  background: linear-gradient(
-    to right,
-    transparent 0%,
-    color-mix(in srgb, var(--surface-soft) 45%, transparent) 55%,
-    var(--surface-soft) 100%
-  );
+    linear-gradient(var(--border), var(--border)) top left / 1px 100% no-repeat,
+    linear-gradient(
+        to bottom,
+        var(--border) 0%,
+        var(--border) var(--fade-y, 48%),
+        transparent calc(var(--fade-y, 48%) + 18%)
+      )
+      top right / 1px 100% no-repeat;
 }
 

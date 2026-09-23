@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import {
   Check,
@@ -6,12 +8,23 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { assets } from "@/lib/assets";
 import { cn } from "@/lib/utils";
 
 type CommunityFeature = {
   title: string;
   description: string;
+  /** Marks where the right-edge fade should begin (end of this word). */
+  fadeAnchor?: string;
 };
 
 type CommunityBlock = {
@@ -48,6 +61,7 @@ const communities: readonly CommunityBlock[] = [
         title: "Replacement Guarantee",
         description:
           "If your caregiver is unwell, a trusted backup steps in to keep your care going.",
+        fadeAnchor: "trusted",
       },
       {
         title: "Direct Family Advisor",
@@ -104,13 +118,89 @@ const themeMap = {
   },
 } as const;
 
+function renderDescription(
+  description: string,
+  fadeAnchor: string | undefined,
+  anchorRef: RefObject<HTMLSpanElement | null>,
+): ReactNode {
+  if (!fadeAnchor || !description.includes(fadeAnchor)) {
+    return description;
+  }
+
+  const index = description.indexOf(fadeAnchor);
+  const before = description.slice(0, index);
+  const after = description.slice(index + fadeAnchor.length);
+
+  return (
+    <>
+      {before}
+      <span ref={anchorRef}>{fadeAnchor}</span>
+      {after}
+    </>
+  );
+}
+
 function CommunityCard({ block }: { block: CommunityBlock }) {
   const theme = themeMap[block.theme];
   const { Icon } = block;
+  const cardRef = useRef<HTMLElement>(null);
+  const anchorRef = useRef<HTMLSpanElement>(null);
+
+  const syncFadeStart = useCallback(() => {
+    const card = cardRef.current;
+    const anchor = anchorRef.current;
+    if (!card) return;
+
+    if (!anchor) {
+      card.style.setProperty("--fade-start", "86%");
+      card.style.setProperty("--fade-y", "48%");
+      return;
+    }
+
+    const cardRect = card.getBoundingClientRect();
+    const anchorRect = anchor.getBoundingClientRect();
+    if (cardRect.width === 0 || cardRect.height === 0) return;
+
+    const fadeStart = ((anchorRect.right - cardRect.left) / cardRect.width) * 100;
+    const fadeY = ((anchorRect.bottom - cardRect.top) / cardRect.height) * 100;
+
+    card.style.setProperty(
+      "--fade-start",
+      `${String(Math.min(96, Math.max(70, fadeStart)))}%`,
+    );
+    card.style.setProperty(
+      "--fade-y",
+      `${String(Math.min(70, Math.max(30, fadeY)))}%`,
+    );
+  }, []);
+
+  useLayoutEffect(() => {
+    syncFadeStart();
+  }, [syncFadeStart, block.id]);
+
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const observer = new ResizeObserver(() => syncFadeStart());
+    observer.observe(card);
+    window.addEventListener("resize", syncFadeStart);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", syncFadeStart);
+    };
+  }, [syncFadeStart]);
 
   return (
     <article
+      ref={cardRef}
       id={block.id === "families" ? "for-you" : "for-me"}
+      style={
+        {
+          "--fade-start": "86%",
+          "--fade-y": "48%",
+        } as CSSProperties
+      }
       className={cn(
         "community-card-fade-border relative flex h-full flex-col overflow-hidden rounded-[1.75rem]",
         block.theme === "green" && "community-card-fade-border--green",
@@ -166,14 +256,17 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
               </span>
               <p className="text-[0.95rem] leading-relaxed text-muted">
                 <span className="font-bold text-navy">{feature.title}: </span>
-                {feature.description}
+                {renderDescription(
+                  feature.description,
+                  feature.fadeAnchor,
+                  anchorRef,
+                )}
               </p>
             </li>
           ))}
         </ul>
       </div>
 
-      {/* Full-bleed footer bar (Figma web) */}
       <div
         className={cn(
           "relative z-10 mt-auto flex items-center gap-3.5 px-5 py-4 sm:gap-4 sm:px-7 sm:py-5 lg:px-10 lg:py-5",
