@@ -123,7 +123,7 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
 
       <Button
         type="button"
-        className="absolute top-1/2 right-4 hidden h-10 -translate-y-1/2 rounded-full px-5 md:inline-flex lg:right-6 xl:right-8"
+        className="absolute top-1/2 right-8 hidden h-10 -translate-y-1/2 rounded-full px-5 md:inline-flex lg:right-12 xl:right-16"
         onClick={scrollToWaitlist}
       >
         Join Waitlist
