@@ -126,19 +126,14 @@ function ProtocolCard({ step }: { step: ProtocolStep }) {
         </p>
 
         {step.seal ? (
-          <div className="relative flex shrink-0 flex-col items-center">
-            <span
-              className={cn(
-                "flex size-10 items-center justify-center rounded-full border border-gold/40 bg-surface-gold shadow-sm",
-                styles.icon,
-              )}
-            >
-              <Icon aria-hidden className="size-5" />
-            </span>
-            <span className="mt-1 text-[0.55rem] font-semibold tracking-wide text-gold-deep uppercase">
-              Verified Seal
-            </span>
-          </div>
+          <span
+            className={cn(
+              "relative inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full bg-surface-gold px-3 py-1.5 text-xs font-semibold text-gold-deep shadow-sm sm:px-3.5 sm:py-2 sm:text-sm",
+            )}
+          >
+            <Icon aria-hidden className="size-4 shrink-0 sm:size-[1.125rem]" />
+            Verified Seal
+          </span>
         ) : (
           <span
             className={cn(

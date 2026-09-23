@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Verified Seal pill
+
+- Protocol trust card seal is a horizontal peach pill (icon + “Verified Seal” on one line), not a stacked circle + label.
+
 ### 2026-09-23 — Protocol headline one line on web
 
 - Protocol title stays on a single line from `lg` up (`whitespace-nowrap` + wider container).
