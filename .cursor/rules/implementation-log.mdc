@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Families community Cloudinary icon
+
+- Replaced Lucide Users on Families card header with Cloudinary `family_vrdxjj`.
+
 ### 2026-09-23 — Trust callout verification icon
 
 - Replaced Lucide IdCard on “Verification conducted” callout with Cloudinary `verification_sfwvtb`.

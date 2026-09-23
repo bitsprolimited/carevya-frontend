@@ -26,7 +26,8 @@ type CommunityBlock = {
   theme: "blue" | "green";
   /** Families fade right; caregivers fade left (Figma zigzag). */
   fadeSide: "left" | "right";
-  Icon: LucideIcon;
+  Icon?: LucideIcon;
+  iconSrc?: string;
   labelDesktop: string;
   labelMobile: string;
   title: string;
@@ -43,7 +44,7 @@ const communities: readonly CommunityBlock[] = [
     id: "families",
     theme: "blue",
     fadeSide: "right",
-    Icon: Users,
+    iconSrc: assets.communityFamilyIcon,
     labelDesktop: "FOR FAMILIES & CARESEEKERS",
     labelMobile: "FOR FAMILIES & RELATIVES",
     title: "Compassion you can lean on",
@@ -140,7 +141,7 @@ function renderDescription(
 
 function CommunityCard({ block }: { block: CommunityBlock }) {
   const theme = themeMap[block.theme];
-  const { Icon } = block;
+  const { Icon, iconSrc } = block;
   const cardRef = useRef<HTMLElement>(null);
   const anchorRef = useRef<HTMLSpanElement>(null);
   const iconRef = useRef<HTMLSpanElement>(null);
@@ -230,11 +231,21 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
           <span
             ref={iconRef}
             className={cn(
-              "flex size-11 shrink-0 items-center justify-center rounded-xl",
+              "relative flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-xl",
               theme.iconWrap,
             )}
           >
-            <Icon aria-hidden className="size-5" />
+            {iconSrc ? (
+              <Image
+                src={iconSrc}
+                alt=""
+                width={20}
+                height={20}
+                className="size-5 object-contain"
+              />
+            ) : Icon ? (
+              <Icon aria-hidden className="size-5" />
+            ) : null}
           </span>
           <p
             className={cn(
