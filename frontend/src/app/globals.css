@@ -5,6 +5,8 @@
   --foreground: #0b1f3a;
   --navy: #0b1f3a;
   --navy-muted: #1a3354;
+  /* Footer / deep authority surface (Figma footer) */
+  --footer: #0b172a;
   --brand-blue: #2563eb;
   --brand-blue-hover: #1d4ed8;
   --emerald: #10b981;
@@ -37,6 +39,7 @@
   --color-foreground: var(--foreground);
   --color-navy: var(--navy);
   --color-navy-muted: var(--navy-muted);
+  --color-footer: var(--footer);
   --color-brand-blue: var(--brand-blue);
   --color-brand-blue-hover: var(--brand-blue-hover);
   --color-emerald: var(--emerald);
