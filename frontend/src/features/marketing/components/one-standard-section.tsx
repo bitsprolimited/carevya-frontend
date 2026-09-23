@@ -92,15 +92,13 @@ const themeMap = {
     label: "text-brand-blue",
     iconWrap: "bg-brand-blue/10 text-brand-blue",
     checkWrap: "bg-emerald/20 text-emerald-dark",
-    cardWash: "to-surface-lavender/80",
-    footer: "bg-surface-lavender",
+    footer: "bg-surface-lavender/90",
     footerIcon: "bg-brand-blue text-on-media",
   },
   green: {
     label: "text-emerald-dark",
     iconWrap: "bg-emerald/15 text-emerald-dark",
     checkWrap: "bg-emerald/20 text-emerald-dark",
-    cardWash: "to-emerald/10",
     footer: "bg-emerald/10",
     footerIcon: "bg-emerald-dark text-on-media",
   },
@@ -115,17 +113,10 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
       id={block.id === "families" ? "for-you" : "for-me"}
       className={cn(
         "community-card-fade-border relative flex h-full flex-col overflow-hidden rounded-[1.75rem]",
-        "bg-gradient-to-br from-background via-background shadow-md",
-        theme.cardWash,
+        block.theme === "green" && "community-card-fade-border--green",
         "sm:rounded-[2rem]",
       )}
     >
-      {/* Soft lavender glow near the fading right edge */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-10 -right-8 size-48 rounded-full bg-surface-lavender/90 blur-3xl"
-      />
-
       <div className="relative z-10 flex flex-1 flex-col px-5 pt-5 pb-6 sm:px-7 sm:pt-7 sm:pb-8 lg:px-10 lg:pt-10 lg:pb-9">
         <div className="flex items-center gap-3">
           <span

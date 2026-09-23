@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Exact right-edge dissolve on community cards
+
+- No right border stroke; top/bottom borders fade out toward the right; card wash + soft overlay dissolves into `surface-soft` so the edge vanishes like Figma.
+
 ### 2026-09-23 — Community card fading right border
 
 - Added `.community-card-fade-border`: top/left/bottom solid; right edge fades out mid-card (Figma). Soft lavender corner glow behind families-style wash.
