@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Connect protocol Cloudinary icon
+
+- Replaced Lucide MessageCircle on “Connect with Peace” with Cloudinary `Contain_wpjjci` asset.
+
 ### 2026-09-23 — Verified Seal pill
 
 - Protocol trust card seal is a horizontal peach pill (icon + “Verified Seal” on one line); `seal` token `#ffddb8`.
