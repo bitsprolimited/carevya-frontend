@@ -160,10 +160,12 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
         return;
       }
       const iconRect = icon.getBoundingClientRect();
-      const fadeStart = ((iconRect.left - cardRect.left) / cardRect.width) * 100;
+      // Solid from the icon's left edge — fade only in the gutter to the left of it
+      const fadeStart =
+        ((iconRect.left - cardRect.left) / cardRect.width) * 100;
       card.style.setProperty(
         "--fade-start",
-        `${String(Math.min(28, Math.max(8, fadeStart)))}%`,
+        `${String(Math.min(22, Math.max(6, fadeStart)))}%`,
       );
       return;
     }
