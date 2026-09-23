@@ -9,6 +9,10 @@ alwaysApply: true
 
 ## Entries
 
+### 2026-09-23 — Community card fading right border
+
+- Added `.community-card-fade-border`: top/left/bottom solid; right edge fades out mid-card (Figma). Soft lavender corner glow behind families-style wash.
+
 ### 2026-09-23 — Families card Figma polish
 
 - Matched web Families/Careseekers card to Figma: soft lavender wash, border + shadow, larger padding, soft green check rings, full-bleed waitlist footer bar (same structure on caregivers card).

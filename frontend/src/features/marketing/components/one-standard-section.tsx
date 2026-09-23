@@ -114,13 +114,19 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
     <article
       id={block.id === "families" ? "for-you" : "for-me"}
       className={cn(
-        "relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-border",
+        "community-card-fade-border relative flex h-full flex-col overflow-hidden rounded-[1.75rem]",
         "bg-gradient-to-br from-background via-background shadow-md",
         theme.cardWash,
         "sm:rounded-[2rem]",
       )}
     >
-      <div className="flex flex-1 flex-col px-5 pt-5 pb-6 sm:px-7 sm:pt-7 sm:pb-8 lg:px-10 lg:pt-10 lg:pb-9">
+      {/* Soft lavender glow near the fading right edge */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-10 -right-8 size-48 rounded-full bg-surface-lavender/90 blur-3xl"
+      />
+
+      <div className="relative z-10 flex flex-1 flex-col px-5 pt-5 pb-6 sm:px-7 sm:pt-7 sm:pb-8 lg:px-10 lg:pt-10 lg:pb-9">
         <div className="flex items-center gap-3">
           <span
             className={cn(
@@ -179,7 +185,7 @@ function CommunityCard({ block }: { block: CommunityBlock }) {
       {/* Full-bleed footer bar (Figma web) */}
       <div
         className={cn(
-          "mt-auto flex items-center gap-3.5 border-t border-border/60 px-5 py-4 sm:gap-4 sm:px-7 sm:py-5 lg:px-10 lg:py-5",
+          "relative z-10 mt-auto flex items-center gap-3.5 px-5 py-4 sm:gap-4 sm:px-7 sm:py-5 lg:px-10 lg:py-5",
           theme.footer,
         )}
       >

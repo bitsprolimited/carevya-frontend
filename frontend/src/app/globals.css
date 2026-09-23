@@ -69,3 +69,33 @@ body {
   color: var(--foreground);
   font-family: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Community cards: solid edges with a fading right border (Figma) */
+.community-card-fade-border {
+  position: relative;
+}
+
+.community-card-fade-border::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  background:
+    linear-gradient(var(--border), var(--border)) top left / 100% 1px no-repeat,
+    linear-gradient(var(--border), var(--border)) bottom left / 100% 1px
+      no-repeat,
+    linear-gradient(var(--border), var(--border)) top left / 1px 100% no-repeat,
+    linear-gradient(
+        to bottom,
+        var(--border) 0%,
+        var(--border) 10%,
+        transparent 32%,
+        transparent 68%,
+        var(--border) 90%,
+        var(--border) 100%
+      )
+      top right / 1px 100% no-repeat;
+}
+
