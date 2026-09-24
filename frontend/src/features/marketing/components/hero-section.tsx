@@ -33,10 +33,10 @@ export function HeroSection() {
 
           <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 pb-36 pt-2 md:justify-center md:gap-10 md:px-6 md:pb-14 md:pt-6 lg:px-8 lg:pb-16 xl:px-10">
             <div className="max-w-xl space-y-3 md:max-w-2xl md:space-y-5">
-              <h1 className="font-lato max-w-[249px] text-[32px] leading-[40px] font-bold tracking-normal text-on-media md:font-sans md:max-w-none md:text-5xl md:leading-[1.15] lg:text-6xl">
-                Find trusted care,
-                <br className="md:hidden" />
-                closer to home.
+              <h1 className="font-lato text-[32px] leading-[40px] font-bold tracking-normal text-on-media md:font-sans md:text-5xl md:leading-[1.15] lg:text-6xl">
+                <span className="whitespace-nowrap">Find trusted care,</span>
+                <br className="md:hidden" />{" "}
+                <span className="whitespace-nowrap">closer to home.</span>
               </h1>
               <p className="max-w-md text-sm leading-relaxed text-on-media-muted sm:text-base md:max-w-lg md:text-lg">
                 Discover verified caregivers, compare their experience and
