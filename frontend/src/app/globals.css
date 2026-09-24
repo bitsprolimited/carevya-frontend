@@ -69,6 +69,7 @@
   --color-on-media-muted: var(--on-media-muted);
   --font-sans: var(--font-plus-jakarta);
   --font-lato: var(--font-lato-family);
+  --font-inter: var(--font-inter-family);
 }
 
 body {

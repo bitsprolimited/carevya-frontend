@@ -38,7 +38,7 @@ export function HeroSection() {
                 <br className="md:hidden" />{" "}
                 <span className="whitespace-nowrap">closer to home.</span>
               </h1>
-              <p className="max-w-md text-sm leading-relaxed text-on-media-muted sm:text-base md:max-w-lg md:text-lg">
+              <p className="font-inter max-w-[370px] text-[20px] leading-[28px] font-normal tracking-normal text-on-media/80 md:font-sans md:max-w-lg md:text-lg md:leading-relaxed">
                 Discover verified caregivers, compare their experience and
                 services, and connect with the right provider for your loved
                 one.
