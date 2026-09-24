@@ -133,11 +133,16 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
       <div
         id="hero-mobile-nav"
         className={cn(
-          "absolute inset-x-0 top-full border-b border-on-media/10 bg-glass-deep px-4 py-4 backdrop-blur-xl md:hidden",
+          "absolute inset-x-0 top-full overflow-hidden border-b border-on-media/20 px-4 py-4 md:hidden",
+          "bg-gradient-to-b from-glass-liquid-top via-glass-liquid-mid to-glass-liquid-bottom",
+          "backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:bg-glass-fill",
           open ? "block" : "hidden",
         )}
       >
-        <nav aria-label="Mobile" className="flex flex-col gap-2">
+        <nav
+          aria-label="Mobile"
+          className="flex flex-col items-end gap-2 text-right"
+        >
           {audienceTabs.map((tab) => (
             <Link
               key={tab.id}
