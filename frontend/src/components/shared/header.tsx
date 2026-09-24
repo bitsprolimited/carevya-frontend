@@ -32,6 +32,7 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
   const isTransparent = variant === "transparent";
 
   return (
+    //This is the header component
     <header
       className={cn(
         "relative z-40 w-full",
