@@ -15,25 +15,28 @@ export function HeroSection() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[62%_center] sm:object-[68%_center] lg:object-right"
+          className="object-cover object-[72%_center] sm:object-[68%_center] lg:object-right"
         />
 
+        {/* Mobile: darker scrim for copy; desktop: lighter left wash */}
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-b from-scrim/25 via-scrim/10 to-scrim/35 md:bg-gradient-to-r md:from-scrim/45 md:via-scrim/15 md:to-transparent"
+          className="absolute inset-0 bg-gradient-to-b from-scrim/60 via-scrim/45 to-scrim/75 md:bg-gradient-to-r md:from-scrim/45 md:via-scrim/15 md:to-transparent"
         />
         <div
           aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-scrim/20 via-transparent to-scrim/15 md:from-scrim/20 md:to-scrim/10"
+          className="absolute inset-0 bg-gradient-to-t from-scrim/55 via-transparent to-scrim/35 md:from-scrim/20 md:to-scrim/10"
         />
 
-        <div className="relative z-10 flex min-h-[72svh] flex-col md:min-h-[100svh]">
+        <div className="relative z-10 flex min-h-[78svh] flex-col md:min-h-[100svh]">
           <SiteHeader variant="transparent" />
 
-          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pb-28 pt-4 md:justify-center md:gap-10 md:px-6 md:pb-14 md:pt-6 lg:px-8 lg:pb-16 xl:px-10">
+          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-5 pb-32 pt-3 md:justify-center md:gap-10 md:px-6 md:pb-14 md:pt-6 lg:px-8 lg:pb-16 xl:px-10">
             <div className="max-w-xl space-y-3 pt-2 md:max-w-2xl md:space-y-5 md:pt-0">
               <h1 className="text-[2rem] font-bold leading-[1.15] tracking-tight text-on-media sm:text-4xl md:text-5xl lg:text-6xl">
-                Find trusted care, <br /> closer to home.
+                Find trusted care,{" "}
+                <br className="md:hidden" />
+                closer to home.
               </h1>
               <p className="max-w-md text-sm leading-relaxed text-on-media-muted sm:text-base md:max-w-lg md:text-lg">
                 Discover verified caregivers, compare their experience and
@@ -45,7 +48,7 @@ export function HeroSection() {
             {/* Desktop waitlist sits in-hero */}
             <div
               id="hero-waitlist"
-              className="mt-8 hidden w-full max-w-xl scroll-mt-24 md:mt-0 md:block md:max-w-2xl lg:max-w-3xl xl:max-w-4xl"
+              className="mt-8 hidden w-full max-w-xl scroll-mt-24 md:mt-0 md:block md:max-w-2xl lg:max-w-3xl xl:max-w-2xl"
             >
               <HeroWaitlistCard />
             </div>
@@ -74,7 +77,7 @@ export function HeroSection() {
       {/* Mobile: glass card floats over hero → white content seam */}
       <div
         id="hero-waitlist-mobile"
-        className="relative z-20 -mt-24 px-4 pb-2 md:hidden"
+        className="relative z-20 -mt-28 px-5 pb-4 md:hidden"
       >
         <HeroWaitlistCard />
       </div>

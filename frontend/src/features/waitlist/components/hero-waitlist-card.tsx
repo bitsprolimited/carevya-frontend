@@ -46,9 +46,9 @@ export function HeroWaitlistCard() {
     <div
       className={cn(
         "relative w-full max-w-[40rem] overflow-hidden rounded-[1.75rem] p-5 shadow-2xl sm:rounded-[2rem] sm:p-6 md:max-w-none md:rounded-[2.25rem] md:p-8",
-        "border border-on-media/30",
-        /* Mobile: frosts into white section below; desktop: warm liquid glass */
-        "bg-gradient-to-b from-on-media/20 via-on-media/35 to-on-media/85",
+        "border border-on-media/25",
+        /* Mobile: frosts into solid white; desktop: warm liquid glass */
+        "bg-gradient-to-b from-on-media/25 via-on-media/55 to-on-media",
         "backdrop-blur-2xl backdrop-saturate-150",
         "md:border-on-media/25 md:from-glass-liquid-top md:via-glass-liquid-mid md:to-glass-liquid-bottom",
         "md:supports-[backdrop-filter]:bg-glass-fill",
@@ -98,7 +98,7 @@ export function HeroWaitlistCard() {
           })}
         </div>
 
-        <div className="flex min-h-12 items-center gap-1.5 rounded-full bg-on-media p-1 pl-3.5 sm:min-h-14 sm:gap-2 sm:p-1.5 sm:pl-5">
+        <div className="flex min-h-12 items-center gap-1.5 rounded-full bg-on-media p-1 pl-3.5 shadow-sm sm:min-h-14 sm:gap-2 sm:p-1.5 sm:pl-5">
           <Input
             type="email"
             autoComplete="email"
@@ -140,9 +140,11 @@ export function HeroWaitlistCard() {
           </p>
         ) : null}
 
-        <p className="text-center text-xs font-medium text-navy md:text-left md:text-sm md:font-normal md:text-on-media">
-          Designed for safer elderly care in Nigeria
-        </p>
+        <div className="border-t border-navy/10 pt-3 md:border-on-media/20">
+          <p className="text-left text-xs font-medium text-navy md:text-sm md:font-normal md:text-on-media">
+            Designed for safer elderly care in Nigeria
+          </p>
+        </div>
       </form>
     </div>
   );
