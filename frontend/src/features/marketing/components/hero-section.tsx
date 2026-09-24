@@ -31,10 +31,10 @@ export function HeroSection() {
         <div className="relative z-10 flex min-h-[78svh] flex-col md:min-h-[100svh]">
           <SiteHeader variant="transparent" />
 
-          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-5 pb-32 pt-3 md:justify-center md:gap-10 md:px-6 md:pb-14 md:pt-6 lg:px-8 lg:pb-16 xl:px-10">
-            <div className="max-w-xl space-y-3 pt-2 md:max-w-2xl md:space-y-5 md:pt-0">
-              <h1 className="text-[2rem] font-bold leading-[1.15] tracking-tight text-on-media sm:text-4xl md:text-5xl lg:text-6xl">
-                Find trusted care,{" "}
+          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 pb-36 pt-2 md:justify-center md:gap-10 md:px-6 md:pb-14 md:pt-6 lg:px-8 lg:pb-16 xl:px-10">
+            <div className="max-w-xl space-y-3 md:max-w-2xl md:space-y-5">
+              <h1 className="font-lato max-w-[249px] text-[32px] leading-[40px] font-bold tracking-normal text-on-media md:font-sans md:max-w-none md:text-5xl md:leading-[1.15] lg:text-6xl">
+                Find trusted care,
                 <br className="md:hidden" />
                 closer to home.
               </h1>
