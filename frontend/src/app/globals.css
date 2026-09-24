@@ -226,3 +226,22 @@ body {
       top left / 1px 100% no-repeat;
 }
 
+/* Mobile: no dissolve — full solid cards (fade is desktop-only) */
+@media (max-width: 1023px) {
+  .community-card-fade-border,
+  .community-card-fade-border--green,
+  .community-card-fade-border--fade-left,
+  .community-card-fade-border--fade-left.community-card-fade-border--green {
+    background-image: none;
+    background-color: var(--background);
+    border: 1px solid var(--border);
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .community-card-fade-border::before,
+  .community-card-fade-border--fade-left::before {
+    display: none;
+  }
+}
+
