@@ -18,6 +18,35 @@ export type WaitlistJoinInput = z.infer<typeof waitlistJoinSchema>;
 
 export type WaitlistJoinResponse = {
   success: boolean;
-  position?: number;
   message: string;
+  data: {
+    id: string;
+    email: string;
+    role: string;
+    position: number;
+    referralCode: string;
+    createdAt: string;
+  };
+  meta: {
+    alreadyJoined: boolean;
+    roleChanged: boolean;
+  };
+};
+
+export type WaitlistStatsResponse = {
+  success: boolean;
+  data: {
+    careSeekers: number;
+    caregivers: number;
+    total: number;
+  };
+  meta: {
+    asOf: string;
+  };
+};
+
+export type HealthResponse = {
+  status: string;
+  uptime: number;
+  timestamp: string;
 };

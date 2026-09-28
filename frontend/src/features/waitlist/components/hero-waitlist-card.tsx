@@ -1,13 +1,13 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, type Resolver } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { joinWaitlist } from "@/features/waitlist/services/waitlist-service";
-import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
+import { waitlistStatsKey } from "@/features/waitlist/hooks/use-waitlist-stats";
 import {
   heroWaitlistSchema,
   type HeroWaitlistInput,
@@ -21,7 +21,7 @@ const roleOptions: { value: WaitlistRole; label: string }[] = [
 ];
 
 export function HeroWaitlistCard() {
-  const increment = useWaitlistStore((state) => state.increment);
+  const queryClient = useQueryClient();
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const form = useForm<HeroWaitlistInput>({
@@ -36,11 +36,19 @@ export function HeroWaitlistCard() {
 
   const mutation = useMutation({
     mutationFn: joinWaitlist,
-    onSuccess: () => {
-      increment();
+    onSuccess: (res) => {
+      // Refresh the real count only for genuinely new signups
+      if (!res.meta?.alreadyJoined) {
+        queryClient.invalidateQueries({ queryKey: waitlistStatsKey });
+      }
       form.reset({ email: "", role: selectedRole });
     },
   });
+
+  const result = mutation.data;
+  const alreadyJoined = Boolean(result?.meta?.alreadyJoined);
+  const position = result?.data?.position; // fixed: no top-level fallback
+  const referralCode = result?.data?.referralCode;
 
   return (
     <div
@@ -130,14 +138,31 @@ export function HeroWaitlistCard() {
 
         {mutation.isError ? (
           <p className="text-xs text-danger" role="alert">
-            Something went wrong. Please try again.
+            {mutation.error instanceof Error && mutation.error.message
+              ? mutation.error.message
+              : "Something went wrong. Please try again."}
           </p>
         ) : null}
 
         {mutation.isSuccess ? (
-          <p className="text-xs font-medium text-emerald" role="status">
-            You&apos;re on the waitlist — we&apos;ll be in touch.
-          </p>
+          <div className="flex flex-col gap-1" role="status">
+            <p className="text-xs font-medium text-emerald">
+              {alreadyJoined
+                ? "You're already on the waitlist."
+                : "You're on the waitlist — we'll be in touch."}
+            </p>
+            {position != null || referralCode ? (
+              <p className="text-xs text-navy md:text-on-media">
+                {position != null ? `Your position: #${position}` : null}
+                {referralCode ? (
+                  <>
+                    {position != null ? " · " : null}
+                    Referral code: <strong>{referralCode}</strong>
+                  </>
+                ) : null}
+              </p>
+            ) : null}
+          </div>
         ) : null}
 
         <div className="border-t border-navy/10 pt-3 md:border-on-media/20">
