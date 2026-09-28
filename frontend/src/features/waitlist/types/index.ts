@@ -19,7 +19,7 @@ export type WaitlistJoinInput = z.infer<typeof waitlistJoinSchema>;
 export type WaitlistJoinResponse = {
   success: boolean;
   message: string;
-  data: {
+  data?: {
     id: string;
     email: string;
     role: string;
@@ -27,7 +27,7 @@ export type WaitlistJoinResponse = {
     referralCode: string;
     createdAt: string;
   };
-  meta: {
+  meta?: {
     alreadyJoined: boolean;
     roleChanged: boolean;
   };

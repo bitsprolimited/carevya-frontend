@@ -31,10 +31,23 @@ export async function POST(request: Request) {
     );
   }
 
+  const { email, role } = parsed.data;
+
   const response: WaitlistJoinResponse = {
     success: true,
-    position: 501,
     message: "You're on the CareVYA waitlist.",
+    data: {
+      id: crypto.randomUUID(),
+      email,
+      role,
+      position: 501, // placeholder until this is backed by the real API
+      referralCode: crypto.randomUUID().slice(0, 8).toUpperCase(),
+      createdAt: new Date().toISOString(),
+    },
+    meta: {
+      alreadyJoined: false,
+      roleChanged: false,
+    },
   };
 
   return NextResponse.json(response, { status: 201 });
