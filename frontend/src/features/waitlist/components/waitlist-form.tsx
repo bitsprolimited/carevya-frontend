@@ -1,37 +1,72 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, type Resolver } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { joinWaitlist } from "@/features/waitlist/services/waitlist-service";
-import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
+import {
+  useWaitlistStats,
+  waitlistStatsKey,
+} from "@/features/waitlist/hooks/use-waitlist-stats";
 import {
   waitlistJoinSchema,
   type WaitlistJoinInput,
 } from "@/features/waitlist/types";
 
+const defaults: WaitlistJoinInput = {
+  email: "",
+  location: "",
+  role: "family",
+};
+
 export function WaitlistForm() {
-  const increment = useWaitlistStore((state) => state.increment);
-  const count = useWaitlistStore((state) => state.count);
+  const queryClient = useQueryClient();
+  const { data: stats } = useWaitlistStats();
 
   const form = useForm<WaitlistJoinInput>({
     resolver: zodResolver(waitlistJoinSchema) as Resolver<WaitlistJoinInput>,
-    defaultValues: {
-      email: "",
-      location: "",
-      role: "family",
-    },
+    defaultValues: defaults,
   });
 
   const mutation = useMutation({
     mutationFn: joinWaitlist,
-    onSuccess: () => {
-      increment();
-      form.reset({ email: "", location: "", role: "family" });
+    onSuccess: (res) => {
+      // Refresh the real count after a genuinely new signup
+      if (!res.meta?.alreadyJoined) {
+        queryClient.invalidateQueries({ queryKey: waitlistStatsKey });
+      }
+      form.reset(defaults);
     },
   });
+
+  if (mutation.isSuccess) {
+    const { data, meta, message } = mutation.data;
+    const position = data?.position; // fixed: no top-level fallback
+    return (
+      <div className="flex w-full flex-col gap-2" role="status">
+        <p className="text-sm font-medium">
+          {meta?.alreadyJoined
+            ? meta.roleChanged
+              ? "You're already on the list. We've updated your details."
+              : "You're already on the list."
+            : message}
+        </p>
+        {position != null || data?.referralCode ? (
+          <p className="text-xs text-muted">
+            {position != null ? `Your position: #${position}` : null}
+            {data?.referralCode ? (
+              <>
+                {" · Referral code: "}
+                <strong>{data.referralCode}</strong>
+              </>
+            ) : null}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
 
   return (
     <form
@@ -74,12 +109,15 @@ export function WaitlistForm() {
       </Button>
 
       <p className="text-xs text-muted">
-        Join over {count}+ on the waitlist already! Starting in Nigeria.
-      </p>
+       {stats ? `Join over ${stats.total} on the waitlist already! ` : ""}
+          Starting in Nigeria.
+        </p>
 
       {mutation.isError ? (
         <p className="text-xs text-danger" role="alert">
-          Something went wrong. Please try again.
+          {mutation.error instanceof Error
+            ? mutation.error.message
+            : "Something went wrong. Please try again."}
         </p>
       ) : null}
     </form>
