@@ -40,6 +40,9 @@
   --glass-modal: #ffffff33;
   --glass-field: #ffffff26;
   --glass-field-border: #ffffff4d;
+  /* Searchable select dropdown panel (brand-blue glass) */
+  --glass-dropdown: #2563eb99;
+  --glass-dropdown-hover: #2563ebcc;
 }
 
 @theme inline {
@@ -78,6 +81,8 @@
   --color-glass-modal: var(--glass-modal);
   --color-glass-field: var(--glass-field);
   --color-glass-field-border: var(--glass-field-border);
+  --color-glass-dropdown: var(--glass-dropdown);
+  --color-glass-dropdown-hover: var(--glass-dropdown-hover);
   --font-sans: var(--font-plus-jakarta);
   --font-lato: var(--font-lato-family);
   --font-inter: var(--font-inter-family);
@@ -235,6 +240,25 @@ body {
         transparent 75%
       )
       top left / 1px 100% no-repeat;
+}
+
+/* Thin light scrollbar for glass searchable dropdown */
+.glass-dropdown-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.45) transparent;
+}
+
+.glass-dropdown-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.glass-dropdown-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.glass-dropdown-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.45);
 }
 
 /* Mobile: no dissolve — full solid cards (fade is desktop-only) */

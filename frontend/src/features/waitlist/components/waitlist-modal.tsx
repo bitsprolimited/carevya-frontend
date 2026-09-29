@@ -5,7 +5,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowRight,
   Building2,
-  ChevronDown,
   Mail,
   MapPin,
   Phone,
@@ -14,8 +13,9 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useId } from "react";
-import { useForm, type Resolver } from "react-hook-form";
+import { Controller, useForm, type Resolver } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
   nigeriaStateNames,
   nigeriaStates,
@@ -268,32 +268,29 @@ export function WaitlistModal() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="min-w-0">
-                  <label className={cn(fieldShell, "relative pr-9")}>
-                    <MapPin
-                      className="size-4 shrink-0 text-on-media/70"
-                      aria-hidden
-                    />
-                    <select
-                      aria-invalid={Boolean(form.formState.errors.state)}
-                      className="min-w-0 flex-1 appearance-none border-0 bg-transparent py-2 text-on-media outline-none"
-                      {...form.register("state", {
-                        onChange: () => form.setValue("lga", ""),
-                      })}
-                    >
-                      <option value="" className="text-navy">
-                        State
-                      </option>
-                      {nigeriaStateNames.map((name) => (
-                        <option key={name} value={name} className="text-navy">
-                          {name}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown
-                      className="pointer-events-none absolute right-3 size-4 text-on-media/70"
-                      aria-hidden
-                    />
-                  </label>
+                  <Controller
+                    name="state"
+                    control={form.control}
+                    render={({ field }) => (
+                      <SearchableSelect
+                        options={nigeriaStateNames}
+                        value={field.value}
+                        onChange={(next) => {
+                          field.onChange(next);
+                          form.setValue("lga", "");
+                        }}
+                        placeholder="State"
+                        aria-label="State"
+                        invalid={Boolean(form.formState.errors.state)}
+                        icon={
+                          <MapPin
+                            className="size-4 shrink-0 text-on-media/70"
+                            aria-hidden
+                          />
+                        }
+                      />
+                    )}
+                  />
                   {form.formState.errors.state ? (
                     <p className="mt-1 text-xs text-danger" role="alert">
                       {form.formState.errors.state.message}
@@ -302,31 +299,30 @@ export function WaitlistModal() {
                 </div>
 
                 <div className="min-w-0">
-                  <label className={cn(fieldShell, "relative pr-9")}>
-                    <Building2
-                      className="size-4 shrink-0 text-on-media/70"
-                      aria-hidden
-                    />
-                    <select
-                      aria-invalid={Boolean(form.formState.errors.lga)}
-                      disabled={!selectedState}
-                      className="min-w-0 flex-1 appearance-none border-0 bg-transparent py-2 text-on-media outline-none disabled:opacity-50"
-                      {...form.register("lga")}
-                    >
-                      <option value="" className="text-navy">
-                        LGA
-                      </option>
-                      {lgas.map((name) => (
-                        <option key={name} value={name} className="text-navy">
-                          {name}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown
-                      className="pointer-events-none absolute right-3 size-4 text-on-media/70"
-                      aria-hidden
-                    />
-                  </label>
+                  <Controller
+                    name="lga"
+                    control={form.control}
+                    render={({ field }) => (
+                      <SearchableSelect
+                        options={lgas}
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="LGA"
+                        aria-label="LGA"
+                        disabled={!selectedState}
+                        invalid={Boolean(form.formState.errors.lga)}
+                        emptyMessage={
+                          selectedState ? "No matches" : "Select a state first"
+                        }
+                        icon={
+                          <Building2
+                            className="size-4 shrink-0 text-on-media/70"
+                            aria-hidden
+                          />
+                        }
+                      />
+                    )}
+                  />
                   {form.formState.errors.lga ? (
                     <p className="mt-1 text-xs text-danger" role="alert">
                       {form.formState.errors.lga.message}
