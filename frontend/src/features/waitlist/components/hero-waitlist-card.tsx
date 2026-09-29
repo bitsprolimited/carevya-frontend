@@ -4,8 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm, type Resolver } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useMediaQuery } from "@/hooks/use-media-query";
+// import { Input } from "@/components/ui/input";
+// import { useMediaQuery } from "@/hooks/use-media-query";
 import { joinWaitlist } from "@/features/waitlist/services/waitlist-service";
 import { waitlistStatsKey } from "@/features/waitlist/hooks/use-waitlist-stats";
 import {
@@ -19,10 +19,11 @@ const roleOptions: { value: WaitlistRole; label: string }[] = [
   { value: "family", label: "Care Seeker" },
   { value: "caregiver", label: "Caregivers" },
 ];
+void roleOptions; // kept for when the role toggle is restored
 
 export function HeroWaitlistCard() {
   const queryClient = useQueryClient();
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  // const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const form = useForm<HeroWaitlistInput>({
     resolver: zodResolver(heroWaitlistSchema) as Resolver<HeroWaitlistInput>,
@@ -47,7 +48,7 @@ export function HeroWaitlistCard() {
 
   const result = mutation.data;
   const alreadyJoined = Boolean(result?.meta?.alreadyJoined);
-  const position = result?.data?.position; // fixed: no top-level fallback
+  const position = result?.data?.position;
   const referralCode = result?.data?.referralCode;
 
   return (
@@ -72,10 +73,11 @@ export function HeroWaitlistCard() {
       />
 
       <form
-        className="relative z-10 flex flex-col gap-4 sm:gap-5 md:gap-6"
+        className="relative z-10 flex flex-col items-start gap-4 sm:gap-5 md:gap-6"
         onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
         noValidate
       >
+        {/* Role toggle — temporarily hidden
         <div
           role="tablist"
           aria-label="Waitlist role"
@@ -105,7 +107,9 @@ export function HeroWaitlistCard() {
             );
           })}
         </div>
+        */}
 
+        {/* Email field — temporarily hidden; keep Join Waitlist only
         <div className="flex min-h-12 items-center gap-1.5 rounded-full bg-on-media p-1 pl-3.5 shadow-sm sm:min-h-14 sm:gap-2 sm:p-1.5 sm:pl-5">
           <Input
             type="email"
@@ -121,20 +125,24 @@ export function HeroWaitlistCard() {
             )}
             {...form.register("email")}
           />
-          <Button
-            type="submit"
-            disabled={mutation.isPending}
-            className="h-10 shrink-0 rounded-full px-3 text-xs sm:h-11 sm:px-5 sm:text-sm md:px-6 md:text-base"
-          >
-            {mutation.isPending ? "Joining..." : "Join Waitlist"}
-          </Button>
         </div>
+        */}
 
+        <Button
+          type="submit"
+          disabled={mutation.isPending}
+          className="h-10 shrink-0 rounded-full px-5 text-sm sm:h-11 sm:px-6 sm:text-base md:px-8"
+        >
+          {mutation.isPending ? "Joining..." : "Join Waitlist"}
+        </Button>
+
+        {/*
         {form.formState.errors.email ? (
           <p className="text-xs text-danger" role="alert">
             {form.formState.errors.email.message}
           </p>
         ) : null}
+        */}
 
         {mutation.isError ? (
           <p className="text-xs text-danger" role="alert">
@@ -165,11 +173,13 @@ export function HeroWaitlistCard() {
           </div>
         ) : null}
 
+        {/* Nigeria line — temporarily hidden
         <div className="border-t border-navy/10 pt-3 md:border-on-media/20">
           <p className="text-left text-xs font-medium text-navy md:text-sm md:font-normal md:text-on-media">
             Designed for safer elderly care in Nigeria
           </p>
         </div>
+        */}
       </form>
     </div>
   );
