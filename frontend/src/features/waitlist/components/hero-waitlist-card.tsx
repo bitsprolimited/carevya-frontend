@@ -13,7 +13,7 @@ import {
   type HeroWaitlistInput,
   type WaitlistRole,
 } from "@/features/waitlist/types";
-import { cn } from "@/lib/utils";
+// import { cn } from "@/lib/utils";
 
 const roleOptions: { value: WaitlistRole; label: string }[] = [
   { value: "family", label: "Care Seeker" },
@@ -52,28 +52,31 @@ export function HeroWaitlistCard() {
   const referralCode = result?.data?.referralCode;
 
   return (
-    <div
-      className={cn(
-        "relative w-full max-w-[40rem] overflow-hidden rounded-[1.75rem] p-5 shadow-2xl sm:rounded-[2rem] sm:p-6 md:max-w-none md:rounded-[2.25rem] md:p-8",
-        "border border-on-media/25",
-        /* Mobile: frosts into solid white; desktop: warm liquid glass */
-        "bg-gradient-to-b from-on-media/25 via-on-media/55 to-on-media",
-        "backdrop-blur-2xl backdrop-saturate-150",
-        "md:border-on-media/25 md:from-glass-liquid-top md:via-glass-liquid-mid md:to-glass-liquid-bottom",
-        "md:supports-[backdrop-filter]:bg-glass-fill",
-      )}
-    >
+    <>
+      {/* Transparent liquid glass card — temporarily hidden
       <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-br from-on-media/30 via-transparent to-transparent"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 hidden rounded-[inherit] bg-gradient-to-tl from-gold-deep/20 via-transparent to-transparent md:block"
-      />
+        className={cn(
+          "relative w-full max-w-[40rem] overflow-hidden rounded-[1.75rem] p-5 shadow-2xl sm:rounded-[2rem] sm:p-6 md:max-w-none md:rounded-[2.25rem] md:p-8",
+          "border border-on-media/25",
+          "bg-gradient-to-b from-on-media/25 via-on-media/55 to-on-media",
+          "backdrop-blur-2xl backdrop-saturate-150",
+          "md:border-on-media/25 md:from-glass-liquid-top md:via-glass-liquid-mid md:to-glass-liquid-bottom",
+          "md:supports-[backdrop-filter]:bg-glass-fill",
+        )}
+      >
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-br from-on-media/30 via-transparent to-transparent"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 hidden rounded-[inherit] bg-gradient-to-tl from-gold-deep/20 via-transparent to-transparent md:block"
+        />
+      </div>
+      */}
 
       <form
-        className="relative z-10 flex flex-col items-start gap-4 sm:gap-5 md:gap-6"
+        className="relative z-10 flex flex-col items-start gap-4"
         onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
         noValidate
       >
@@ -109,7 +112,7 @@ export function HeroWaitlistCard() {
         </div>
         */}
 
-        {/* Email field — temporarily hidden; keep Join Waitlist only
+        {/* Email field — temporarily hidden
         <div className="flex min-h-12 items-center gap-1.5 rounded-full bg-on-media p-1 pl-3.5 shadow-sm sm:min-h-14 sm:gap-2 sm:p-1.5 sm:pl-5">
           <Input
             type="email"
@@ -181,6 +184,7 @@ export function HeroWaitlistCard() {
         </div>
         */}
       </form>
-    </div>
+    </>
   );
 }
+
