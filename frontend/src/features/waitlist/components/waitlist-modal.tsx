@@ -173,7 +173,7 @@ export function WaitlistModal() {
               <Button
                 type="button"
                 onClick={closeModal}
-                className="mt-2 h-11 rounded-full bg-teal px-6 text-on-media hover:bg-teal-hover"
+                className="mt-2 h-11 rounded-full bg-brand-blue px-6 text-on-media hover:bg-brand-blue-hover"
               >
                 Done
               </Button>
@@ -201,7 +201,7 @@ export function WaitlistModal() {
                         "inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2.5 text-sm font-semibold transition-colors",
                         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue",
                         isActive
-                          ? "bg-teal text-navy shadow-sm"
+                          ? "bg-brand-blue text-on-media shadow-sm"
                           : "bg-transparent text-on-media",
                       )}
                       onClick={() =>
@@ -338,7 +338,7 @@ export function WaitlistModal() {
               <Button
                 type="submit"
                 disabled={mutation.isPending}
-                className="mt-2 h-12 w-full rounded-full bg-teal text-base text-on-media hover:bg-teal-hover"
+                className="mt-2 h-12 w-full rounded-full bg-brand-blue text-base text-on-media hover:bg-brand-blue-hover"
               >
                 {mutation.isPending ? "Joining..." : "Join Waitlist"}
                 <ArrowRight className="size-4" aria-hidden />
