@@ -16,10 +16,7 @@ import { useEffect, useId } from "react";
 import { Controller, useForm, type Resolver } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import {
-  nigeriaStateNames,
-  nigeriaStates,
-} from "@/features/waitlist/data/nigeria-locations";
+import { useNigeriaLocations } from "@/features/waitlist/hooks/use-nigeria-locations";
 import { waitlistStatsKey } from "@/features/waitlist/hooks/use-waitlist-stats";
 import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { joinWaitlist } from "@/features/waitlist/services/waitlist-service";
@@ -56,6 +53,7 @@ export function WaitlistModal() {
   const queryClient = useQueryClient();
   const isOpen = useWaitlistStore((s) => s.isModalOpen);
   const closeModal = useWaitlistStore((s) => s.closeModal);
+  const locationsQuery = useNigeriaLocations();
 
   const form = useForm<WaitlistJoinInput>({
     resolver: zodResolver(waitlistJoinSchema) as Resolver<WaitlistJoinInput>,
@@ -64,7 +62,12 @@ export function WaitlistModal() {
 
   const selectedRole = form.watch("role");
   const selectedState = form.watch("state");
-  const lgas = selectedState ? (nigeriaStates[selectedState] ?? []) : [];
+  const stateOptions = locationsQuery.data?.states ?? [];
+  const lgas = selectedState
+    ? (locationsQuery.data?.lgasByState[selectedState] ?? [])
+    : [];
+  const locationsLoading = locationsQuery.isPending;
+  const locationsFailed = locationsQuery.isError;
 
   const mutation = useMutation({
     mutationFn: joinWaitlist,
@@ -273,15 +276,23 @@ export function WaitlistModal() {
                     control={form.control}
                     render={({ field }) => (
                       <SearchableSelect
-                        options={nigeriaStateNames}
+                        options={stateOptions}
                         value={field.value}
                         onChange={(next) => {
                           field.onChange(next);
                           form.setValue("lga", "");
                         }}
-                        placeholder="State"
+                        placeholder={
+                          locationsLoading ? "Loading…" : "State"
+                        }
                         aria-label="State"
+                        disabled={locationsLoading || locationsFailed}
                         invalid={Boolean(form.formState.errors.state)}
+                        emptyMessage={
+                          locationsFailed
+                            ? "Couldn’t load states"
+                            : "No matches"
+                        }
                         icon={
                           <MapPin
                             className="size-4 shrink-0 text-on-media/70"
@@ -307,12 +318,22 @@ export function WaitlistModal() {
                         options={lgas}
                         value={field.value}
                         onChange={field.onChange}
-                        placeholder="LGA"
+                        placeholder={
+                          locationsLoading ? "Loading…" : "LGA"
+                        }
                         aria-label="LGA"
-                        disabled={!selectedState}
+                        disabled={
+                          locationsLoading ||
+                          locationsFailed ||
+                          !selectedState
+                        }
                         invalid={Boolean(form.formState.errors.lga)}
                         emptyMessage={
-                          selectedState ? "No matches" : "Select a state first"
+                          locationsFailed
+                            ? "Couldn’t load LGAs"
+                            : selectedState
+                              ? "No matches"
+                              : "Select a state first"
                         }
                         icon={
                           <Building2
@@ -330,6 +351,13 @@ export function WaitlistModal() {
                   ) : null}
                 </div>
               </div>
+
+              {locationsFailed ? (
+                <p className="text-center text-xs text-danger" role="alert">
+                  Couldn’t load Nigerian states. Check your connection and try
+                  again.
+                </p>
+              ) : null}
 
               <Button
                 type="submit"
