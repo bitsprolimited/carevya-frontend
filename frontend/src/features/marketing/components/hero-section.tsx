@@ -31,7 +31,7 @@ export function HeroSection() {
         <div className="relative z-10 flex min-h-[78svh] flex-col md:min-h-[100svh]">
           <SiteHeader variant="transparent" />
 
-          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 pb-36 pt-2 md:justify-center md:gap-10 md:px-6 md:pb-14 md:pt-6 lg:px-8 lg:pb-16 xl:px-10">
+          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 pb-10 pt-2 md:justify-center md:gap-10 md:px-6 md:pb-14 md:pt-6 lg:px-8 lg:pb-16 xl:px-10">
             <div className="max-w-xl space-y-3 md:max-w-2xl md:space-y-5">
               <h1 className="font-lato text-[32px] leading-[40px] font-bold tracking-normal text-on-media md:font-sans md:text-5xl md:leading-[1.15] lg:text-6xl">
                 <span className="whitespace-nowrap">Find trusted care,</span>
@@ -45,10 +45,9 @@ export function HeroSection() {
               </p>
             </div>
 
-            {/* Desktop waitlist sits in-hero */}
             <div
               id="hero-waitlist"
-              className="mt-8 hidden w-full max-w-xl scroll-mt-24 md:mt-0 md:block md:max-w-2xl lg:max-w-3xl xl:max-w-2xl"
+              className="mt-4 w-full max-w-xl scroll-mt-24 md:mt-0 md:max-w-2xl lg:max-w-3xl xl:max-w-2xl"
             >
               <HeroWaitlistCard />
             </div>
@@ -72,14 +71,6 @@ export function HeroSection() {
             </ul>
           </div>
         </div>
-      </div>
-
-      {/* Mobile: glass card floats over hero → white content seam */}
-      <div
-        id="hero-waitlist-mobile"
-        className="relative z-20 -mt-28 px-5 pb-4 md:hidden"
-      >
-        <HeroWaitlistCard />
       </div>
     </section>
   );
