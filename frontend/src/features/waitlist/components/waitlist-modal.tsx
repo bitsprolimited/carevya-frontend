@@ -133,7 +133,7 @@ export function WaitlistModal() {
           type="button"
           aria-label="Close"
           onClick={closeModal}
-          className="absolute top-4 right-4 z-20 inline-flex size-9 items-center justify-center rounded-full bg-on-media/15 text-on-media transition-colors hover:bg-on-media/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal"
+          className="absolute top-4 right-4 z-20 inline-flex size-9 items-center justify-center rounded-full bg-on-media/15 text-on-media transition-colors hover:bg-on-media/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
         >
           <X className="size-4" aria-hidden />
         </button>
@@ -199,7 +199,7 @@ export function WaitlistModal() {
                       aria-selected={isActive}
                       className={cn(
                         "inline-flex flex-1 items-center justify-center gap-1.5 rounded-full px-3 py-2.5 text-sm font-semibold transition-colors",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue",
                         isActive
                           ? "bg-teal text-navy shadow-sm"
                           : "bg-transparent text-on-media",
