@@ -8,8 +8,17 @@ export const heroWaitlistSchema = z.object({
   role: waitlistRoleSchema,
 });
 
-export const waitlistJoinSchema = heroWaitlistSchema.extend({
-  location: z.string().min(2, "Enter your location").max(120).optional(),
+/** Full waitlist modal form. */
+export const waitlistJoinSchema = z.object({
+  role: waitlistRoleSchema,
+  fullName: z.string().min(2, "Enter your full name").max(120),
+  email: z.email("Enter a valid email address"),
+  phone: z
+    .string()
+    .min(7, "Enter a valid phone number")
+    .max(20, "Enter a valid phone number"),
+  state: z.string().min(1, "Select a state"),
+  lga: z.string().min(1, "Select an LGA"),
 });
 
 export type WaitlistRole = z.infer<typeof waitlistRoleSchema>;

@@ -2,17 +2,12 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { assets } from "@/lib/assets";
 
-function scrollToWaitlistForm() {
-  const desktop = window.matchMedia("(min-width: 768px)").matches;
-  const target = document.getElementById(
-    desktop ? "hero-waitlist" : "hero-waitlist-mobile",
-  );
-  target?.scrollIntoView({ behavior: "smooth", block: "center" });
-}
-
 export function WaitlistCtaSection() {
+  const openModal = useWaitlistStore((state) => state.openModal);
+
   return (
     <section
       id="join-waitlist"
@@ -50,7 +45,7 @@ export function WaitlistCtaSection() {
         <Button
           type="button"
           className="mt-8 h-12 rounded-full px-8 text-base sm:mt-10 sm:h-14 sm:px-10 sm:text-lg"
-          onClick={scrollToWaitlistForm}
+          onClick={openModal}
         >
           Join Waitlist Now
         </Button>

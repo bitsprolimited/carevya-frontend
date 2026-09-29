@@ -34,6 +34,12 @@
   --scrim: #1a1410;
   --on-media: #ffffff;
   --on-media-muted: #ffffffcc;
+  /* Waitlist modal accents (Figma teal) */
+  --teal: #00cdb0;
+  --teal-hover: #00b89e;
+  --glass-modal: #ffffff33;
+  --glass-field: #ffffff26;
+  --glass-field-border: #ffffff4d;
 }
 
 @theme inline {
@@ -67,6 +73,11 @@
   --color-scrim: var(--scrim);
   --color-on-media: var(--on-media);
   --color-on-media-muted: var(--on-media-muted);
+  --color-teal: var(--teal);
+  --color-teal-hover: var(--teal-hover);
+  --color-glass-modal: var(--glass-modal);
+  --color-glass-field: var(--glass-field);
+  --color-glass-field-border: var(--glass-field-border);
   --font-sans: var(--font-plus-jakarta);
   --font-lato: var(--font-lato-family);
   --font-inter: var(--font-inter-family);

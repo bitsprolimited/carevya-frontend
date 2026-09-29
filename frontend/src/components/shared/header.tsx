@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { assets } from "@/lib/assets";
+import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { cn } from "@/lib/utils";
 
 const audienceTabs = [
@@ -17,18 +18,12 @@ type SiteHeaderProps = {
   variant?: "transparent" | "solid";
 };
 
-function scrollToWaitlist() {
-  const target =
-    document.getElementById("hero-waitlist-mobile") ??
-    document.getElementById("hero-waitlist");
-  target?.scrollIntoView({ behavior: "smooth", block: "center" });
-}
-
 export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
   const [open, setOpen] = useState(false);
   const [audience, setAudience] = useState<(typeof audienceTabs)[number]["id"]>(
     "families",
   );
+  const openWaitlistModal = useWaitlistStore((state) => state.openModal);
   const isTransparent = variant === "transparent";
 
   return (
@@ -125,7 +120,7 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
       <Button
         type="button"
         className="absolute top-1/2 right-12 hidden h-10 -translate-y-1/2 rounded-full px-5 md:inline-flex lg:right-16 xl:right-24"
-        onClick={scrollToWaitlist}
+        onClick={openWaitlistModal}
       >
         Join Waitlist
         <ArrowRight className="size-4" aria-hidden />
@@ -162,7 +157,7 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
             className="mt-1 w-full rounded-full"
             onClick={() => {
               setOpen(false);
-              scrollToWaitlist();
+              openWaitlistModal();
             }}
           >
             Join Waitlist

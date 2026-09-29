@@ -9,19 +9,19 @@ import type {
 export async function joinWaitlist(
   input: WaitlistJoinInput,
 ): Promise<WaitlistJoinResponse> {
-  const { email, role } = input;
-
   return apiFetch<WaitlistJoinResponse>("/api/waitlist", {
     method: "POST",
     body: {
-      email: email.trim().toLowerCase(),
-      role, // backend accepts "family" | "caregiver" | "agency" as-is
-      // location: input.location, // add only if the backend accepts it
+      role: input.role,
+      fullName: input.fullName.trim(),
+      email: input.email.trim().toLowerCase(),
+      phone: input.phone.trim(),
+      state: input.state,
+      lga: input.lga,
     },
   });
 }
 
-// NOTE: paths below are assumptions; replace with the real routes.
 export async function getWaitlistStats(): Promise<WaitlistStatsResponse> {
   return apiFetch<WaitlistStatsResponse>("/api/waitlist/stats");
 }

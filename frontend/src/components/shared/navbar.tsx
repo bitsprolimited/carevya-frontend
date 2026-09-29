@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -14,6 +15,7 @@ const navLinks = [
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const openWaitlistModal = useWaitlistStore((state) => state.openModal);
 
   return (
     <>
@@ -64,7 +66,15 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Button size="sm" className="mt-1 w-full">
+          <Button
+            size="sm"
+            className="mt-1 w-full"
+            type="button"
+            onClick={() => {
+              setOpen(false);
+              openWaitlistModal();
+            }}
+          >
             Join Waitlist
           </Button>
         </nav>

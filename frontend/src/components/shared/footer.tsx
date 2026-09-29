@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ComponentType, SVGProps } from "react";
 import { assets } from "@/lib/assets";
+import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { cn } from "@/lib/utils";
 
 const sectionLinks = [
@@ -94,19 +95,12 @@ const socialLinks: {
   { href: "https://linkedin.com", label: "LinkedIn", Icon: LinkedInIcon },
 ];
 
-function scrollToWaitlist() {
-  const desktop = window.matchMedia("(min-width: 768px)").matches;
-  const target = document.getElementById(
-    desktop ? "hero-waitlist" : "hero-waitlist-mobile",
-  );
-  target?.scrollIntoView({ behavior: "smooth", block: "center" });
-}
-
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 export function Footer() {
+  const openWaitlistModal = useWaitlistStore((state) => state.openModal);
   return (
     <footer className="relative mt-auto bg-footer text-white">
       <div className="mx-auto w-full max-w-7xl px-4 py-12 md:px-6 md:py-14 lg:px-8 lg:py-16">
@@ -171,7 +165,7 @@ export function Footer() {
             </p>
             <button
               type="button"
-              onClick={scrollToWaitlist}
+              onClick={openWaitlistModal}
               className="mt-1 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue transition-colors hover:text-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
             >
               Reserve your waitlist slot
