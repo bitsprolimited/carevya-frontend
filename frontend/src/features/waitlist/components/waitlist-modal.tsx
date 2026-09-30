@@ -25,6 +25,7 @@ import {
   type WaitlistJoinInput,
   type WaitlistRole,
 } from "@/features/waitlist/types";
+import { ApiError } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const roleOptions: {
@@ -32,12 +33,12 @@ const roleOptions: {
   label: string;
   Icon: typeof User;
 }[] = [
-  { value: "family", label: "Care Seeker", Icon: User },
+  { value: "care_seeker", label: "Care Seeker", Icon: User },
   { value: "caregiver", label: "Caregivers", Icon: Users },
 ];
 
 const defaults: WaitlistJoinInput = {
-  role: "family",
+  role: "care_seeker",
   fullName: "",
   email: "",
   phone: "",
@@ -47,6 +48,36 @@ const defaults: WaitlistJoinInput = {
 
 const fieldShell =
   "flex h-12 w-full items-center gap-2.5 rounded-2xl border border-glass-field-border bg-glass-field px-3.5 text-sm text-on-media placeholder:text-on-media/55 focus-within:border-on-media/60";
+
+function normalizePhone(raw: string) {
+  const p = raw.replace(/[\s()-]/g, "");
+  if (p.startsWith("+")) return p;
+  if (p.startsWith("234")) return `+${p}`;
+  if (p.startsWith("0")) return `+234${p.slice(1)}`;
+  return p;
+}
+
+
+function getErrorMessage(err: unknown): string {
+  if (err instanceof ApiError) {
+    const body = err.body;
+    if (
+      body &&
+      typeof body === "object" &&
+      "message" in body &&
+      typeof body.message === "string" &&
+      body.message
+    ) {
+      return body.message;
+    }
+    return "Something went wrong. Please try again.";
+  }
+  if (err instanceof TypeError) {
+    return "Network error. Please check your connection and try again.";
+  }
+  if (err instanceof Error && err.message) return err.message;
+  return "Something went wrong. Please try again.";
+}
 
 export function WaitlistModal() {
   const titleId = useId();
@@ -156,11 +187,15 @@ export function WaitlistModal() {
           </div>
 
           {mutation.isSuccess ? (
-            <div className="mt-8 flex flex-col items-center gap-3 text-center" role="status">
+            <div
+              className="mt-8 flex flex-col items-center gap-3 text-center"
+              role="status"
+            >
               <p className="text-sm font-medium text-on-media">
                 {alreadyJoined
                   ? "You're already on the waitlist."
-                  : result?.message ?? "You're on the waitlist — we'll be in touch."}
+                  : (result?.message ??
+                    "You're on the waitlist — we'll be in touch.")}
               </p>
               {position != null || referralCode ? (
                 <p className="text-xs text-on-media/75">
@@ -184,7 +219,12 @@ export function WaitlistModal() {
           ) : (
             <form
               className="mt-6 flex flex-col gap-3.5"
-              onSubmit={form.handleSubmit((values) => mutation.mutate(values))}
+              onSubmit={form.handleSubmit((values) =>
+                mutation.mutate({
+                  ...values,
+                  phone: normalizePhone(values.phone),
+                }),
+              )}
               noValidate
             >
               <div
@@ -217,6 +257,11 @@ export function WaitlistModal() {
                   );
                 })}
               </div>
+              {form.formState.errors.role ? (
+                <p className="text-xs text-danger" role="alert">
+                  {form.formState.errors.role.message}
+                </p>
+              ) : null}
 
               <label className={fieldShell}>
                 <User className="size-4 shrink-0 text-on-media/70" aria-hidden />
@@ -282,9 +327,7 @@ export function WaitlistModal() {
                           field.onChange(next);
                           form.setValue("lga", "");
                         }}
-                        placeholder={
-                          locationsLoading ? "Loading…" : "State"
-                        }
+                        placeholder={locationsLoading ? "Loading…" : "State"}
                         aria-label="State"
                         disabled={locationsLoading || locationsFailed}
                         invalid={Boolean(form.formState.errors.state)}
@@ -318,14 +361,10 @@ export function WaitlistModal() {
                         options={lgas}
                         value={field.value}
                         onChange={field.onChange}
-                        placeholder={
-                          locationsLoading ? "Loading…" : "LGA"
-                        }
+                        placeholder={locationsLoading ? "Loading…" : "LGA"}
                         aria-label="LGA"
                         disabled={
-                          locationsLoading ||
-                          locationsFailed ||
-                          !selectedState
+                          locationsLoading || locationsFailed || !selectedState
                         }
                         invalid={Boolean(form.formState.errors.lga)}
                         emptyMessage={
@@ -368,11 +407,15 @@ export function WaitlistModal() {
                 <ArrowRight className="size-4" aria-hidden />
               </Button>
 
+              {mutation.isPending ? (
+                <p className="text-center text-xs text-on-media/70">
+                  This can take a few seconds
+                </p>
+              ) : null}
+
               {mutation.isError ? (
                 <p className="text-center text-xs text-danger" role="alert">
-                  {mutation.error instanceof Error
-                    ? mutation.error.message
-                    : "Something went wrong. Please try again."}
+                  {getErrorMessage(mutation.error)}
                 </p>
               ) : null}
             </form>
