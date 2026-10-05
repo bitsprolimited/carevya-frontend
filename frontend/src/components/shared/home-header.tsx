@@ -14,7 +14,7 @@ const navLinks = [
   { label: "Home", href: "/", match: "/" },
   { label: "How It Works", href: "/how-it-works", match: "/how-it-works", chevron: true },
   { label: "About Us", href: "/about", match: "/about" },
-  { label: "Contact Us", href: "/#contact", match: null },
+  { label: "Contact Us", href: "/contact", match: "/contact" },
   { label: "FAQs", href: "/#faq", match: null },
 ] as const;
 
