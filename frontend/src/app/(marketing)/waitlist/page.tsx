@@ -1,3 +1,4 @@
+import { Reveal } from "@/components/shared/reveal";
 import { FaqSection } from "@/features/faqs/components/faq-section";
 import { HeroSection } from "@/features/marketing/components/hero-section";
 import { OneStandardSection } from "@/features/marketing/components/one-standard-section";
@@ -9,11 +10,21 @@ export default function WaitlistPage() {
   return (
     <div className="flex flex-col">
       <HeroSection />
-      <ProtocolSection />
-      <OneStandardSection />
-      <VerificationSection />
-      <FaqSection />
-      <WaitlistCtaSection />
+      <Reveal>
+        <ProtocolSection />
+      </Reveal>
+      <Reveal>
+        <OneStandardSection />
+      </Reveal>
+      <Reveal>
+        <VerificationSection />
+      </Reveal>
+      <Reveal>
+        <FaqSection />
+      </Reveal>
+      <Reveal>
+        <WaitlistCtaSection />
+      </Reveal>
     </div>
   );
 }

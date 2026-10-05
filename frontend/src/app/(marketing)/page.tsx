@@ -1,5 +1,6 @@
-import { FaqSection } from "@/features/faqs/components/faq-section";
 import { SiteFooter } from "@/components/shared/site-footer";
+import { Reveal } from "@/components/shared/reveal";
+import { FaqSection } from "@/features/faqs/components/faq-section";
 import { WaitlistCtaSection } from "@/features/waitlist/components/waitlist-cta-section";
 import { HomeCommitmentSection } from "@/features/marketing/components/home-commitment-section";
 import { HomeHeroSection } from "@/features/marketing/components/home-hero-section";
@@ -12,13 +13,27 @@ export default function HomePage() {
   return (
     <div className="flex flex-col">
       <HomeHeroSection />
-      <HomeHowItWorksSection />
-      <HomeCommitmentSection />
-      <HomeVerificationSection />
-      <HomeWhySection />
-      <HomeTestimonialsSection />
-      <FaqSection />
-      <WaitlistCtaSection ctaLabel="Get Started Now" />
+      <Reveal>
+        <HomeHowItWorksSection />
+      </Reveal>
+      <Reveal>
+        <HomeCommitmentSection />
+      </Reveal>
+      <Reveal>
+        <HomeVerificationSection />
+      </Reveal>
+      <Reveal>
+        <HomeWhySection />
+      </Reveal>
+      <Reveal>
+        <HomeTestimonialsSection />
+      </Reveal>
+      <Reveal>
+        <FaqSection />
+      </Reveal>
+      <Reveal>
+        <WaitlistCtaSection ctaLabel="Get Started Now" />
+      </Reveal>
       <SiteFooter />
     </div>
   );

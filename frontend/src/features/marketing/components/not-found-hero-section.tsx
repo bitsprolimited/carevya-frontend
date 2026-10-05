@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { HomeHeader } from "@/components/shared/home-header";
 import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
+import { fadeUp, heroTransition, staggerContainer } from "@/lib/motion";
 import { assets } from "@/lib/assets";
 import { cn } from "@/lib/utils";
 
@@ -35,18 +37,39 @@ export function NotFoundHeroSection() {
         <div className="relative z-10 flex min-h-[85svh] flex-col md:min-h-[100svh]">
           <HomeHeader variant="transparent" />
 
-          <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-16 pt-8 text-center md:px-6 md:pb-20">
-            <h1 className="font-sans text-[4.5rem] leading-none font-bold tracking-tight text-on-media sm:text-7xl md:text-8xl lg:text-[7rem]">
+          <motion.div
+            className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-16 pt-8 text-center md:px-6 md:pb-20"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.h1
+              variants={fadeUp}
+              transition={heroTransition}
+              className="font-sans text-[4.5rem] leading-none font-bold tracking-tight text-on-media sm:text-7xl md:text-8xl lg:text-[7rem]"
+            >
               404
-            </h1>
-            <p className="mt-3 font-sans text-3xl leading-tight font-bold tracking-tight text-brand-blue sm:mt-4 sm:text-4xl md:text-5xl lg:text-[3.25rem]">
+            </motion.h1>
+            <motion.p
+              variants={fadeUp}
+              transition={heroTransition}
+              className="mt-3 font-sans text-3xl leading-tight font-bold tracking-tight text-brand-blue sm:mt-4 sm:text-4xl md:text-5xl lg:text-[3.25rem]"
+            >
               Page Not Found
-            </p>
-            <p className="mt-4 max-w-md text-sm leading-relaxed text-on-media/90 sm:mt-5 sm:text-base md:text-lg">
+            </motion.p>
+            <motion.p
+              variants={fadeUp}
+              transition={heroTransition}
+              className="mt-4 max-w-md text-sm leading-relaxed text-on-media/90 sm:mt-5 sm:text-base md:text-lg"
+            >
               The page you are looking for doesn&apos;t exist or has been moved.
-            </p>
+            </motion.p>
 
-            <div className="mt-8 flex w-full max-w-lg flex-col items-stretch gap-3 sm:mt-10 sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-4">
+            <motion.div
+              variants={fadeUp}
+              transition={heroTransition}
+              className="mt-8 flex w-full max-w-lg flex-col items-stretch gap-3 sm:mt-10 sm:max-w-none sm:flex-row sm:items-center sm:justify-center sm:gap-4"
+            >
               <Button
                 type="button"
                 size="lg"
@@ -66,8 +89,8 @@ export function NotFoundHeroSection() {
               >
                 Go Home
               </Link>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
     </section>

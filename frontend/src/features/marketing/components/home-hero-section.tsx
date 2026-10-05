@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import { motion } from "motion/react";
 import { Button } from "@/components/ui/button";
 import { HomeHeader } from "@/components/shared/home-header";
 import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
+import { fadeUp, heroTransition, staggerContainer } from "@/lib/motion";
 import { assets } from "@/lib/assets";
 
 export function HomeHeroSection() {
@@ -34,17 +36,34 @@ export function HomeHeroSection() {
           <HomeHeader variant="transparent" />
 
           <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-start px-5 pb-14 pt-4 md:justify-center md:px-6 md:pb-20 md:pt-4 lg:px-8 xl:px-10">
-            <div className="max-w-xl space-y-5 md:max-w-2xl md:space-y-6">
-              <h1 className="font-sans text-[2rem] leading-[1.2] font-bold tracking-tight text-on-media sm:text-4xl md:text-5xl md:leading-[1.15] lg:text-[3.5rem] lg:leading-[1.12]">
+            <motion.div
+              className="max-w-xl space-y-5 md:max-w-2xl md:space-y-6"
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
+              <motion.h1
+                variants={fadeUp}
+                transition={heroTransition}
+                className="font-sans text-[2rem] leading-[1.2] font-bold tracking-tight text-on-media sm:text-4xl md:text-5xl md:leading-[1.15] lg:text-[3.5rem] lg:leading-[1.12]"
+              >
                 Where every elder feels truly cherished and safe at home.
-              </h1>
-              <p className="max-w-md text-base leading-relaxed text-on-media/90 sm:text-lg md:max-w-lg md:leading-relaxed">
+              </motion.h1>
+              <motion.p
+                variants={fadeUp}
+                transition={heroTransition}
+                className="max-w-md text-base leading-relaxed text-on-media/90 sm:text-lg md:max-w-lg md:leading-relaxed"
+              >
                 We connect families / care seekers across Nigeria with verified
                 independent caregivers. Structured checks, transparent rates and
                 real human warmth.
-              </p>
+              </motion.p>
 
-              <div className="pt-1">
+              <motion.div
+                variants={fadeUp}
+                transition={heroTransition}
+                className="pt-1"
+              >
                 <Button
                   type="button"
                   size="lg"
@@ -53,8 +72,8 @@ export function HomeHeroSection() {
                 >
                   Get Started Now
                 </Button>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </div>
       </div>

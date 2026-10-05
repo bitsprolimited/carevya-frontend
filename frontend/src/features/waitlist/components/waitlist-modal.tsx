@@ -12,6 +12,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useId } from "react";
 import { Controller, useForm, type Resolver } from "react-hook-form";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ import {
   type WaitlistRole,
 } from "@/features/waitlist/types";
 import { ApiError } from "@/lib/api";
+import { duration, easeOutExpo, fadeIn, scaleIn } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 const roleOptions: {
@@ -134,35 +136,49 @@ export function WaitlistModal() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset only when modal opens/closes
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   const result = mutation.data;
   const alreadyJoined = Boolean(result?.meta?.alreadyJoined);
   const position = result?.data?.position;
   const referralCode = result?.data?.referralCode;
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
-      role="presentation"
-    >
-      <button
-        type="button"
-        aria-label="Close waitlist modal"
-        className="absolute inset-0 bg-scrim/70 backdrop-blur-sm"
-        onClick={closeModal}
-      />
+    <AnimatePresence>
+      {isOpen ? (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+          role="presentation"
+          variants={fadeIn}
+          initial="hidden"
+          animate="visible"
+          exit="hidden"
+          transition={{ duration: duration.fast, ease: easeOutExpo }}
+        >
+          <motion.button
+            type="button"
+            aria-label="Close waitlist modal"
+            className="absolute inset-0 bg-scrim/70 backdrop-blur-sm"
+            onClick={closeModal}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: duration.fast }}
+          />
 
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        className={cn(
-          "relative z-10 flex max-h-[min(92svh,40rem)] w-full max-w-md flex-col overflow-hidden rounded-[1.75rem]",
-          "border border-on-media/30 bg-glass-modal shadow-2xl",
-          "backdrop-blur-2xl backdrop-saturate-150",
-        )}
-      >
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            variants={scaleIn}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            transition={{ duration: duration.base, ease: easeOutExpo }}
+            className={cn(
+              "relative z-10 flex max-h-[min(92svh,40rem)] w-full max-w-md flex-col overflow-hidden rounded-[1.75rem]",
+              "border border-on-media/30 bg-glass-modal shadow-2xl",
+              "backdrop-blur-2xl backdrop-saturate-150",
+            )}
+          >
         <button
           type="button"
           aria-label="Close"
@@ -421,7 +437,9 @@ export function WaitlistModal() {
             </form>
           )}
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
   );
 }
