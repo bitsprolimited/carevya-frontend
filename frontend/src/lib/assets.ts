@@ -58,6 +58,8 @@ export const assets = {
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1791207468/7ed15e5598b17096513e7437e38cbe556c426dc6_x3jbho.jpg",
   contactMap:
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1791207595/bde178beb4ee570c586491764d311336383a718d_c7qiz2.png",
+  faqsHeroBackground:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791210022/888fd010cc5ca260fe67f4d04d4b9172b3a4e052_vpkskm.jpg",
   /** Public ID still uses legacy filename on Cloudinary; displays as CareVYA logo. */
   logo: "https://res.cloudinary.com/dycukxm7r/image/upload/v1790166614/carenestLogo_to9u5s.png",
   communityFamily:

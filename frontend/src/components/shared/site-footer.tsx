@@ -14,7 +14,7 @@ const quickLinks = [
   { href: "/about", label: "About Us" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/contact", label: "Contact Us" },
-  { href: "/#faq", label: "FAQs" },
+  { href: "/faqs", label: "FAQs" },
 ] as const;
 
 const verificationLinks = [
