@@ -1,5 +1,9 @@
-import { redirect } from "next/navigation";
+import { HomeHeroSection } from "@/features/marketing/components/home-hero-section";
 
-export default function MarketingHomePage() {
-  redirect("/waitlist");
+export default function HomePage() {
+  return (
+    <div className="flex flex-col">
+      <HomeHeroSection />
+    </div>
+  );
 }
