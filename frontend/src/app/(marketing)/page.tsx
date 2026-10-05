@@ -2,6 +2,7 @@ import { HomeCommitmentSection } from "@/features/marketing/components/home-comm
 import { HomeHeroSection } from "@/features/marketing/components/home-hero-section";
 import { HomeHowItWorksSection } from "@/features/marketing/components/home-how-it-works-section";
 import { HomeVerificationSection } from "@/features/marketing/components/home-verification-section";
+import { HomeWhySection } from "@/features/marketing/components/home-why-section";
 
 export default function HomePage() {
   return (
@@ -10,6 +11,7 @@ export default function HomePage() {
       <HomeHowItWorksSection />
       <HomeCommitmentSection />
       <HomeVerificationSection />
+      <HomeWhySection />
     </div>
   );
 }

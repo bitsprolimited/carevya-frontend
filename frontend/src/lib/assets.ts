@@ -14,6 +14,8 @@ export const assets = {
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1791197159/image_52_lweppt.png",
   homeVerification:
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1791197158/Frame_2147226145_bzl0fb.png",
+  homeWhyCarevya:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791197159/image_53_mp8yyb.png",
   /** Public ID still uses legacy filename on Cloudinary; displays as CareVYA logo. */
   logo: "https://res.cloudinary.com/dycukxm7r/image/upload/v1790166614/carenestLogo_to9u5s.png",
   communityFamily:
