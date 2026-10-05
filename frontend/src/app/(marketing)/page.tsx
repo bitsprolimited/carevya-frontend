@@ -17,6 +17,7 @@ export default function HomePage() {
       <HomeWhySection />
       <HomeTestimonialsSection />
       <FaqSection />
+      <WaitlistCtaSection ctaLabel="Get Started Now" />
     </div>
   );
 }

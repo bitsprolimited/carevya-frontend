@@ -53,7 +53,7 @@ export function WaitlistCtaSection({
           className="mt-8 h-12 rounded-full px-8 text-base sm:mt-10 sm:h-14 sm:px-10 sm:text-lg"
           onClick={openModal}
         >
-          Join Waitlist Now
+          {ctaLabel}
         </Button>
       </div>
     </section>
