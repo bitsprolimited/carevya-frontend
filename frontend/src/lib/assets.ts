@@ -16,6 +16,16 @@ export const assets = {
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1791197158/Frame_2147226145_bzl0fb.png",
   homeWhyCarevya:
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1791197159/image_53_mp8yyb.png",
+  homeTestimonialFeatured:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791202296/cf290889684685a2cb49a57d1511f4778a2c7579_lz0z7v.png",
+  homeTestimonialAvatarA:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791202272/Ellipse_2013_o9mpac.png",
+  homeTestimonialAvatarB:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791202272/Ellipse_2013_1_el0lfz.png",
+  homeTestimonialAvatarC:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791202271/5b53d545272b38f5a21c450cbf39fb87e5a06ec3_yjswtx.png",
+  homeTestimonialAvatarD:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791202271/4a3d1f8d29056ed08a31207593c5a7ea02cf8be3_tb7dtt.png",
   /** Public ID still uses legacy filename on Cloudinary; displays as CareVYA logo. */
   logo: "https://res.cloudinary.com/dycukxm7r/image/upload/v1790166614/carenestLogo_to9u5s.png",
   communityFamily:
