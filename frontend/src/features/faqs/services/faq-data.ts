@@ -9,7 +9,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   },
   {
     id: "evaluation",
-    question: "How are caregivers evaluated and vetted?",
+    question: "How are carers evaluated and vetted?",
     answer:
       "Every caregiver goes through multi-layer vetting: identity checks, background screening, experience and skills review, interviews, and ongoing family feedback.",
   },

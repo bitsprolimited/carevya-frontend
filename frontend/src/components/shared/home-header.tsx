@@ -15,7 +15,7 @@ const navLinks = [
   { label: "How It Works", href: "/#how-it-works", chevron: true },
   { label: "About Us", href: "/#about" },
   { label: "Contact Us", href: "/#contact" },
-  { label: "FAQs", href: "/waitlist#faq" },
+  { label: "FAQs", href: "/#faq" },
 ] as const;
 
 type HomeHeaderProps = {
