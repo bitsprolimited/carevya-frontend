@@ -9,10 +9,11 @@ export function HeroWaitlistCard() {
   return (
     <Button
       type="button"
+      size="lg"
       onClick={openModal}
-      className="h-10 shrink-0 rounded-full px-5 text-sm sm:h-11 sm:px-6 sm:text-base md:px-8"
+      className="h-12 rounded-full px-8 text-base sm:h-14 sm:px-10 sm:text-lg"
     >
-      Join Waitlist
+      Get Started Now
     </Button>
   );
 }

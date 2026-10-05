@@ -7,8 +7,9 @@
   --navy-muted: #1a3354;
   /* Footer / deep authority surface (Figma footer) */
   --footer: #0f172a;
-  --brand-blue: #2563eb;
-  --brand-blue-hover: #1d4ed8;
+  /* Hero / primary CTA blue (CareVYA home mock) */
+  --brand-blue: #0084ff;
+  --brand-blue-hover: #0070db;
   --emerald: #10b981;
   --emerald-dark: #059669;
   --surface-soft: #f0f5fb;
@@ -18,7 +19,7 @@
   --seal: #ffddb8;
   --muted: #5b6b7c;
   --border: #d7e0ea;
-  --ring: #2563eb;
+  --ring: #0084ff;
   --danger: #dc2626;
   /* Liquid warm glass (hero waitlist card) */
   --glass: #3d342955;
@@ -41,8 +42,8 @@
   --glass-field: #ffffff26;
   --glass-field-border: #ffffff4d;
   /* Searchable select dropdown panel (brand-blue glass) */
-  --glass-dropdown: #2563eb99;
-  --glass-dropdown-hover: #2563ebcc;
+  --glass-dropdown: #0084ff99;
+  --glass-dropdown-hover: #0084ffcc;
 }
 
 @theme inline {
