@@ -38,7 +38,7 @@ export function HomeHowItWorksSection() {
     <section id="how-it-works" className="scroll-mt-24 bg-background">
       <div className="mx-auto w-full max-w-7xl px-5 py-14 md:px-6 md:py-20 lg:px-8 lg:py-24 xl:px-10">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10 xl:gap-14">
-          <div className="flex flex-col justify-center lg:col-span-4">
+          <div className="flex flex-col lg:col-span-4">
             <p className="text-xs font-bold tracking-[0.14em] text-emerald uppercase">
               How CareVYA Works
             </p>
