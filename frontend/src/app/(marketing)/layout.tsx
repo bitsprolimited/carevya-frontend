@@ -1,4 +1,3 @@
-import { Footer } from "@/components/shared/footer";
 import { WaitlistModal } from "@/features/waitlist/components/waitlist-modal";
 
 export default function MarketingLayout({
@@ -9,7 +8,6 @@ export default function MarketingLayout({
   return (
     <>
       <main className="flex-1">{children}</main>
-      <Footer />
       <WaitlistModal />
     </>
   );

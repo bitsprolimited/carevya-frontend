@@ -1,4 +1,5 @@
 import { FaqSection } from "@/features/faqs/components/faq-section";
+import { SiteFooter } from "@/components/shared/site-footer";
 import { WaitlistCtaSection } from "@/features/waitlist/components/waitlist-cta-section";
 import { HomeCommitmentSection } from "@/features/marketing/components/home-commitment-section";
 import { HomeHeroSection } from "@/features/marketing/components/home-hero-section";
@@ -18,6 +19,7 @@ export default function HomePage() {
       <HomeTestimonialsSection />
       <FaqSection />
       <WaitlistCtaSection ctaLabel="Get Started Now" />
+      <SiteFooter />
     </div>
   );
 }
