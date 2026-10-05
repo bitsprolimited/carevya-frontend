@@ -5,7 +5,13 @@ import { Button } from "@/components/ui/button";
 import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { assets } from "@/lib/assets";
 
-export function WaitlistCtaSection() {
+type WaitlistCtaSectionProps = {
+  ctaLabel?: string;
+};
+
+export function WaitlistCtaSection({
+  ctaLabel = "Join Waitlist Now",
+}: WaitlistCtaSectionProps) {
   const openModal = useWaitlistStore((state) => state.openModal);
 
   return (

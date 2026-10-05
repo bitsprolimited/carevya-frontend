@@ -1,4 +1,5 @@
 import { FaqSection } from "@/features/faqs/components/faq-section";
+import { WaitlistCtaSection } from "@/features/waitlist/components/waitlist-cta-section";
 import { HomeCommitmentSection } from "@/features/marketing/components/home-commitment-section";
 import { HomeHeroSection } from "@/features/marketing/components/home-hero-section";
 import { HomeHowItWorksSection } from "@/features/marketing/components/home-how-it-works-section";
