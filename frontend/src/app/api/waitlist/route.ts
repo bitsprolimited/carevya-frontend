@@ -1,70 +1,85 @@
+
 import { NextResponse } from "next/server";
 import {
   waitlistJoinSchema,
   type WaitlistJoinResponse,
 } from "@/features/waitlist/types";
 
-export async function POST(request: Request) {
-  let json: unknown;
+const WAITLIST_API_URL = process.env.WAITLIST_API_URL;
 
+function errorResponse(message: string, status: number) {
+  return NextResponse.json(
+    {
+      success: false,
+      message,
+      data: {
+        id: "",
+        email: "",
+        role: "",
+        position: 0,
+        referralCode: "",
+        createdAt: "",
+      },
+      meta: { alreadyJoined: false, roleChanged: false },
+    } satisfies WaitlistJoinResponse,
+    { status },
+  );
+}
+
+export async function POST(request: Request) {
+  if (!WAITLIST_API_URL) {
+    console.error("WAITLIST_API_URL is not set");
+    return errorResponse("Server is not configured correctly.", 500);
+  }
+
+  let json: unknown;
   try {
     json = await request.json();
   } catch {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Invalid JSON body",
-        data: {
-          id: "",
-          email: "",
-          role: "",
-          position: 0,
-          referralCode: "",
-          createdAt: "",
-        },
-        meta: { alreadyJoined: false, roleChanged: false },
-      } satisfies WaitlistJoinResponse,
-      { status: 400 },
-    );
+    return errorResponse("Invalid JSON body", 400);
   }
 
   const parsed = waitlistJoinSchema.safeParse(json);
-
   if (!parsed.success) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: parsed.error.issues[0]?.message ?? "Invalid waitlist payload",
-        data: {
-          id: "",
-          email: "",
-          role: "",
-          position: 0,
-          referralCode: "",
-          createdAt: "",
-        },
-        meta: { alreadyJoined: false, roleChanged: false },
-      } satisfies WaitlistJoinResponse,
-      { status: 400 },
+    return errorResponse(
+      parsed.error.issues[0]?.message ?? "Invalid waitlist payload",
+      400,
     );
   }
 
-  const response: WaitlistJoinResponse = {
-    success: true,
-    message: "You're on the CareVYA waitlist.",
-    data: {
-      id: crypto.randomUUID(),
-      email: parsed.data.email,
-      role: parsed.data.role,
-      position: 501,
-      referralCode: `CV-${parsed.data.email.slice(0, 3).toUpperCase()}501`,
-      createdAt: new Date().toISOString(),
-    },
-    meta: {
-      alreadyJoined: false,
-      roleChanged: false,
-    },
-  };
+  try {
+    const upstream = await fetch(WAITLIST_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(parsed.data),
+      cache: "no-store",
+      // Render free tier can take 30-60s to wake from sleep
+      signal: AbortSignal.timeout(60_000),
+    });
 
-  return NextResponse.json(response, { status: 201 });
+    const data = await upstream.json().catch(() => null);
+
+    if (upstream.status === 429) {
+      return errorResponse(
+        "Too many attempts. Please wait a bit and try again.",
+        429,
+      );
+    }
+
+    if (!upstream.ok || !data) {
+      return errorResponse(
+        data?.message ?? "Could not join the waitlist. Please try again.",
+        upstream.status || 502,
+      );
+    }
+
+    // Backend already returns the WaitlistJoinResponse shape.
+    // 200 = success (including idempotent re-joins)
+    return NextResponse.json(data as WaitlistJoinResponse, {
+      status: upstream.status,
+    });
+  } catch (err) {
+    console.error("Waitlist upstream error:", err);
+    return errorResponse("Unable to reach the server. Please try again.", 502);
+  }
 }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Free MIT dataset: state → LGA map (36 states + FCT). */
+
 export const NIGERIA_LGAS_URL =
   "https://temikeezy.github.io/nigeria-geojson-data/data/lgas.json";
 
