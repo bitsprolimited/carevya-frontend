@@ -6,7 +6,7 @@ const featured = {
   quote:
     "When Mom was discharged from Riverside Methodist, we were terrified. CareVYA gave us direct access to Sarah’s complete background checks, within 30 minutes.",
   family: "The Henderson Family",
-  avatar: assets.homeTestimonialAvatarB,
+  avatar: assets.homeTestimonialAvatarHenderson,
   photo: assets.homeTestimonialFeatured,
 } as const;
 
