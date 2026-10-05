@@ -4,6 +4,8 @@ export const assets = {
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1790163942/grandMaHero_vba2hs.png",
   homeHeroBackground:
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1791196525/18dc9aeefb4c45eb665db1ef82290e1ab5a05886_tcyxi3.png",
+  homeHowItWorks:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791197159/image_49_vy687c.png",
   /** Public ID still uses legacy filename on Cloudinary; displays as CareVYA logo. */
   logo: "https://res.cloudinary.com/dycukxm7r/image/upload/v1790166614/carenestLogo_to9u5s.png",
   communityFamily:
