@@ -11,11 +11,11 @@ import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { label: "Home", href: "/", exact: true },
-  { label: "How It Works", href: "/#how-it-works", chevron: true },
-  { label: "About Us", href: "/#about" },
-  { label: "Contact Us", href: "/#contact" },
-  { label: "FAQs", href: "/#faq" },
+  { label: "Home", href: "/", match: "/" },
+  { label: "How It Works", href: "/how-it-works", match: "/how-it-works", chevron: true },
+  { label: "About Us", href: "/#about", match: null },
+  { label: "Contact Us", href: "/#contact", match: null },
+  { label: "FAQs", href: "/#faq", match: null },
 ] as const;
 
 type HomeHeaderProps = {
@@ -67,7 +67,12 @@ export function HomeHeader({ variant = "transparent" }: HomeHeaderProps) {
           className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-6 lg:flex xl:gap-8"
         >
           {navLinks.map((link) => {
-            const active = "exact" in link && link.exact && pathname === "/";
+            const active =
+              link.match !== null &&
+              (link.match === "/"
+                ? pathname === "/"
+                : pathname === link.match ||
+                  pathname.startsWith(`${link.match}/`));
             return (
               <Link
                 key={link.label}
