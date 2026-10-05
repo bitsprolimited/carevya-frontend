@@ -1,21 +1,17 @@
 "use client";
 
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { assets } from "@/lib/assets";
 import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { cn } from "@/lib/utils";
 
-const navLinks = [
-  { label: "Home", href: "/", exact: true },
-  { label: "How It Works", href: "/#protocol", chevron: true },
-  { label: "About Us", href: "/#about" },
-  { label: "Contact Us", href: "/#contact" },
-  { label: "FAQs", href: "/#faq" },
+const audienceTabs = [
+  { id: "families", label: "Families", href: "/#for-you" },
+  { id: "carers", label: "Carers", href: "/#for-me" },
 ] as const;
 
 type SiteHeaderProps = {
@@ -24,16 +20,14 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
   const [open, setOpen] = useState(false);
-  const pathname = usePathname();
+  const [audience, setAudience] = useState<(typeof audienceTabs)[number]["id"]>(
+    "families",
+  );
   const openWaitlistModal = useWaitlistStore((state) => state.openModal);
   const isTransparent = variant === "transparent";
 
-  const isActive = (href: string, exact?: boolean) => {
-    if (exact) return pathname === "/";
-    return false;
-  };
-
   return (
+    //This is the header component
     <header
       className={cn(
         "relative z-40 w-full",
@@ -42,10 +36,10 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
           : "border-b border-border/80 bg-white/90 backdrop-blur-md",
       )}
     >
-      <div className="relative mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4 sm:h-[4.5rem] md:px-6 lg:px-8 xl:px-10">
+      <div className="relative mx-auto flex h-16 w-full max-w-7xl items-center px-4 sm:h-[4.5rem] md:px-6 lg:px-8 xl:px-10">
         <Link
           href="/"
-          className="relative z-10 flex shrink-0 items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="relative z-10 flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span className="relative size-9 shrink-0 overflow-hidden rounded-full sm:size-10">
             <Image
@@ -57,83 +51,85 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
               priority
             />
           </span>
-          <span
-            className={cn(
-              "text-base font-bold tracking-tight sm:text-lg",
-              isTransparent ? "text-on-media" : "text-navy",
-            )}
-          >
-            CareVYA
+          <span className="flex flex-col leading-tight">
+            <span
+              className={cn(
+                "text-base font-bold tracking-tight sm:text-lg",
+                isTransparent ? "text-on-media" : "text-navy",
+              )}
+            >
+              CareVYA
+            </span>
+            <span
+              className={cn(
+                "text-[0.65rem] sm:text-xs",
+                isTransparent ? "text-on-media-muted" : "text-muted",
+              )}
+            >
+              Care, closer to home.
+            </span>
           </span>
         </Link>
 
-        <nav
-          aria-label="Primary"
-          className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-6 lg:flex xl:gap-8"
+        <div
+          role="tablist"
+          aria-label="Audience"
+          className="absolute left-[calc(50%+2.75rem)] top-1/2 hidden -translate-x-1/2 -translate-y-1/2 rounded-full bg-on-media p-1 shadow-sm md:inline-flex"
         >
-          {navLinks.map((link) => {
-            const active = isActive(link.href, "exact" in link && link.exact);
+          {audienceTabs.map((tab) => {
+            const isActive = audience === tab.id;
             return (
               <Link
-                key={link.label}
-                href={link.href}
+                key={tab.id}
+                href={tab.href}
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => setAudience(tab.id)}
                 className={cn(
-                  "inline-flex items-center gap-1 text-sm font-medium transition-colors",
+                  "rounded-full px-5 py-2 text-sm transition-colors",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  isTransparent
-                    ? active
-                      ? "text-brand-blue"
-                      : "text-on-media hover:text-on-media/80"
-                    : active
-                      ? "text-brand-blue"
-                      : "text-navy/70 hover:text-navy",
-                  active && "border-b-2 border-brand-blue pb-0.5",
+                  isActive
+                    ? "font-bold text-navy"
+                    : "font-medium text-navy/50 hover:text-navy",
                 )}
               >
-                {link.label}
-                {"chevron" in link && link.chevron ? (
-                  <ChevronDown
-                    aria-hidden
-                    className="size-3.5 opacity-80"
-                  />
-                ) : null}
+                {tab.label}
               </Link>
             );
           })}
-        </nav>
-
-        <div className="ml-auto flex items-center gap-2">
-          <Button
-            type="button"
-            className="hidden h-10 rounded-full px-5 md:inline-flex"
-            onClick={openWaitlistModal}
-          >
-            Get Started
-          </Button>
-
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className={cn(
-              "lg:hidden",
-              isTransparent &&
-                "text-on-media hover:bg-on-media/10 hover:text-on-media",
-            )}
-            aria-expanded={open}
-            aria-controls="hero-mobile-nav"
-            aria-label={open ? "Close menu" : "Open menu"}
-            onClick={() => setOpen((value) => !value)}
-          >
-            {open ? <X className="size-6" /> : <Menu className="size-6" />}
-          </Button>
         </div>
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className={cn(
+            "ml-auto md:hidden",
+            isTransparent &&
+              "text-on-media hover:bg-on-media/10 hover:text-on-media",
+          )}
+          aria-expanded={open}
+          aria-controls="hero-mobile-nav"
+          aria-label={open ? "Close menu" : "Open menu"}
+          onClick={() => setOpen((value) => !value)}
+        >
+          {open ? <X className="size-6" /> : <Menu className="size-6" />}
+        </Button>
       </div>
+
+      <Button
+        type="button"
+        className="absolute top-1/2 right-12 hidden h-10 -translate-y-1/2 rounded-full px-5 md:inline-flex lg:right-16 xl:right-24"
+        onClick={openWaitlistModal}
+      >
+        Join Waitlist
+        <ArrowRight className="size-4" aria-hidden />
+      </Button>
 
       <div
         id="hero-mobile-nav"
         className={cn(
-          "absolute inset-x-0 top-full overflow-hidden border-b border-on-media/20 px-4 py-4 lg:hidden",
+          "absolute inset-x-0 top-full overflow-hidden border-b border-on-media/20 px-4 py-4 md:hidden",
           "bg-gradient-to-b from-glass-liquid-top via-glass-liquid-mid to-glass-liquid-bottom",
           "backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:bg-glass-fill",
           open ? "block" : "hidden",
@@ -141,27 +137,31 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
       >
         <nav
           aria-label="Mobile"
-          className="flex flex-col gap-1"
+          className="flex flex-col items-end gap-2 text-right"
         >
-          {navLinks.map((link) => (
+          {audienceTabs.map((tab) => (
             <Link
-              key={link.label}
-              href={link.href}
+              key={tab.id}
+              href={tab.href}
               className="rounded-lg px-3 py-2.5 text-sm font-semibold text-on-media hover:bg-on-media/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setAudience(tab.id);
+                setOpen(false);
+              }}
             >
-              {link.label}
+              {tab.label}
             </Link>
           ))}
           <Button
             type="button"
-            className="mt-2 w-full rounded-full"
+            className="mt-1 w-full rounded-full"
             onClick={() => {
               setOpen(false);
               openWaitlistModal();
             }}
           >
-            Get Started
+            Join Waitlist
+            <ArrowRight className="size-4" aria-hidden />
           </Button>
         </nav>
       </div>
