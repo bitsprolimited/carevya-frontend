@@ -3,6 +3,7 @@ import { AboutCoreValuesSection } from "@/features/marketing/components/about-co
 import { AboutHeroSection } from "@/features/marketing/components/about-hero-section";
 import { AboutMembersSection } from "@/features/marketing/components/about-members-section";
 import { AboutMissionSection } from "@/features/marketing/components/about-mission-section";
+import { WaitlistCtaSection } from "@/features/waitlist/components/waitlist-cta-section";
 
 export default function AboutPage() {
   return (
@@ -11,6 +12,7 @@ export default function AboutPage() {
       <AboutMissionSection />
       <AboutCoreValuesSection />
       <AboutMembersSection />
+      <WaitlistCtaSection ctaLabel="Get Started Now" />
       <SiteFooter />
     </div>
   );
