@@ -30,7 +30,7 @@ const testimonials = [
       "We found a caregiver who truly understood my dad’s needs, routine, and personality.",
     family: "The Henderson Family",
     meta: "Mushin, Nigeria • 6 months care",
-    avatar: assets.homeTestimonialAvatarHenderson,
+    avatar: assets.homeTestimonialAvatarC,
   },
   {
     quote:
