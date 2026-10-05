@@ -33,7 +33,7 @@ export function HomeHeroSection() {
         <div className="relative z-10 flex min-h-[85svh] flex-col md:min-h-[100svh]">
           <HomeHeader variant="transparent" />
 
-          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 pb-14 pt-6 md:px-6 md:pb-20 md:pt-4 lg:px-8 xl:px-10">
+          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-start px-5 pb-14 pt-4 md:justify-center md:px-6 md:pb-20 md:pt-4 lg:px-8 xl:px-10">
             <div className="max-w-xl space-y-5 md:max-w-2xl md:space-y-6">
               <h1 className="font-sans text-[2rem] leading-[1.2] font-bold tracking-tight text-on-media sm:text-4xl md:text-5xl md:leading-[1.15] lg:text-[3.5rem] lg:leading-[1.12]">
                 Where every elder feels truly cherished and safe at home.
