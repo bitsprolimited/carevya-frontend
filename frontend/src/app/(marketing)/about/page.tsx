@@ -1,4 +1,5 @@
 import { SiteFooter } from "@/components/shared/site-footer";
+import { AboutCoreValuesSection } from "@/features/marketing/components/about-core-values-section";
 import { AboutHeroSection } from "@/features/marketing/components/about-hero-section";
 import { AboutMissionSection } from "@/features/marketing/components/about-mission-section";
 
@@ -7,6 +8,7 @@ export default function AboutPage() {
     <div className="flex flex-col">
       <AboutHeroSection />
       <AboutMissionSection />
+      <AboutCoreValuesSection />
       <SiteFooter />
     </div>
   );
