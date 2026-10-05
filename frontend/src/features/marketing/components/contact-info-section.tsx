@@ -79,9 +79,9 @@ const details = [
 export function ContactInfoSection() {
   return (
     <section className="bg-surface-soft">
-      <div className="mx-auto w-full max-w-7xl px-5 py-14 md:px-6 md:py-20 lg:px-8 lg:py-24 xl:px-10">
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12 xl:gap-16">
-          <div className="relative aspect-[761/391] w-full overflow-hidden rounded-2xl border border-brand-blue/30 bg-background shadow-sm">
+      <div className="mx-auto w-full max-w-7xl px-5 py-14 md:px-6 md:py-16 lg:px-8 lg:py-20 xl:px-10">
+        <div className="grid gap-8 lg:grid-cols-2 lg:items-stretch lg:gap-12 xl:gap-14">
+          <div className="relative min-h-[16rem] overflow-hidden rounded-2xl bg-background sm:min-h-[18rem] lg:min-h-0 lg:h-full">
             <Image
               src={assets.contactMap}
               alt="Map of Lagos, Nigeria highlighting CareVYA’s location"
@@ -92,7 +92,7 @@ export function ContactInfoSection() {
           </div>
 
           <div>
-            <h2 className="text-3xl font-bold tracking-tight text-navy sm:text-4xl lg:text-[2.5rem] lg:leading-[1.15]">
+            <h2 className="text-3xl font-bold tracking-tight text-navy sm:text-4xl lg:text-[2.35rem] lg:leading-[1.15]">
               Our Contact Information
             </h2>
 
