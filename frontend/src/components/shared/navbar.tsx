@@ -8,9 +8,9 @@ import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { href: "/#for-you", label: "For You" },
-  { href: "/#for-me", label: "For Me" },
-  { href: "/#faq", label: "FAQ" },
+  { href: "/waitlist#for-you", label: "For You" },
+  { href: "/waitlist#for-me", label: "For Me" },
+  { href: "/waitlist#faq", label: "FAQ" },
 ] as const;
 
 export function Navbar() {

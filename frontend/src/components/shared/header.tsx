@@ -10,8 +10,8 @@ import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { cn } from "@/lib/utils";
 
 const audienceTabs = [
-  { id: "families", label: "Families", href: "/#for-you" },
-  { id: "carers", label: "Carers", href: "/#for-me" },
+  { id: "families", label: "Families", href: "/waitlist#for-you" },
+  { id: "carers", label: "Carers", href: "/waitlist#for-me" },
 ] as const;
 
 type SiteHeaderProps = {
@@ -38,7 +38,7 @@ export function SiteHeader({ variant = "transparent" }: SiteHeaderProps) {
     >
       <div className="relative mx-auto flex h-16 w-full max-w-7xl items-center px-4 sm:h-[4.5rem] md:px-6 lg:px-8 xl:px-10">
         <Link
-          href="/"
+          href="/waitlist"
           className="relative z-10 flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span className="relative size-9 shrink-0 overflow-hidden rounded-full sm:size-10">

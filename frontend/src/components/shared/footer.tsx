@@ -9,9 +9,9 @@ import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { cn } from "@/lib/utils";
 
 const sectionLinks = [
-  { href: "/#for-you", label: "For Families/Care seekers" },
-  { href: "/#for-me", label: "For Qualified Caregivers" },
-  { href: "/#verify", label: "Verification Protocol" },
+  { href: "/waitlist#for-you", label: "For Families/Care seekers" },
+  { href: "/waitlist#for-me", label: "For Qualified Caregivers" },
+  { href: "/waitlist#verify", label: "Verification Protocol" },
 ] as const;
 
 const legalLinks = [
@@ -107,7 +107,7 @@ export function Footer() {
         <div className="grid gap-10 lg:grid-cols-[1.4fr_0.9fr_1fr] lg:gap-12">
           <div className="space-y-4">
             <Link
-              href="/"
+              href="/waitlist"
               className="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 focus-visible:ring-offset-footer"
             >
               <span className="relative size-9 shrink-0 overflow-hidden sm:size-10">
