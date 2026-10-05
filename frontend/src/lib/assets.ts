@@ -32,6 +32,16 @@ export const assets = {
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1791203759/9dde792aa412df1918d23746e00a76151d67d3fb_dvp9a9.jpg",
   howItWorksCaregivers:
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1791197158/Frame_2147226145_bzl0fb.png",
+  aboutHeroFan1:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791205141/6f3cc78e00ff37c5975d53a3573ef9d308e6327d_cjfksg.png",
+  aboutHeroFan2:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791205140/b8e9aeecf25f94b0f0325826ed636d264dc01367_wwr5fn.jpg",
+  aboutHeroFan3:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791205141/e7bbdcd6dc95e5bd88e3e691e59149cca19a9847_jnbi2s.png",
+  aboutHeroFan4:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791205140/1668676e076f8ef325e55ac971291a0e71562501_t3ncg3.jpg",
+  aboutHeroFan5:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791205140/c9116936b0b3329082bb1f0cf8370bb8026d2d9c_mnjojv.jpg",
   /** Public ID still uses legacy filename on Cloudinary; displays as CareVYA logo. */
   logo: "https://res.cloudinary.com/dycukxm7r/image/upload/v1790166614/carenestLogo_to9u5s.png",
   communityFamily:

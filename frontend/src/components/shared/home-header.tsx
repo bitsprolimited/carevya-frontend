@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 const navLinks = [
   { label: "Home", href: "/", match: "/" },
   { label: "How It Works", href: "/how-it-works", match: "/how-it-works", chevron: true },
-  { label: "About Us", href: "/#about", match: null },
+  { label: "About Us", href: "/about", match: "/about" },
   { label: "Contact Us", href: "/#contact", match: null },
   { label: "FAQs", href: "/#faq", match: null },
 ] as const;
@@ -130,9 +130,10 @@ export function HomeHeader({ variant = "transparent" }: HomeHeaderProps) {
       <div
         id="home-mobile-nav"
         className={cn(
-          "absolute inset-x-0 top-full overflow-hidden border-b border-on-media/20 px-4 py-4 lg:hidden",
-          "bg-gradient-to-b from-glass-liquid-top via-glass-liquid-mid to-glass-liquid-bottom",
-          "backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:bg-glass-fill",
+          "absolute inset-x-0 top-full overflow-hidden border-b px-4 py-4 lg:hidden",
+          isTransparent
+            ? "border-on-media/20 bg-gradient-to-b from-glass-liquid-top via-glass-liquid-mid to-glass-liquid-bottom backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:bg-glass-fill"
+            : "border-border bg-background shadow-sm",
           open ? "block" : "hidden",
         )}
       >
@@ -141,7 +142,12 @@ export function HomeHeader({ variant = "transparent" }: HomeHeaderProps) {
             <Link
               key={link.label}
               href={link.href}
-              className="rounded-lg px-3 py-2.5 text-sm font-semibold text-on-media hover:bg-on-media/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className={cn(
+                "rounded-lg px-3 py-2.5 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                isTransparent
+                  ? "text-on-media hover:bg-on-media/10"
+                  : "text-navy hover:bg-surface-soft",
+              )}
               onClick={() => setOpen(false)}
             >
               {link.label}
