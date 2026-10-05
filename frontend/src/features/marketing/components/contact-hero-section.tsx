@@ -12,7 +12,7 @@ export function ContactHeroSection() {
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[68%_18%] sm:object-[65%_15%] lg:object-[62%_12%]"
+          className="object-cover object-[68%_8%] sm:object-[65%_5%] lg:object-[62%_3%]"
         />
 
         <div
