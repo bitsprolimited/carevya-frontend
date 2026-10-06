@@ -17,6 +17,7 @@ import { useEffect, useId } from "react";
 import { Controller, useForm, type Resolver } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useNigeriaLocations } from "@/features/waitlist/hooks/use-nigeria-locations";
 import { waitlistStatsKey } from "@/features/waitlist/hooks/use-waitlist-stats";
 import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
@@ -331,80 +332,93 @@ export function WaitlistModal() {
               ) : null}
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="min-w-0">
-                  <Controller
-                    name="state"
-                    control={form.control}
-                    render={({ field }) => (
-                      <SearchableSelect
-                        options={stateOptions}
-                        value={field.value}
-                        onChange={(next) => {
-                          field.onChange(next);
-                          form.setValue("lga", "");
-                        }}
-                        placeholder={locationsLoading ? "Loading…" : "State"}
-                        aria-label="State"
-                        disabled={locationsLoading || locationsFailed}
-                        invalid={Boolean(form.formState.errors.state)}
-                        emptyMessage={
-                          locationsFailed
-                            ? "Couldn’t load states"
-                            : "No matches"
-                        }
-                        icon={
-                          <MapPin
-                            className="size-4 shrink-0 text-on-media/70"
-                            aria-hidden
+                {locationsLoading ? (
+                  <div
+                    className="col-span-2 grid grid-cols-2 gap-3"
+                    role="status"
+                    aria-live="polite"
+                    aria-label="Loading location options"
+                  >
+                    <span className="sr-only">Loading location options…</span>
+                    <Skeleton className="h-12 w-full rounded-2xl bg-on-media/20" />
+                    <Skeleton className="h-12 w-full rounded-2xl bg-on-media/15" />
+                  </div>
+                ) : (
+                  <>
+                    <div className="min-w-0">
+                      <Controller
+                        name="state"
+                        control={form.control}
+                        render={({ field }) => (
+                          <SearchableSelect
+                            options={stateOptions}
+                            value={field.value}
+                            onChange={(next) => {
+                              field.onChange(next);
+                              form.setValue("lga", "");
+                            }}
+                            placeholder="State"
+                            aria-label="State"
+                            disabled={locationsFailed}
+                            invalid={Boolean(form.formState.errors.state)}
+                            emptyMessage={
+                              locationsFailed
+                                ? "Couldn’t load states"
+                                : "No matches"
+                            }
+                            icon={
+                              <MapPin
+                                className="size-4 shrink-0 text-on-media/70"
+                                aria-hidden
+                              />
+                            }
                           />
-                        }
+                        )}
                       />
-                    )}
-                  />
-                  {form.formState.errors.state ? (
-                    <p className="mt-1 text-xs text-danger" role="alert">
-                      {form.formState.errors.state.message}
-                    </p>
-                  ) : null}
-                </div>
+                      {form.formState.errors.state ? (
+                        <p className="mt-1 text-xs text-danger" role="alert">
+                          {form.formState.errors.state.message}
+                        </p>
+                      ) : null}
+                    </div>
 
-                <div className="min-w-0">
-                  <Controller
-                    name="lga"
-                    control={form.control}
-                    render={({ field }) => (
-                      <SearchableSelect
-                        options={lgas}
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder={locationsLoading ? "Loading…" : "LGA"}
-                        aria-label="LGA"
-                        disabled={
-                          locationsLoading || locationsFailed || !selectedState
-                        }
-                        invalid={Boolean(form.formState.errors.lga)}
-                        emptyMessage={
-                          locationsFailed
-                            ? "Couldn’t load LGAs"
-                            : selectedState
-                              ? "No matches"
-                              : "Select a state first"
-                        }
-                        icon={
-                          <Building2
-                            className="size-4 shrink-0 text-on-media/70"
-                            aria-hidden
+                    <div className="min-w-0">
+                      <Controller
+                        name="lga"
+                        control={form.control}
+                        render={({ field }) => (
+                          <SearchableSelect
+                            options={lgas}
+                            value={field.value}
+                            onChange={field.onChange}
+                            placeholder="LGA"
+                            aria-label="LGA"
+                            disabled={locationsFailed || !selectedState}
+                            invalid={Boolean(form.formState.errors.lga)}
+                            emptyMessage={
+                              locationsFailed
+                                ? "Couldn’t load LGAs"
+                                : selectedState
+                                  ? "No matches"
+                                  : "Select a state first"
+                            }
+                            icon={
+                              <Building2
+                                className="size-4 shrink-0 text-on-media/70"
+                                aria-hidden
+                              />
+                            }
                           />
-                        }
+                        )}
                       />
-                    )}
-                  />
-                  {form.formState.errors.lga ? (
-                    <p className="mt-1 text-xs text-danger" role="alert">
-                      {form.formState.errors.lga.message}
-                    </p>
-                  ) : null}
-                </div>
+                      {form.formState.errors.lga ? (
+                        <p className="mt-1 text-xs text-danger" role="alert">
+                          {form.formState.errors.lga.message}
+                        </p>
+                      ) : null}
+                    </div>
+                  </>
+                )}
               </div>
 
               {locationsFailed ? (
