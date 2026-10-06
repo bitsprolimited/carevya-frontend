@@ -60,14 +60,16 @@ export function AboutMissionSection() {
             </ul>
           </div>
 
-          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl sm:aspect-[5/6] lg:sticky lg:top-24 lg:aspect-auto lg:min-h-[32rem]">
-            <Image
-              src={assets.homeWhyCarevya}
-              alt="Caregiver holding hands with an elderly woman while a child plays with a stethoscope nearby"
-              fill
-              sizes="(max-width: 1024px) 100vw, 48vw"
-              className="object-cover object-center"
-            />
+          <div className="w-full lg:sticky lg:top-24">
+            <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl sm:aspect-[5/6] lg:aspect-auto lg:min-h-[32rem]">
+              <Image
+                src={assets.homeWhyCarevya}
+                alt="Caregiver holding hands with an elderly woman while a child plays with a stethoscope nearby"
+                fill
+                sizes="(max-width: 1024px) 100vw, 48vw"
+                className="object-cover object-center"
+              />
+            </div>
           </div>
         </div>
       </div>
