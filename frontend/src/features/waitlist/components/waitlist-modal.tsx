@@ -139,8 +139,6 @@ export function WaitlistModal() {
 
   const result = mutation.data;
   const alreadyJoined = Boolean(result?.meta?.alreadyJoined);
-  const position = result?.data?.position;
-  const referralCode = result?.data?.referralCode;
 
   return (
     <AnimatePresence>
@@ -191,16 +189,27 @@ export function WaitlistModal() {
 
         <div className="overflow-y-auto px-5 pt-8 pb-6 sm:px-7 sm:pt-9 sm:pb-7">
           <div className="pr-8 text-center">
-            <h2
-              id={titleId}
-              className="text-2xl font-bold tracking-tight text-on-media sm:text-[1.65rem]"
-            >
-              Join the Waitlist
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-on-media/75">
-              Be the first to know when we&apos;re ready to support you or your
-              loved ones.
-            </p>
+            {mutation.isSuccess ? (
+              <h2
+                id={titleId}
+                className="text-2xl font-bold tracking-tight text-on-media uppercase sm:text-[1.65rem]"
+              >
+                Congratulations
+              </h2>
+            ) : (
+              <>
+                <h2
+                  id={titleId}
+                  className="text-2xl font-bold tracking-tight text-on-media sm:text-[1.65rem]"
+                >
+                  Join the Waitlist
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-on-media/75">
+                  Be the first to know when we&apos;re ready to support you or
+                  your loved ones.
+                </p>
+              </>
+            )}
           </div>
 
           {mutation.isSuccess ? (
@@ -214,17 +223,6 @@ export function WaitlistModal() {
                   : (result?.message ??
                     "You're on the waitlist — we'll be in touch.")}
               </p>
-              {position != null || referralCode ? (
-                <p className="text-xs text-on-media/75">
-                  {position != null ? `Your position: #${position}` : null}
-                  {referralCode ? (
-                    <>
-                      {position != null ? " · " : null}
-                      Referral code: <strong>{referralCode}</strong>
-                    </>
-                  ) : null}
-                </p>
-              ) : null}
               <Button
                 type="button"
                 onClick={closeModal}
