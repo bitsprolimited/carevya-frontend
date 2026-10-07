@@ -86,7 +86,7 @@ export function ContactFormSection() {
   }
 
   return (
-    <section className="bg-surface-soft">
+    <section className="bg-surface-contact">
       <div className="mx-auto w-full max-w-7xl px-5 py-14 md:px-6 md:py-20 lg:px-8 lg:py-24 xl:px-10">
         <div className="grid items-start gap-10 lg:grid-cols-12 lg:gap-12 xl:gap-16">
           <div className="lg:col-span-4">
@@ -99,7 +99,7 @@ export function ContactFormSection() {
             </p>
           </div>
 
-          <div className="rounded-3xl bg-background p-6 shadow-sm sm:p-8 lg:col-span-8 lg:p-10">
+          <div className="rounded-3xl bg-surface-form p-6 shadow-sm sm:p-8 lg:col-span-8 lg:p-10">
             <h3 className="text-xl font-semibold text-navy sm:text-2xl">
               Send a message
             </h3>
