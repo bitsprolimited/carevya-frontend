@@ -29,6 +29,15 @@ const defaults: ContactMessageInput = {
   message: "",
 };
 
+/** Figma: text inputs 24px radius / 40px height; message textarea 20px radius. */
+const fieldClassName = "h-10 rounded-3xl px-4";
+const messageClassName = cn(
+  "flex min-h-[8.5rem] w-full resize-y rounded-[1.25rem] border border-border bg-white px-4 py-2.5 text-sm text-navy",
+  "placeholder:text-muted",
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+  "disabled:cursor-not-allowed disabled:opacity-50",
+);
+
 function FieldLabel({
   htmlFor,
   children,
@@ -110,6 +119,7 @@ export function ContactFormSection() {
                     autoComplete="given-name"
                     placeholder="John"
                     aria-invalid={Boolean(errors.firstName)}
+                    className={fieldClassName}
                     {...register("firstName")}
                   />
                   {errors.firstName ? (
@@ -127,6 +137,7 @@ export function ContactFormSection() {
                     autoComplete="family-name"
                     placeholder="Doe"
                     aria-invalid={Boolean(errors.lastName)}
+                    className={fieldClassName}
                     {...register("lastName")}
                   />
                   {errors.lastName ? (
@@ -145,6 +156,7 @@ export function ContactFormSection() {
                     autoComplete="email"
                     placeholder="johndoe@gmail.com"
                     aria-invalid={Boolean(errors.email)}
+                    className={fieldClassName}
                     {...register("email")}
                   />
                   {errors.email ? (
@@ -162,6 +174,7 @@ export function ContactFormSection() {
                     type="tel"
                     autoComplete="tel"
                     placeholder="9037239782"
+                    className={fieldClassName}
                     {...register("phone")}
                   />
                 </div>
@@ -175,6 +188,7 @@ export function ContactFormSection() {
                   id="contact-subject"
                   placeholder="Caregiver Enquiry"
                   aria-invalid={Boolean(errors.subject)}
+                  className={fieldClassName}
                   {...register("subject")}
                 />
                 {errors.subject ? (
@@ -193,12 +207,7 @@ export function ContactFormSection() {
                   rows={5}
                   placeholder="Your message"
                   aria-invalid={Boolean(errors.message)}
-                  className={cn(
-                    "flex min-h-[8.5rem] w-full resize-y rounded-lg border border-border bg-white px-3.5 py-3 text-sm text-navy",
-                    "placeholder:text-muted",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-                    "disabled:cursor-not-allowed disabled:opacity-50",
-                  )}
+                  className={messageClassName}
                   {...register("message")}
                 />
                 {errors.message ? (
