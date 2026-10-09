@@ -19,10 +19,11 @@ const navLinks = [
 ] as const;
 
 type HomeHeaderProps = {
+  /** Figma uses a solid white bar, so "solid" is now the default. */
   variant?: "transparent" | "solid";
 };
 
-export function HomeHeader({ variant = "transparent" }: HomeHeaderProps) {
+export function HomeHeader({ variant = "solid" }: HomeHeaderProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const openWaitlistModal = useWaitlistStore((state) => state.openModal);
@@ -34,7 +35,7 @@ export function HomeHeader({ variant = "transparent" }: HomeHeaderProps) {
         "relative z-40 w-full",
         isTransparent
           ? "bg-transparent"
-          : "border-b border-border/80 bg-white/90 backdrop-blur-md",
+          : "border-b border-border/60 bg-white",
       )}
     >
       <div className="relative mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4 sm:h-[4.5rem] md:px-6 lg:px-8 xl:px-10">
@@ -55,7 +56,7 @@ export function HomeHeader({ variant = "transparent" }: HomeHeaderProps) {
           <span
             className={cn(
               "text-base font-bold tracking-tight sm:text-lg",
-              isTransparent ? "text-on-media" : "text-navy",
+              isTransparent ? "text-on-media" : "text-brand-blue",
             )}
           >
             CareVYA
@@ -68,26 +69,25 @@ export function HomeHeader({ variant = "transparent" }: HomeHeaderProps) {
         >
           {navLinks.map((link) => {
             const active =
-              link.match !== null &&
-              (link.match === "/"
+              link.match === "/"
                 ? pathname === "/"
                 : pathname === link.match ||
-                  pathname.startsWith(`${link.match}/`));
+                  pathname.startsWith(`${link.match}/`);
             return (
               <Link
                 key={link.label}
                 href={link.href}
+                aria-current={active ? "page" : undefined}
                 className={cn(
-                  "inline-flex items-center gap-1 text-sm font-medium transition-colors",
+                  "inline-flex items-center gap-1 border-b-2 pb-1.5 text-sm font-medium transition-colors",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   isTransparent
                     ? active
-                      ? "text-brand-blue"
-                      : "text-on-media hover:text-on-media/80"
+                      ? "border-brand-blue text-brand-blue"
+                      : "border-transparent text-on-media hover:text-on-media/80"
                     : active
-                      ? "text-brand-blue"
-                      : "text-navy/70 hover:text-navy",
-                  active && "border-b-2 border-brand-blue pb-0.5",
+                      ? "border-brand-blue text-brand-blue"
+                      : "border-transparent text-navy hover:text-brand-blue",
                 )}
               >
                 {link.label}
@@ -102,7 +102,7 @@ export function HomeHeader({ variant = "transparent" }: HomeHeaderProps) {
         <div className="ml-auto flex items-center gap-2">
           <Button
             type="button"
-            className="hidden h-10 rounded-full px-5 md:inline-flex"
+            className="hidden h-10 rounded-full px-6 text-sm font-semibold md:inline-flex"
             onClick={openWaitlistModal}
           >
             Get Started
@@ -133,7 +133,7 @@ export function HomeHeader({ variant = "transparent" }: HomeHeaderProps) {
           "absolute inset-x-0 top-full overflow-hidden border-b px-4 py-4 lg:hidden",
           isTransparent
             ? "border-on-media/20 bg-gradient-to-b from-glass-liquid-top via-glass-liquid-mid to-glass-liquid-bottom backdrop-blur-2xl backdrop-saturate-150 supports-[backdrop-filter]:bg-glass-fill"
-            : "border-border bg-background shadow-sm",
+            : "border-border bg-white shadow-sm",
           open ? "block" : "hidden",
         )}
       >
