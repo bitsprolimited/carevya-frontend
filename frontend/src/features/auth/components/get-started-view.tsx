@@ -1,8 +1,15 @@
+"use client";
+
 import { HeartHandshake, UserRound } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { Modal } from "@/components/ui/modal";
 import { RoleCard } from "@/features/auth/components/role-card";
+import { SignupFlow } from "@/features/auth/components/signup-flow";
 
 export function GetStartedView() {
+  const [careseekerSignupOpen, setCareseekerSignupOpen] = useState(false);
+
   return (
     <section className="mx-auto flex w-full max-w-3xl flex-col items-center gap-10 px-4 py-12 md:px-6 md:py-16">
       <header className="space-y-2 text-center">
@@ -20,7 +27,7 @@ export function GetStartedView() {
           title="I'm a Careseeker"
           description="I'm looking for verified, compassionate elder companions, specialized nurses, or vetted caregivers for my family."
           ctaLabel="Sign up as Careseeker"
-          href="/sign-up/careseeker"
+          onClick={() => setCareseekerSignupOpen(true)}
         />
         <RoleCard
           Icon={HeartHandshake}
@@ -40,6 +47,16 @@ export function GetStartedView() {
           Log In
         </Link>
       </p>
+
+      <Modal
+        isOpen={careseekerSignupOpen}
+        onClose={() => setCareseekerSignupOpen(false)}
+        className="max-h-[min(92vh,52rem)] max-w-md overflow-y-auto"
+      >
+        {careseekerSignupOpen ? (
+          <SignupFlow key="careseeker-signup-modal" />
+        ) : null}
+      </Modal>
     </section>
   );
 }

@@ -40,15 +40,18 @@ export function Modal({ isOpen, onClose, children, className }: ModalProps) {
       />
       
       {/* Modal Content */}
-      <div 
+      <div
+        role="dialog"
+        aria-modal="true"
         className={cn(
           "relative z-10 w-full max-w-md animate-in fade-in zoom-in-95 duration-200",
-          className
+          className,
         )}
       >
         <button
+          type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 z-20 rounded-full p-2 text-navy/40 hover:bg-surface-soft hover:text-navy transition-colors"
+          className="absolute right-3 top-3 z-20 rounded-full bg-white/90 p-2 text-navy/40 shadow-sm transition-colors hover:bg-surface-soft hover:text-navy"
           aria-label="Close modal"
         >
           <X className="size-5" />
