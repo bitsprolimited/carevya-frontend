@@ -90,7 +90,7 @@ const socialLinks: {
   label: string;
   Icon: ComponentType<{ className?: string }>;
 }[] = [
-  { href: "https://instagram.com", label: "Instagram", Icon: InstagramIcon },
+  { href: "https://www.instagram.com/care_vya?stkn=MW10ZHc5eTdsZHhlMw==", label: "Instagram", Icon: InstagramIcon },
   { href: "https://x.com", label: "X", Icon: XIcon },
   { href: "https://linkedin.com", label: "LinkedIn", Icon: LinkedInIcon },
 ];

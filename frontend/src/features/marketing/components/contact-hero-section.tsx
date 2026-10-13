@@ -21,7 +21,7 @@ export function ContactHeroSection() {
         />
 
         <div className="relative z-10 flex min-h-[36svh] flex-col md:min-h-[42svh]">
-          <HomeHeader variant="transparent" />
+          <HomeHeader variant="solid" />
 
           <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-10 pt-4 text-center md:px-6 md:pb-12">
             <h1 className="font-sans text-[2rem] leading-[1.1] font-bold tracking-tight text-on-media sm:text-4xl md:text-5xl lg:text-[3.25rem]">

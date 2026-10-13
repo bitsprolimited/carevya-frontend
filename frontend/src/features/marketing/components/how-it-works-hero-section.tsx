@@ -34,8 +34,7 @@ export function HowItWorksHeroSection() {
         />
 
         <div className="relative z-10 flex min-h-[85svh] flex-col md:min-h-[100svh]">
-          <HomeHeader variant="transparent" />
-
+          <HomeHeader variant="solid" />
           <motion.div
             className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center px-5 pb-16 pt-8 text-center md:px-6 md:pb-20"
             variants={staggerContainer}

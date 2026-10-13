@@ -33,8 +33,7 @@ export function HomeHeroSection() {
         />
 
         <div className="relative z-10 flex min-h-[85svh] flex-col md:min-h-[100svh]">
-          <HomeHeader variant="transparent" />
-
+         <HomeHeader variant="solid" />
           <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-start px-5 pb-14 pt-4 md:justify-center md:px-6 md:pb-20 md:pt-4 lg:px-8 xl:px-10">
             <motion.div
               className="max-w-xl space-y-5 md:max-w-2xl md:space-y-6"
