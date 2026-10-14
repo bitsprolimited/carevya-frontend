@@ -27,7 +27,7 @@ export function CareProfileShell({
 
   return (
     <div className="min-h-screen bg-[#F5F7FB]">
-      <header className="border-b border-[#E2E8F0] bg-white">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-[#E2E8F0] bg-white">
         <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-4 sm:px-6">
           <Link href="/" className="inline-flex items-center gap-2">
             <span className="relative size-8 overflow-hidden">
@@ -55,7 +55,7 @@ export function CareProfileShell({
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-10">
+      <main className="mx-auto w-full max-w-3xl px-4 pt-24 pb-8 sm:px-6 sm:pb-10">
         {!hideProgress ? (
           isReviewing ? (
             <div className="mb-6">
