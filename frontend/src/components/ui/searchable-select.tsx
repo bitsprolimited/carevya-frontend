@@ -24,6 +24,8 @@ export type SearchableSelectProps = {
   icon?: ReactNode;
   emptyMessage?: string;
   className?: string;
+  /** glass = marketing/waitlist overlays; light = white form fields */
+  variant?: "glass" | "light";
   "aria-label"?: string;
 };
 
@@ -44,8 +46,10 @@ export function SearchableSelect({
   icon,
   emptyMessage = "No matches",
   className,
+  variant = "glass",
   "aria-label": ariaLabel,
 }: SearchableSelectProps) {
+  const isLight = variant === "light";
   const listboxId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -195,13 +199,19 @@ export function SearchableSelect({
                   }
             }
             className={cn(
-              "glass-dropdown-scroll z-[60] max-h-52 overflow-y-auto overscroll-contain rounded-xl py-1.5",
-              "border border-on-media/25 bg-glass-dropdown shadow-xl",
-              "backdrop-blur-2xl backdrop-saturate-150",
+              "z-[60] max-h-52 overflow-y-auto overscroll-contain rounded-xl py-1.5 shadow-xl",
+              isLight
+                ? "border border-[#D7DEE8] bg-white"
+                : "glass-dropdown-scroll border border-on-media/25 bg-glass-dropdown backdrop-blur-2xl backdrop-saturate-150",
             )}
           >
             {filtered.length === 0 ? (
-              <li className="px-3.5 py-2.5 text-sm text-on-media/70">
+              <li
+                className={cn(
+                  "px-3.5 py-2.5 text-sm",
+                  isLight ? "text-navy/55" : "text-on-media/70",
+                )}
+              >
                 {emptyMessage}
               </li>
             ) : (
@@ -214,10 +224,20 @@ export function SearchableSelect({
                     role="option"
                     aria-selected={selected}
                     className={cn(
-                      "cursor-pointer px-3.5 py-2.5 text-sm text-on-media transition-colors",
-                      active || selected
-                        ? "bg-glass-dropdown-hover"
-                        : "hover:bg-glass-dropdown-hover",
+                      "cursor-pointer px-3.5 py-2.5 text-sm transition-colors",
+                      isLight
+                        ? cn(
+                            "text-navy",
+                            active || selected
+                              ? "bg-[#F0F6FF]"
+                              : "hover:bg-[#F8FBFF]",
+                          )
+                        : cn(
+                            "text-on-media",
+                            active || selected
+                              ? "bg-glass-dropdown-hover"
+                              : "hover:bg-glass-dropdown-hover",
+                          ),
                     )}
                     onMouseEnter={() => setHighlight(index)}
                     onMouseDown={(event) => {
@@ -239,10 +259,12 @@ export function SearchableSelect({
     <div ref={rootRef} className={cn("relative min-w-0", className)}>
       <label
         className={cn(
-          "relative flex h-12 w-full items-center gap-2.5 rounded-2xl border border-glass-field-border bg-glass-field px-3.5 pr-9 text-sm text-on-media",
-          "focus-within:border-on-media/60",
+          "relative flex h-12 w-full items-center gap-2.5 px-3.5 pr-9 text-sm",
+          isLight
+            ? "rounded-full border border-[#D7DEE8] bg-white text-navy focus-within:border-brand-blue focus-within:ring-2 focus-within:ring-brand-blue/20"
+            : "rounded-2xl border border-glass-field-border bg-glass-field text-on-media focus-within:border-on-media/60",
           disabled && "opacity-50",
-          invalid && "border-danger/70",
+          invalid && (isLight ? "border-red-400" : "border-danger/70"),
         )}
       >
         {icon}
@@ -259,7 +281,12 @@ export function SearchableSelect({
           autoComplete="off"
           placeholder={placeholder}
           value={query}
-          className="min-w-0 flex-1 border-0 bg-transparent py-2 text-on-media outline-none placeholder:text-on-media/55 disabled:cursor-not-allowed"
+          className={cn(
+            "min-w-0 flex-1 border-0 bg-transparent py-2 outline-none disabled:cursor-not-allowed",
+            isLight
+              ? "text-navy placeholder:text-navy/35"
+              : "text-on-media placeholder:text-on-media/55",
+          )}
           onFocus={() => {
             openList();
             setQuery(value);
@@ -275,7 +302,8 @@ export function SearchableSelect({
         />
         <ChevronDown
           className={cn(
-            "pointer-events-none absolute right-3 size-4 text-on-media/70 transition-transform",
+            "pointer-events-none absolute right-3 size-4 transition-transform",
+            isLight ? "text-navy/40" : "text-on-media/70",
             open && "rotate-180",
           )}
           aria-hidden

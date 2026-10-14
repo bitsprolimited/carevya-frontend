@@ -80,5 +80,7 @@ export const assets = {
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1790180127/family_vrdxjj.png",
   communityFamilyWaitlistIcon:
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1790180264/arcticons_family-care_eime7m.png",
+  careProfileRecipient:
+    "https://res.cloudinary.com/dycukxm7r/image/upload/v1791991611/efbb5fc2a424d0f03fcab2a686065fa470985ead_zskpfk.png",
 } as const;
 

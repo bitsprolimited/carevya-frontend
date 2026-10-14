@@ -40,10 +40,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${plusJakarta.variable} ${lato.variable} ${inter.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">
-        <AppProviders>{children}</AppProviders>
+      <body
+        suppressHydrationWarning
+        className="min-h-full flex flex-col font-sans"
+      >
+        <AppProviders>
+          {/* Stable host so Next’s hidden metadata outlet isn’t mistaken for page UI */}
+          <div className="flex min-h-full flex-1 flex-col">{children}</div>
+        </AppProviders>
       </body>
     </html>
   );
