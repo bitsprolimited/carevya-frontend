@@ -29,9 +29,12 @@ export type Relationship =
   | "Other";
 
 export type CareType =
-  | "non_clinical"
-  | "clinical"
-  | "personal_specialized";
+  | "companionship"
+  | "personal_care"
+  | "nursing_care"
+  | "memory_care"
+  | "recovery_support"
+  | "household_help";
 
 export type CareFrequency =
   | "live_in"
@@ -40,9 +43,88 @@ export type CareFrequency =
   | "overnight"
   | "weekends_only";
 
-export type CareStartTiming = "asap" | "specific_date";
+export type CareStartTiming =
+  | "asap"
+  | "within_week"
+  | "within_month"
+  | "specific_date"
+  | "not_sure";
 
 export type GenderPreference = "no_preference" | "female" | "male";
+
+export const GENDER_OPTIONS = [
+  { value: "female", label: "Female" },
+  { value: "male", label: "Male" },
+  { value: "prefer_not_to_say", label: "Prefer not to say" },
+] as const;
+
+export const CARE_TYPE_OPTIONS: {
+  value: CareType;
+  title: string;
+  description: string;
+}[] = [
+  {
+    value: "companionship",
+    title: "Companionship",
+    description: "Company, conversation and light activities",
+  },
+  {
+    value: "personal_care",
+    title: "Personal care",
+    description: "Bathing, dressing, grooming and toileting",
+  },
+  {
+    value: "nursing_care",
+    title: "Nursing care",
+    description: "Medication, wound care and health checks",
+  },
+  {
+    value: "memory_care",
+    title: "Memory care",
+    description: "Support for dementia or Alzheimer's",
+  },
+  {
+    value: "recovery_support",
+    title: "Recovery support",
+    description: "After surgery, a stroke or hospital stay",
+  },
+  {
+    value: "household_help",
+    title: "Household help",
+    description: "Meals, laundry and light housekeeping",
+  },
+];
+
+export const CARE_START_OPTIONS: {
+  value: CareStartTiming;
+  label: string;
+}[] = [
+  { value: "asap", label: "As soon as possible" },
+  { value: "within_week", label: "Within a week" },
+  { value: "within_month", label: "Within a month" },
+  { value: "specific_date", label: "On a specific date" },
+  { value: "not_sure", label: "I'm not sure yet" },
+];
+
+export const CAREGIVER_GENDER_OPTIONS: {
+  value: GenderPreference;
+  label: string;
+}[] = [
+  { value: "no_preference", label: "No preference" },
+  { value: "female", label: "Female caregiver" },
+  { value: "male", label: "Male caregiver" },
+];
+
+export const EMERGENCY_RELATIONSHIP_OPTIONS = [
+  { value: "son", label: "Son" },
+  { value: "daughter", label: "Daughter" },
+  { value: "spouse", label: "Spouse" },
+  { value: "sibling", label: "Sibling" },
+  { value: "grandchild", label: "Grandchild" },
+  { value: "other_relative", label: "Other relative" },
+  { value: "friend_or_neighbour", label: "Friend or neighbour" },
+  { value: "other", label: "Other" },
+] as const;
 
 export type Mobility =
   | "walks_alone"

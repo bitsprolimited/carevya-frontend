@@ -40,13 +40,19 @@ import {
 } from "@/features/care-profile/lib/validation";
 import {
   CARE_PROFILE_STEPS,
+  CARE_START_OPTIONS,
+  CARE_TYPE_OPTIONS,
+  CAREGIVER_GENDER_OPTIONS,
   CONDITION_OPTIONS,
+  EMERGENCY_RELATIONSHIP_OPTIONS,
   FAMILY_RELATIONSHIPS,
+  GENDER_OPTIONS,
   GUARDIAN_RELATIONSHIPS,
   LANGUAGE_OPTIONS,
   NONE_OF_THESE_CONDITION,
   type CareFrequency,
   type CareProfileDraft,
+  type CareStartTiming,
   type CareType,
   type Mobility,
   type ReachChannel,
@@ -382,11 +388,7 @@ function AboutThemStep({
               }}
               placeholder="Select gender"
               invalid={Boolean(errors.gender)}
-              options={[
-                { value: "female", label: "Female" },
-                { value: "male", label: "Male" },
-                { value: "other", label: "Other" },
-              ]}
+              options={[...GENDER_OPTIONS]}
             />
             {errors.gender ? <FieldError>{errors.gender}</FieldError> : null}
           </div>
@@ -552,31 +554,6 @@ function CareNeedsStep({
     onContinue();
   }
 
-  const careOptions: {
-    value: CareType;
-    title: string;
-    description: string;
-  }[] = [
-    {
-      value: "non_clinical",
-      title: "Non-Clinical care",
-      description:
-        "Companionship, Comfort and Daily routine support, Personal care assistance, Meal assistance and Family communication.",
-    },
-    {
-      value: "clinical",
-      title: "Clinical care",
-      description:
-        "Nursing care, clinical monitoring, Medication administration, Symptom management and Wound care.",
-    },
-    {
-      value: "personal_specialized",
-      title: "Personal & Specialized care",
-      description:
-        "Mobility assistance, Daily routine support, Supervision, Monitoring & Reporting changes and Medication reminders.",
-    },
-  ];
-
   const frequencies: { value: CareFrequency; label: string }[] = [
     { value: "live_in", label: "Live-in" },
     { value: "full_day", label: "Full day" },
@@ -596,8 +573,8 @@ function CareNeedsStep({
 
       <div className="mt-6">
         <p className="mb-3 text-sm font-medium text-navy">Type of care</p>
-        <div className="space-y-3">
-          {careOptions.map((option) => (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {CARE_TYPE_OPTIONS.map((option) => (
             <OptionCard
               key={option.value}
               title={option.title}
@@ -643,17 +620,16 @@ function CareNeedsStep({
                 startTiming: undefined,
                 startDate: undefined,
               }));
+              const timing = value as CareStartTiming;
               patchDraft({
-                startTiming: value as "asap" | "specific_date",
-                startDate: value === "asap" ? "" : draft.startDate,
+                startTiming: timing,
+                startDate:
+                  timing === "specific_date" ? draft.startDate : "",
               });
             }}
             placeholder="Select timing"
             invalid={Boolean(errors.startTiming)}
-            options={[
-              { value: "asap", label: "As soon as possible" },
-              { value: "specific_date", label: "On a specific date" },
-            ]}
+            options={[...CARE_START_OPTIONS]}
           />
           {errors.startTiming ? (
             <FieldError>{errors.startTiming}</FieldError>
@@ -672,31 +648,26 @@ function CareNeedsStep({
               })
             }
             placeholder="Select preference"
-            options={[
-              { value: "no_preference", label: "No preference" },
-              { value: "female", label: "Female" },
-              { value: "male", label: "Male" },
-            ]}
+            options={[...CAREGIVER_GENDER_OPTIONS]}
           />
         </div>
       </div>
 
-      <div className="mt-4">
-        <FieldLabel htmlFor="start-date">Specific Date</FieldLabel>
-        <DateField
-          id="start-date"
-          value={draft.startDate}
-          onChange={(value) => {
-            setErrors((current) => ({ ...current, startDate: undefined }));
-            patchDraft({
-              startDate: value,
-              startTiming: value ? "specific_date" : draft.startTiming,
-            });
-          }}
-          invalid={Boolean(errors.startDate)}
-        />
-        {errors.startDate ? <FieldError>{errors.startDate}</FieldError> : null}
-      </div>
+      {draft.startTiming === "specific_date" ? (
+        <div className="mt-4">
+          <FieldLabel htmlFor="start-date">Specific Date</FieldLabel>
+          <DateField
+            id="start-date"
+            value={draft.startDate}
+            onChange={(value) => {
+              setErrors((current) => ({ ...current, startDate: undefined }));
+              patchDraft({ startDate: value });
+            }}
+            invalid={Boolean(errors.startDate)}
+          />
+          {errors.startDate ? <FieldError>{errors.startDate}</FieldError> : null}
+        </div>
+      ) : null}
 
       <StepActions
         onBack={onBack}
@@ -892,7 +863,6 @@ function EmergencyConsentStep({
   const [errors, setErrors] = useState<{
     emergencyName?: string;
     relationshipToYou?: string;
-    relationshipToCareRecipient?: string;
     emergencyPhone?: string;
     reachChannels?: string;
     consentMatch?: string;
@@ -923,10 +893,6 @@ function EmergencyConsentStep({
     }
     if (!draft.relationshipToYou) {
       next.relationshipToYou = "Select their relationship to you.";
-    }
-    if (!draft.relationshipToCareRecipient) {
-      next.relationshipToCareRecipient =
-        "Select their relationship to who needs care.";
     }
     const phoneError = validatePhoneNumber(draft.emergencyPhone);
     if (phoneError === "required") {
@@ -964,7 +930,6 @@ function EmergencyConsentStep({
     { value: "whatsapp", label: "WhatsApp" },
     { value: "phone", label: "Phone call" },
     { value: "sms", label: "SMS" },
-    { value: "email", label: "Email" },
   ];
 
   const consentCheckboxClass = (invalid?: boolean) =>
@@ -1002,55 +967,22 @@ function EmergencyConsentStep({
           ) : null}
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <FieldLabel htmlFor="rel-you">Relationship to you</FieldLabel>
-            <SelectField
-              id="rel-you"
-              value={draft.relationshipToYou}
-              onChange={(value) => {
-                clearError("relationshipToYou");
-                patchDraft({ relationshipToYou: value });
-              }}
-              placeholder="Select relationship"
-              invalid={Boolean(errors.relationshipToYou)}
-              options={[
-                { value: "spouse", label: "Spouse" },
-                { value: "sibling", label: "Sibling" },
-                { value: "child", label: "Child" },
-                { value: "friend", label: "Friend" },
-                { value: "other", label: "Other" },
-              ]}
-            />
-            {errors.relationshipToYou ? (
-              <FieldError>{errors.relationshipToYou}</FieldError>
-            ) : null}
-          </div>
-          <div>
-            <FieldLabel htmlFor="rel-care">
-              Relationship to who needs care
-            </FieldLabel>
-            <SelectField
-              id="rel-care"
-              value={draft.relationshipToCareRecipient}
-              onChange={(value) => {
-                clearError("relationshipToCareRecipient");
-                patchDraft({ relationshipToCareRecipient: value });
-              }}
-              placeholder="Select relationship"
-              invalid={Boolean(errors.relationshipToCareRecipient)}
-              options={[
-                { value: "spouse", label: "Spouse" },
-                { value: "child", label: "Child" },
-                { value: "sibling", label: "Sibling" },
-                { value: "relative", label: "Relative" },
-                { value: "other", label: "Other" },
-              ]}
-            />
-            {errors.relationshipToCareRecipient ? (
-              <FieldError>{errors.relationshipToCareRecipient}</FieldError>
-            ) : null}
-          </div>
+        <div>
+          <FieldLabel htmlFor="rel-you">Relationship to you</FieldLabel>
+          <SelectField
+            id="rel-you"
+            value={draft.relationshipToYou}
+            onChange={(value) => {
+              clearError("relationshipToYou");
+              patchDraft({ relationshipToYou: value });
+            }}
+            placeholder="Select relationship"
+            invalid={Boolean(errors.relationshipToYou)}
+            options={[...EMERGENCY_RELATIONSHIP_OPTIONS]}
+          />
+          {errors.relationshipToYou ? (
+            <FieldError>{errors.relationshipToYou}</FieldError>
+          ) : null}
         </div>
 
         <div>
@@ -1222,13 +1154,35 @@ function labelRecipient(draft: CareProfileDraft): string {
 }
 
 function labelCareTypes(draft: CareProfileDraft): string {
-  const labels: Record<CareType, string> = {
-    non_clinical: "Non-Clinical care",
-    clinical: "Clinical care",
-    personal_specialized: "Personal & Specialized care",
-  };
   if (draft.careTypes.length === 0) return "Not provided";
+  const labels = Object.fromEntries(
+    CARE_TYPE_OPTIONS.map((option) => [option.value, option.title]),
+  ) as Record<CareType, string>;
   return draft.careTypes.map((type) => labels[type]).join(", ");
+}
+
+function labelStartTiming(draft: CareProfileDraft): string {
+  if (draft.startTiming === "specific_date") {
+    return displayOrMissing(draft.startDate);
+  }
+  const match = CARE_START_OPTIONS.find(
+    (option) => option.value === draft.startTiming,
+  );
+  return match?.label ?? "Not provided";
+}
+
+function labelCaregiverGender(draft: CareProfileDraft): string {
+  const match = CAREGIVER_GENDER_OPTIONS.find(
+    (option) => option.value === draft.caregiverGender,
+  );
+  return match?.label ?? "Not provided";
+}
+
+function labelEmergencyRelationship(value: string): string {
+  const match = EMERGENCY_RELATIONSHIP_OPTIONS.find(
+    (option) => option.value === value,
+  );
+  return match?.label ?? "Not provided";
 }
 
 function labelFrequency(draft: CareProfileDraft): string {
@@ -1254,13 +1208,8 @@ function labelMobility(draft: CareProfileDraft): string {
 }
 
 function labelGender(value: string): string {
-  if (!value) return "Not provided";
-  return capitalize(value);
-}
-
-function labelRelationshipSelect(value: string): string {
-  if (!value) return "Not provided";
-  return capitalize(value);
+  const match = GENDER_OPTIONS.find((option) => option.value === value);
+  return match?.label ?? "Not provided";
 }
 
 function ReviewRow({
@@ -1459,21 +1408,11 @@ function ReviewSummaryStep({
         <ReviewRow label="How often" value={labelFrequency(draft)} />
         <ReviewRow
           label="When care should start"
-          value={
-            draft.startTiming === "specific_date"
-              ? displayOrMissing(draft.startDate)
-              : draft.startTiming === "asap"
-                ? "As soon as possible"
-                : "Not provided"
-          }
+          value={labelStartTiming(draft)}
         />
         <ReviewRow
           label="Caregiver gender preference"
-          value={
-            draft.caregiverGender === "no_preference"
-              ? "No preference"
-              : capitalize(draft.caregiverGender)
-          }
+          value={labelCaregiverGender(draft)}
         />
       </ReviewSection>
 
@@ -1501,12 +1440,8 @@ function ReviewSummaryStep({
         />
         <ReviewRow
           label="Relationship to you"
-          value={labelRelationshipSelect(draft.relationshipToYou)}
+          value={labelEmergencyRelationship(draft.relationshipToYou)}
           missing={!draft.relationshipToYou}
-        />
-        <ReviewRow
-          label="Relationship to who needs care"
-          value={labelRelationshipSelect(draft.relationshipToCareRecipient)}
         />
         <ReviewRow
           label="Phone number"
@@ -1518,7 +1453,10 @@ function ReviewSummaryStep({
           value={
             draft.reachChannels.length === 0
               ? "Not provided"
-              : draft.reachChannels.map((channel) => reachLabels[channel]).join(", ")
+              : draft.reachChannels
+                  .filter((channel) => channel !== "email")
+                  .map((channel) => reachLabels[channel])
+                  .join(", ")
           }
         />
 

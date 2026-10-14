@@ -5,19 +5,19 @@ import Link from "next/link";
 import { CareProfileShell } from "@/features/care-profile/components/care-profile-shell";
 import { useCareProfileStore } from "@/features/care-profile/hooks/use-care-profile-store";
 import { getCarePronouns } from "@/features/care-profile/lib/pronouns";
-import type {
-  CareFrequency,
-  CareProfileDraft,
-  CareType,
+import {
+  CARE_START_OPTIONS,
+  CARE_TYPE_OPTIONS,
+  type CareFrequency,
+  type CareProfileDraft,
+  type CareType,
 } from "@/features/care-profile/types";
 import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
-const CARE_TYPE_LABELS: Record<CareType, string> = {
-  non_clinical: "Companionship, Personal care",
-  clinical: "Clinical care",
-  personal_specialized: "Specialized care",
-};
+const CARE_TYPE_LABELS: Record<CareType, string> = Object.fromEntries(
+  CARE_TYPE_OPTIONS.map((option) => [option.value, option.title]),
+) as Record<CareType, string>;
 
 const FREQUENCY_LABELS: Record<CareFrequency, string> = {
   live_in: "Live-in",
@@ -75,7 +75,8 @@ function arrangementLabel(draft: CareProfileDraft): string {
   const start =
     draft.startTiming === "specific_date" && draft.startDate.trim()
       ? `Starting ${draft.startDate}`
-      : "Starting as soon as possible";
+      : CARE_START_OPTIONS.find((option) => option.value === draft.startTiming)
+          ?.label ?? "Starting as soon as possible";
   return `${frequency} · ${start}`;
 }
 
