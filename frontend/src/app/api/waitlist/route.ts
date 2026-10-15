@@ -4,8 +4,10 @@ import {
   waitlistJoinSchema,
   type WaitlistJoinResponse,
 } from "@/features/waitlist/types";
+import { backendUrl } from "@/lib/backend";
 
-const WAITLIST_API_URL = process.env.WAITLIST_API_URL;
+const WAITLIST_API_URL =
+  process.env.WAITLIST_API_URL ?? backendUrl("/waitlist");
 
 function errorResponse(message: string, status: number) {
   return NextResponse.json(
