@@ -1,8 +1,10 @@
 
 import { NextResponse } from "next/server";
 import type { WaitlistStatsResponse } from "@/features/waitlist/types";
+import { backendUrl } from "@/lib/backend";
 
-const WAITLIST_STATS_API_URL = process.env.WAITLIST_STATS_API_URL;
+const WAITLIST_STATS_API_URL =
+  process.env.WAITLIST_STATS_API_URL ?? backendUrl("/waitlist/stats");
 
 function errorResponse(status: number) {
   return NextResponse.json(

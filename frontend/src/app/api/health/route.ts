@@ -1,8 +1,10 @@
 
 import { NextResponse } from "next/server";
 import type { HealthResponse } from "@/features/waitlist/types";
+import { backendUrl } from "@/lib/backend";
 
-const WAITLIST_HEALTH_API_URL = process.env.WAITLIST_HEALTH_API_URL;
+const WAITLIST_HEALTH_API_URL =
+  process.env.WAITLIST_HEALTH_API_URL ?? backendUrl("/");
 
 function errorResponse(status: number) {
   return NextResponse.json(
