@@ -1,14 +1,23 @@
 import { inferAdditionalFields } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
-import { getBackendBaseUrl } from "@/lib/backend";
+
+function getAuthBaseUrl(): string {
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+  return (
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/+$/, "") ??
+    "http://localhost:3000"
+  );
+}
 
 /**
- * Better Auth React client — talks to the Carevya backend
- * (`NEXT_PUBLIC_BACKEND_API_URL`), not this Next.js app.
+ * Better Auth client talks to this Next.js app (`/api/auth/*`),
+ * which proxies to `NEXT_PUBLIC_BACKEND_API_URL` (avoids CORS).
  * @see https://better-auth.com/docs/concepts/client
  */
 export const authClient = createAuthClient({
-  baseURL: getBackendBaseUrl(),
+  baseURL: getAuthBaseUrl(),
   plugins: [
     inferAdditionalFields({
       user: {
@@ -20,5 +29,11 @@ export const authClient = createAuthClient({
   ],
 });
 
-export const { signIn, signUp, signOut, useSession, requestPasswordReset, resetPassword } =
-  authClient;
+export const {
+  signIn,
+  signUp,
+  signOut,
+  useSession,
+  requestPasswordReset,
+  resetPassword,
+} = authClient;
