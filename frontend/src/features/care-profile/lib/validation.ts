@@ -43,21 +43,7 @@ export function validateDateOfBirth(value: string): string | null {
   return null;
 }
 
-export function validatePhoneNumber(value: string): string | null {
-  const trimmed = value.trim();
-  if (!trimmed) return "required";
-
-  const digits = trimmed.replace(/\D/g, "");
-  let local = digits;
-  if (local.startsWith("234") && local.length >= 13) local = local.slice(3);
-  if (local.startsWith("0") && local.length >= 11) local = local.slice(1);
-
-  if (local.length < 10 || local.length > 11) {
-    return "Enter a valid phone number, e.g. +234 803 123 4567.";
-  }
-
-  return null;
-}
+export { validateNigerianMobile as validatePhoneNumber } from "@/lib/phone";
 
 export function possessiveLabel(draft: CareProfileDraft): string {
   const pronouns = getCarePronouns(draft);

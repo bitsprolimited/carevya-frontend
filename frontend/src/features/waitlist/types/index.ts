@@ -1,6 +1,8 @@
-
 import { z } from "zod";
-
+import {
+  isValidNigerianMobile,
+  NIGERIAN_PHONE_ERROR,
+} from "@/lib/phone";
 
 export const waitlistRoleSchema = z.enum(["care_seeker", "caregiver"]);
 
@@ -18,8 +20,8 @@ export const waitlistJoinSchema = z.object({
   phone: z
     .string()
     .trim()
-    .min(7, "Enter a valid phone number")
-    .max(20, "Enter a valid phone number"),
+    .min(1, "Enter a valid phone number")
+    .refine(isValidNigerianMobile, { message: NIGERIAN_PHONE_ERROR }),
   state: z.string().min(1, "Select a state").max(60),
   lga: z
     .string()
