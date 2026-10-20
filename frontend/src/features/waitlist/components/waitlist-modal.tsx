@@ -60,6 +60,10 @@ function normalizePhone(raw: string) {
   return p;
 }
 
+function firstNameFrom(fullName: string): string {
+  return fullName.trim().split(/\s+/)[0] || "there";
+}
+
 
 function getErrorMessage(err: unknown): string {
   if (err instanceof ApiError) {
@@ -138,7 +142,17 @@ export function WaitlistModal() {
   }, [isOpen]);
 
   const result = mutation.data;
-  const alreadyJoined = Boolean(result?.meta?.alreadyJoined);
+  const alreadyJoined = Boolean(
+    result?.meta?.alreadyJoined ??
+      (result?.data as { alreadyJoined?: boolean } | undefined)?.alreadyJoined,
+  );
+  const submitted = mutation.variables;
+  const submittedRole = submitted?.role ?? selectedRole;
+  const submittedFirstName = firstNameFrom(
+    submitted?.fullName ?? form.getValues("fullName"),
+  );
+  const isCaregiverSuccess =
+    mutation.isSuccess && submittedRole === "caregiver";
 
   return (
     <AnimatePresence>
@@ -188,6 +202,33 @@ export function WaitlistModal() {
         </button>
 
         <div className="overflow-y-auto px-5 pt-8 pb-6 sm:px-7 sm:pt-9 sm:pb-7">
+          {isCaregiverSuccess ? (
+            <div
+              className="flex flex-col items-center px-2 py-6 text-center sm:py-8"
+              role="status"
+            >
+              <h2
+                id={titleId}
+                className="text-2xl font-bold tracking-tight text-on-media sm:text-[1.75rem]"
+              >
+                {alreadyJoined
+                  ? `You're already on the list, ${submittedFirstName}.`
+                  : `You're on the list, ${submittedFirstName}.`}
+              </h2>
+              <p className="mt-4 max-w-sm text-sm leading-relaxed text-on-media/80 sm:text-base">
+                We will email you as soon as verified caregivers become
+                available.
+              </p>
+              <Button
+                type="button"
+                onClick={closeModal}
+                className="mt-8 h-11 rounded-full bg-emerald px-10 text-sm font-semibold text-white hover:bg-emerald-dark"
+              >
+                Got it
+              </Button>
+            </div>
+          ) : (
+          <>
           <div className="pr-8 text-center">
             {mutation.isSuccess ? (
               <h2
@@ -447,6 +488,8 @@ export function WaitlistModal() {
                 </p>
               ) : null}
             </form>
+          )}
+          </>
           )}
         </div>
           </motion.div>
