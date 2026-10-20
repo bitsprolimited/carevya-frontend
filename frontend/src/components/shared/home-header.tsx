@@ -11,7 +11,7 @@ import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
-  { label: "Home", href: "/", match: "/" },
+  { label: "Home", href: "/home", match: "/home" },
   { label: "How It Works", href: "/how-it-works", match: "/how-it-works", chevron: true },
   { label: "About Us", href: "/about", match: "/about" },
   { label: "Contact Us", href: "/contact", match: "/contact" },
@@ -41,7 +41,7 @@ export function HomeHeader({ variant = "solid" }: HomeHeaderProps) {
       >
         <div className="relative mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4 sm:h-[4.5rem] md:px-6 lg:px-8 xl:px-10">
           <Link
-            href="/"
+            href="/home"
             className="relative z-10 flex shrink-0 items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <span className="relative size-9 shrink-0 overflow-hidden rounded-full sm:size-10">
