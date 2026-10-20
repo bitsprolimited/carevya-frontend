@@ -834,49 +834,7 @@ export const TERMS_SECTIONS: LegalSection[] =
       },
       {
         "type": "p",
-        "text": "Depending on how the Platform is used, information may include:"
-      },
-      {
-        "type": "ul",
-        "items": [
-          "Identity information",
-          "Contact information",
-          "Location",
-          "Profile information",
-          "Identity documents",
-          "Qualifications",
-          "References",
-          "Payment-related information",
-          "Care-recipient information",
-          "Health or care-related information",
-          "Communications",
-          "Reviews and ratings",
-          "Technical and usage information"
-        ]
-      },
-      {
-        "type": "p",
-        "text": "CareVYA will process personal data for legitimate purposes connected with operating, securing and improving the Platform, including where necessary:"
-      },
-      {
-        "type": "ul",
-        "items": [
-          "Account management",
-          "Verification",
-          "Care matching",
-          "Booking",
-          "Payment",
-          "Customer support",
-          "Safety",
-          "Fraud prevention",
-          "Dispute resolution",
-          "Legal compliance",
-          "Sensitive or health-related information will receive appropriate safeguards."
-        ]
-      },
-      {
-        "type": "p",
-        "text": "Users should review the CareVYA Privacy Policy for detailed information about data collection, processing, sharing, retention, security and data-subject rights."
+        "text": "Users should review the CareVYA Privacy Policy (available at /privacy) for detailed information about data collection, processing, sharing, retention, security and data-subject rights."
       }
     ]
   },
