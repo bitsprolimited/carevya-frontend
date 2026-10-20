@@ -4,7 +4,8 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { assets } from "@/lib/assets";
 import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
@@ -25,18 +26,23 @@ type HomeHeaderProps = {
 
 export function HomeHeader({ variant = "solid" }: HomeHeaderProps) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const openWaitlistModal = useWaitlistStore((state) => state.openModal);
   const isTransparent = variant === "transparent";
 
-  return (
-    <>
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const header = (
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-50 w-full",
+          // Portal to body so page sections with `isolate` can’t paint over the nav
+          "fixed inset-x-0 top-0 z-[200] w-full",
           isTransparent
             ? "bg-transparent"
-            : "border-b border-border/60 bg-white",
+            : "border-b border-border/60 bg-white shadow-sm",
         )}
       >
         <div className="relative mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4 sm:h-[4.5rem] md:px-6 lg:px-8 xl:px-10">
@@ -167,6 +173,11 @@ export function HomeHeader({ variant = "solid" }: HomeHeaderProps) {
           </nav>
         </div>
       </header>
+  );
+
+  return (
+    <>
+      {mounted ? createPortal(header, document.body) : header}
       {/* Reserve space so page content isn’t hidden under the fixed bar */}
       <div className="h-16 shrink-0 sm:h-[4.5rem]" aria-hidden />
     </>
