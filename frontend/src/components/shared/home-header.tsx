@@ -76,10 +76,8 @@ export function HomeHeader({ variant = "solid" }: HomeHeaderProps) {
           >
             {navLinks.map((link) => {
               const active =
-                link.match === "/"
-                  ? pathname === "/"
-                  : pathname === link.match ||
-                    pathname.startsWith(`${link.match}/`);
+                pathname === link.match ||
+                pathname.startsWith(`${link.match}/`);
               return (
                 <Link
                   key={link.label}

@@ -1,5 +1,8 @@
 import type { CareProfileDraft } from "@/features/care-profile/types";
 import { getCarePronouns } from "@/features/care-profile/lib/pronouns";
+import { validateNigerianMobile as validatePhoneNumber } from "@/lib/phone";
+
+export { validatePhoneNumber };
 
 const MONTH_NAMES = [
   "January",
@@ -42,8 +45,6 @@ export function validateDateOfBirth(value: string): string | null {
 
   return null;
 }
-
-export { validateNigerianMobile as validatePhoneNumber } from "@/lib/phone";
 
 export function possessiveLabel(draft: CareProfileDraft): string {
   const pronouns = getCarePronouns(draft);
