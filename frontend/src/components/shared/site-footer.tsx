@@ -10,7 +10,7 @@ import { assets } from "@/lib/assets";
 import { cn } from "@/lib/utils";
 
 const quickLinks = [
-  { href: "/", label: "Home" },
+  { href: "/home", label: "Home" },
   { href: "/about", label: "About Us" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/contact", label: "Contact Us" },
@@ -128,7 +128,7 @@ export function SiteFooter({ className }: { className?: string }) {
         <div className="grid gap-10 lg:grid-cols-[1.35fr_0.85fr_0.95fr_1.1fr] lg:gap-8 xl:gap-12">
           <div>
             <Link
-              href="/"
+              href="/home"
               className="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 focus-visible:ring-offset-footer"
             >
               <span className="relative size-9 shrink-0 overflow-hidden sm:size-10">
