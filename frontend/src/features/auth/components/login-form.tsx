@@ -116,7 +116,7 @@ export function LoginForm({
 
       closeModal();
       onClose?.();
-      router.push("/careseeker/profile");
+      router.push("/family/profile");
     } catch {
       setBannerError("We couldn't sign you in. Please try again.");
     } finally {
@@ -289,7 +289,7 @@ export function LoginForm({
             onClick={onCreateAccount}
             className="font-semibold text-brand-blue hover:text-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            Create a Careseeker Account
+            Create a family Account
           </button>
         </p>
       ) : null}

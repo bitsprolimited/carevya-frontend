@@ -29,7 +29,7 @@ import {
   inputWrapperClass,
   otpInputClass,
 } from "@/features/auth/components/auth-feedback";
-import { signUpCareseeker } from "@/features/auth/services/auth-service";
+import { signUpfamily } from "@/features/auth/services/auth-service";
 import {
   PLACEHOLDER_OTP,
   resendOtpPlaceholder,
@@ -180,7 +180,7 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
 
     setSubmitting(true);
     try {
-      const result = await signUpCareseeker({
+      const result = await signUpfamily({
         fullName: fullName.trim(),
         email: email.trim(),
         phone: phone.trim(),
@@ -352,7 +352,7 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
             </h1>
 
             <p className="mx-auto mt-2 max-w-xs text-sm text-navy/70">
-              Sign up as a careseeker to find verified, compassionate
+              Sign up as a family to find verified, compassionate
               caregivers for your family.
             </p>
           </div>
@@ -736,7 +736,7 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
           </div>
 
           <Link
-            href="/careseeker/profile"
+            href="/family/profile"
             className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand-blue px-4 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             Set Up Care Profile

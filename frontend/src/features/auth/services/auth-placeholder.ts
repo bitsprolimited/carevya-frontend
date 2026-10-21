@@ -6,14 +6,14 @@
 /** Fixed OTP accepted by the placeholder verifier. */
 export const PLACEHOLDER_OTP = "123456";
 
-export type RegisterCareseekerInput = {
+export type RegisterfamilyInput = {
   fullName: string;
   email: string;
   phone: string;
   password: string;
 };
 
-export type RegisterCareseekerResult = {
+export type RegisterfamilyResult = {
   success: true;
   message: string;
 };
@@ -37,10 +37,10 @@ function delay(ms = 500) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/** Placeholder: pretend we registered the careseeker and sent an OTP. */
-export async function registerCareseekerPlaceholder(
-  input: RegisterCareseekerInput,
-): Promise<RegisterCareseekerResult> {
+/** Placeholder: pretend we registered the family and sent an OTP. */
+export async function registerfamilyPlaceholder(
+  input: RegisterfamilyInput,
+): Promise<RegisterfamilyResult> {
   await delay();
   void input;
   return {

@@ -4,7 +4,7 @@ import { GetStartedView } from "@/features/auth/components/get-started-view";
 
 export const metadata: Metadata = {
   title: "Get Started | CareVYA",
-  description: "Join CareVYA as a careseeker or a caregiver.",
+  description: "Join CareVYA as a family or a caregiver.",
 };
 
 export default function GetStartedPage() {
