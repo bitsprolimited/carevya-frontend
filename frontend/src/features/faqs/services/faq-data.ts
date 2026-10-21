@@ -28,7 +28,7 @@ export const FAQ_ITEMS: readonly FaqItem[] = [
   },
   {
     id: "payments",
-    question: "How payment are made?",
+    question: "How are payments made?",
     answer:
       "Payments are handled through CareVYA for clarity and fairness. Families pay through the platform, and caregivers receive trackable compensation. Full payment details will be shared as we open beyond the waitlist.",
   },

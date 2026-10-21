@@ -137,8 +137,8 @@ export function WaitlistModal() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset only when modal opens/closes
   }, [isOpen]);
 
-  const result = mutation.data;
-  const alreadyJoined = Boolean(result?.meta?.alreadyJoined);
+  const firstName =
+    mutation.variables?.fullName.trim().split(/\s+/)[0] ?? "";
 
   return (
     <AnimatePresence>
@@ -192,9 +192,9 @@ export function WaitlistModal() {
             {mutation.isSuccess ? (
               <h2
                 id={titleId}
-                className="text-2xl font-bold tracking-tight text-on-media uppercase sm:text-[1.65rem]"
+                className="text-2xl font-bold tracking-tight text-on-media sm:text-[1.65rem]"
               >
-                Congratulations
+                You&apos;re on the list{firstName ? `, ${firstName}` : ""}.
               </h2>
             ) : (
               <>
@@ -218,17 +218,15 @@ export function WaitlistModal() {
               role="status"
             >
               <p className="text-sm font-medium text-on-media">
-                {alreadyJoined
-                  ? "You're already on the waitlist."
-                  : (result?.message ??
-                    "You're on the waitlist — we'll be in touch.")}
+                We will email you as soon as verified caregivers become
+                available.
               </p>
               <Button
                 type="button"
                 onClick={closeModal}
                 className="mt-2 h-11 rounded-full bg-brand-blue px-6 text-on-media hover:bg-brand-blue-hover"
               >
-                Done
+                Got it
               </Button>
             </div>
           ) : (

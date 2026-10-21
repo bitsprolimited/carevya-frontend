@@ -42,7 +42,7 @@ const protocolSteps: readonly ProtocolStep[] = [
     index: "02",
     label: "KNOW WHO TO TRUST",
     title: "Triple-Layer Vetting",
-    body: "We verify every caregivers, so families can feel more confident about who they welcome into their loved one's life.",
+    body: "We verify every caregiver, so families can feel more confident about who they welcome into their loved one's life.",
     callout: "Verification conducted",
     theme: "gold",
     Icon: BadgeCheck,
