@@ -151,8 +151,11 @@ export function WaitlistModal() {
   const submittedFirstName = firstNameFrom(
     submitted?.fullName ?? form.getValues("fullName"),
   );
-  const isCaregiverSuccess =
-    mutation.isSuccess && submittedRole === "caregiver";
+  const showPersonalizedSuccess = mutation.isSuccess;
+  const successBody =
+    submittedRole === "caregiver"
+      ? "We will email you as soon as care opportunities become available."
+      : "We will email you as soon as verified caregivers become available.";
 
   return (
     <AnimatePresence>
@@ -202,7 +205,7 @@ export function WaitlistModal() {
         </button>
 
         <div className="overflow-y-auto px-5 pt-8 pb-6 sm:px-7 sm:pt-9 sm:pb-7">
-          {isCaregiverSuccess ? (
+          {showPersonalizedSuccess ? (
             <div
               className="flex flex-col items-center px-2 py-6 text-center sm:py-8"
               role="status"
@@ -216,8 +219,7 @@ export function WaitlistModal() {
                   : `You're on the list, ${submittedFirstName}.`}
               </h2>
               <p className="mt-4 max-w-sm text-sm leading-relaxed text-on-media/80 sm:text-base">
-                We will email you as soon as verified caregivers become
-                available.
+                {successBody}
               </p>
               <Button
                 type="button"
@@ -230,49 +232,18 @@ export function WaitlistModal() {
           ) : (
           <>
           <div className="pr-8 text-center">
-            {mutation.isSuccess ? (
-              <h2
-                id={titleId}
-                className="text-2xl font-bold tracking-tight text-on-media uppercase sm:text-[1.65rem]"
-              >
-                Congratulations
-              </h2>
-            ) : (
-              <>
-                <h2
-                  id={titleId}
-                  className="text-2xl font-bold tracking-tight text-on-media sm:text-[1.65rem]"
-                >
-                  Join the Waitlist
-                </h2>
-                <p className="mt-2 text-sm leading-relaxed text-on-media/75">
-                  Be the first to know when we&apos;re ready to support you or
-                  your loved ones.
-                </p>
-              </>
-            )}
+            <h2
+              id={titleId}
+              className="text-2xl font-bold tracking-tight text-on-media sm:text-[1.65rem]"
+            >
+              Join the Waitlist
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-on-media/75">
+              Be the first to know when we&apos;re ready to support you or
+              your loved ones.
+            </p>
           </div>
 
-          {mutation.isSuccess ? (
-            <div
-              className="mt-8 flex flex-col items-center gap-3 text-center"
-              role="status"
-            >
-              <p className="text-sm font-medium text-on-media">
-                {alreadyJoined
-                  ? "You're already on the waitlist."
-                  : (result?.message ??
-                    "You're on the waitlist — we'll be in touch.")}
-              </p>
-              <Button
-                type="button"
-                onClick={closeModal}
-                className="mt-2 h-11 rounded-full bg-brand-blue px-6 text-on-media hover:bg-brand-blue-hover"
-              >
-                Done
-              </Button>
-            </div>
-          ) : (
             <form
               className="mt-6 flex flex-col gap-3.5"
               onSubmit={form.handleSubmit((values) =>
@@ -488,7 +459,6 @@ export function WaitlistModal() {
                 </p>
               ) : null}
             </form>
-          )}
           </>
           )}
         </div>
