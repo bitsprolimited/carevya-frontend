@@ -10,7 +10,7 @@ function errorResponse(status: number) {
   return NextResponse.json(
     {
       success: false,
-      data: { careSeekers: 0, caregivers: 0, total: 0 },
+      data: { familys: 0, caregivers: 0, total: 0 },
       meta: { asOf: new Date().toISOString() },
     } satisfies WaitlistStatsResponse,
     { status },

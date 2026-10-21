@@ -17,7 +17,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
   return fallback;
 }
 
-export async function signUpCareseeker(input: {
+export async function signUpfamily(input: {
   fullName: string;
   email: string;
   phone: string;
@@ -64,7 +64,7 @@ export async function signInWithEmail(input: {
 export async function signInWithGoogle(): Promise<AuthResult> {
   const { error } = await authClient.signIn.social({
     provider: "google",
-    callbackURL: "/careseeker/profile",
+    callbackURL: "/family/profile",
   });
 
   if (error) {

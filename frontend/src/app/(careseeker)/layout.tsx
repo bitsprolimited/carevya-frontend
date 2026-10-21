@@ -1,4 +1,4 @@
-export default function CareseekerLayout({
+export default function familyLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

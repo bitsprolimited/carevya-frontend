@@ -58,7 +58,7 @@ export type WaitlistJoinResponse = {
 export type WaitlistStatsResponse = {
   success: boolean;
   data: {
-    careSeekers: number;
+    familys: number;
     caregivers: number;
     total: number;
   };
