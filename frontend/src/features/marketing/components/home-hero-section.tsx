@@ -1,16 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "motion/react";
-import { Button } from "@/components/ui/button";
 import { HomeHeader } from "@/components/shared/home-header";
-import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { fadeUp, heroTransition, staggerContainer } from "@/lib/motion";
 import { assets } from "@/lib/assets";
 
 export function HomeHeroSection() {
-  const openModal = useWaitlistStore((state) => state.openModal);
-
   return (
     <section className="relative isolate bg-background">
       <div className="relative overflow-hidden bg-scrim">
@@ -63,14 +60,12 @@ export function HomeHeroSection() {
                 transition={heroTransition}
                 className="pt-1"
               >
-                <Button
-                  type="button"
-                  size="lg"
-                  onClick={openModal}
-                  className="h-12 rounded-full px-8 text-base sm:h-14 sm:px-10 sm:text-lg"
+                <Link
+                  href="/get-started"
+                  className="inline-flex h-12 items-center justify-center rounded-full bg-brand-blue px-8 text-base font-semibold text-white shadow-sm transition-colors hover:bg-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:h-14 sm:px-10 sm:text-lg"
                 >
                   Get Started Now
-                </Button>
+                </Link>
               </motion.div>
             </motion.div>
           </div>
