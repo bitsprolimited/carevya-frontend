@@ -87,7 +87,7 @@ export function HomeTestimonialsSection() {
             />
             <div className="relative z-10 flex h-full min-h-[28rem] flex-col justify-end p-6 sm:min-h-[32rem] sm:p-8 lg:min-h-[36rem]">
               <p className="max-w-md text-base leading-relaxed text-on-media sm:text-lg">
-                {featured.quote}
+                “{featured.quote}”
               </p>
               <div className="mt-6 flex items-end justify-between gap-4">
                 <div className="flex items-center gap-3">
@@ -104,12 +104,6 @@ export function HomeTestimonialsSection() {
                     {featured.family}
                   </p>
                 </div>
-                <span
-                  aria-hidden
-                  className="select-none text-6xl leading-none font-serif text-on-media/35 sm:text-7xl"
-                >
-                  ”
-                </span>
               </div>
             </div>
           </article>
