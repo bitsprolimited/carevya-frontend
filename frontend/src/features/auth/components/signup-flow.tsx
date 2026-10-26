@@ -744,7 +744,7 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
           </Link>
 
           <Link
-            href="/dashboard"
+            href="/careseeker"
             className="mt-4 inline-block text-sm font-medium text-brand-blue hover:text-brand-blue-hover"
           >
             Skip &amp; Go to Dashboard
