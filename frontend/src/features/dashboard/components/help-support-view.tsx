@@ -20,7 +20,7 @@ const FAQS = [
     id: "pay",
     question: "How do I pay my caregiver?",
     answer:
-      "After you confirm a booking, you’ll see the agreed amount and how to pay. For most bookings you’ll pay the caregiver directly as arranged in chat. Receipts and payment reminders appear under Bookings and in your notifications.",
+      "CareVYA doesn’t handle payments. You and your caregiver agree a price in chat, it’s saved on the booking, and you pay them directly — in cash or by transfer — the way you both agreed.",
   },
   {
     id: "cancel",
@@ -108,7 +108,7 @@ function SupportIllustration() {
 }
 
 export function HelpSupportView() {
-  const [openFaq, setOpenFaq] = useState<string | null>(null);
+  const [openFaq, setOpenFaq] = useState<string | null>("pay");
   const [reportOpen, setReportOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -172,13 +172,20 @@ export function HelpSupportView() {
                       }
                       className="flex w-full items-center justify-between gap-3 py-4 text-left"
                     >
-                      <span className="text-sm font-semibold text-navy">
+                      <span
+                        className={cn(
+                          "text-sm font-semibold",
+                          isOpen ? "text-brand-blue" : "text-navy",
+                        )}
+                      >
                         {faq.question}
                       </span>
                       <ChevronDown
                         className={cn(
-                          "size-4 shrink-0 text-navy/40 transition-transform",
-                          isOpen && "rotate-180",
+                          "size-4 shrink-0 transition-transform",
+                          isOpen
+                            ? "rotate-180 text-brand-blue"
+                            : "text-navy/40",
                         )}
                         aria-hidden
                       />

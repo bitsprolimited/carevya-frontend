@@ -9,6 +9,7 @@ import type {
 export const mockUser = {
   firstName: "Grace",
   fullName: "Grace Bills",
+  email: "grace.bills@family.ng",
   roleLabel: "Family",
   avatarUrl: assets.homeTestimonialAvatarA,
   notificationCount: 1,
@@ -31,9 +32,10 @@ export const mockRecipients: CareRecipient[] = [
     fullName: "Musa Adebayo",
     relationship: "Father",
     age: 80,
-    area: "Yaba",
+    area: "Surulere",
     city: "Lagos",
     avatarUrl: assets.homeTestimonialAvatarD,
+    profileProgress: { completed: 2, total: 5 },
   },
 ];
 

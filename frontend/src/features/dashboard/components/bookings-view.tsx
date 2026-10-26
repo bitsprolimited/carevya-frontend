@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, ChevronDown, Info } from "lucide-react";
+import { CalendarDays, Check, ChevronDown, Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -18,7 +18,13 @@ import { cn } from "@/lib/utils";
 
 type TabFilter = "all" | "pending" | "accepted" | "declined";
 
-const TIMEFRAMES = ["This month", "Last month", "All time"] as const;
+const TIMEFRAMES = [
+  "This week",
+  "This month",
+  "Last 3 months",
+  "This year",
+  "All time",
+] as const;
 
 export function BookingsView() {
   const router = useRouter();
@@ -131,25 +137,31 @@ export function BookingsView() {
               <ChevronDown className="size-3.5 text-navy/45" aria-hidden />
             </button>
             {timeframeOpen ? (
-              <div className="absolute right-0 z-20 mt-2 min-w-[10rem] overflow-hidden rounded-xl border border-[#E8EEF5] bg-white py-1 shadow-lg">
-                {TIMEFRAMES.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => {
-                      setTimeframe(option);
-                      setTimeframeOpen(false);
-                    }}
-                    className={cn(
-                      "block w-full px-3.5 py-2 text-left text-sm hover:bg-surface-soft",
-                      option === timeframe
-                        ? "font-semibold text-brand-blue"
-                        : "text-navy",
-                    )}
-                  >
-                    {option}
-                  </button>
-                ))}
+              <div className="absolute right-0 z-20 mt-2 min-w-[11.5rem] overflow-hidden rounded-xl border border-[#E8EEF5] bg-white py-1 shadow-lg">
+                {TIMEFRAMES.map((option) => {
+                  const selected = option === timeframe;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => {
+                        setTimeframe(option);
+                        setTimeframeOpen(false);
+                      }}
+                      className={cn(
+                        "flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left text-sm hover:bg-surface-soft",
+                        selected
+                          ? "font-semibold text-brand-blue"
+                          : "text-navy",
+                      )}
+                    >
+                      {option}
+                      {selected ? (
+                        <Check className="size-4 shrink-0" aria-hidden />
+                      ) : null}
+                    </button>
+                  );
+                })}
               </div>
             ) : null}
           </div>

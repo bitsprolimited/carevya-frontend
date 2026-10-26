@@ -22,6 +22,8 @@ export type CareRecipient = {
   area: string;
   city: string;
   avatarUrl: string;
+  /** Completed care-profile steps out of total; omit when complete. */
+  profileProgress?: { completed: number; total: number };
 };
 
 export type Caregiver = {

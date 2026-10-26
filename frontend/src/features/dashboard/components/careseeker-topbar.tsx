@@ -1,6 +1,17 @@
 "use client";
 
-import { Bell, ChevronDown, Search, Settings, UserRound } from "lucide-react";
+import {
+  Bell,
+  Check,
+  ChevronDown,
+  ChevronRight,
+  Headphones,
+  LogOut,
+  Plus,
+  Search,
+  Settings,
+  UserRound,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -32,6 +43,7 @@ export function CareseekerTopbar({
 }) {
   const { data: session } = useSession();
   const displayFullName = session?.user?.name?.trim() || mockUser.fullName;
+  const displayEmail = session?.user?.email || mockUser.email;
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -41,6 +53,7 @@ export function CareseekerTopbar({
   );
   const [localQuery, setLocalQuery] = useState(searchQuery ?? "");
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const recipientMenuRef = useRef<HTMLDivElement>(null);
 
   const activeRecipientId = recipientId ?? localRecipientId;
   const selectedRecipient: CareRecipient | undefined =
@@ -58,15 +71,19 @@ export function CareseekerTopbar({
   }
 
   useEffect(() => {
-    if (!userMenuOpen) return;
+    if (!userMenuOpen && !menuOpen) return;
     function onPointerDown(event: MouseEvent) {
-      if (!userMenuRef.current?.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (userMenuOpen && !userMenuRef.current?.contains(target)) {
         setUserMenuOpen(false);
+      }
+      if (menuOpen && !recipientMenuRef.current?.contains(target)) {
+        setMenuOpen(false);
       }
     }
     document.addEventListener("mousedown", onPointerDown);
     return () => document.removeEventListener("mousedown", onPointerDown);
-  }, [userMenuOpen]);
+  }, [userMenuOpen, menuOpen]);
 
   return (
     <>
@@ -88,10 +105,16 @@ export function CareseekerTopbar({
         >
           {showSearch ? (
             <div className="relative flex h-11 min-w-0 flex-1 items-center rounded-full border border-[#D7E0EA] bg-white pl-1.5 pr-3 shadow-sm">
-              <div className="relative">
+              <div className="relative" ref={recipientMenuRef}>
                 <button
                   type="button"
-                  onClick={() => setMenuOpen((open) => !open)}
+                  aria-expanded={menuOpen}
+                  aria-label="Switch care recipient"
+                  onClick={() => {
+                    setMenuOpen((open) => !open);
+                    setUserMenuOpen(false);
+                    setNotificationsOpen(false);
+                  }}
                   className="inline-flex items-center gap-2 rounded-full bg-[#F3F6FB] py-1.5 pr-2.5 pl-1.5 text-sm font-semibold text-navy"
                 >
                   <span className="relative size-7 overflow-hidden rounded-full bg-surface-soft">
@@ -108,32 +131,92 @@ export function CareseekerTopbar({
                   {selectedRecipient?.firstName ?? "Select"}
                   <ChevronDown className="size-3.5 text-navy/50" aria-hidden />
                 </button>
+
                 {menuOpen ? (
-                  <div className="absolute top-full left-0 z-20 mt-2 min-w-[12rem] overflow-hidden rounded-xl border border-[#E8EEF5] bg-white py-1 shadow-lg">
-                    {mockRecipients.map((recipient) => (
-                      <button
-                        key={recipient.id}
-                        type="button"
-                        onClick={() => selectRecipient(recipient.id)}
-                        className={cn(
-                          "flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-surface-soft",
-                          recipient.id === activeRecipientId
-                            ? "font-semibold text-brand-blue"
-                            : "text-navy",
-                        )}
+                  <div className="absolute top-full left-0 z-40 mt-2 w-[min(100vw-2rem,20rem)] overflow-hidden rounded-2xl border border-[#E8EEF5] bg-white shadow-xl">
+                    <p className="px-4 pt-3 pb-1.5 text-[0.6875rem] font-semibold tracking-wide text-navy/40 uppercase">
+                      Caring for
+                    </p>
+                    <ul className="px-2 pb-2">
+                      {mockRecipients.map((recipient) => {
+                        const selected = recipient.id === activeRecipientId;
+                        return (
+                          <li key={recipient.id}>
+                            <button
+                              type="button"
+                              onClick={() => selectRecipient(recipient.id)}
+                              className={cn(
+                                "flex w-full items-center gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors",
+                                selected
+                                  ? "bg-[#EAF2FF]"
+                                  : "hover:bg-surface-soft",
+                              )}
+                            >
+                              <span className="relative size-10 shrink-0 overflow-hidden rounded-full bg-surface-soft">
+                                <Image
+                                  src={recipient.avatarUrl}
+                                  alt=""
+                                  fill
+                                  sizes="40px"
+                                  className="object-cover"
+                                />
+                              </span>
+                              <span className="min-w-0 flex-1">
+                                <span className="flex items-center gap-2">
+                                  <span className="truncate text-sm font-semibold text-navy">
+                                    {recipient.fullName}
+                                  </span>
+                                  {recipient.profileProgress ? (
+                                    <span className="shrink-0 rounded-full bg-[#FFF1E0] px-1.5 py-0.5 text-[0.625rem] font-semibold text-amber-700">
+                                      Profile {recipient.profileProgress.completed}/
+                                      {recipient.profileProgress.total}
+                                    </span>
+                                  ) : null}
+                                </span>
+                                <span className="mt-0.5 block truncate text-xs text-navy/50">
+                                  {recipient.relationship} · {recipient.age} ·{" "}
+                                  {recipient.area}, {recipient.city}
+                                </span>
+                              </span>
+                              {selected ? (
+                                <Check
+                                  className="size-4 shrink-0 text-brand-blue"
+                                  aria-hidden
+                                />
+                              ) : null}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+
+                    <div className="border-t border-[#E8EEF5] px-2 py-2">
+                      <Link
+                        href="/careseeker/care-profile"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-start gap-3 rounded-xl px-2.5 py-2.5 hover:bg-surface-soft"
                       >
-                        <span className="relative size-6 overflow-hidden rounded-full bg-surface-soft">
-                          <Image
-                            src={recipient.avatarUrl}
-                            alt=""
-                            fill
-                            sizes="24px"
-                            className="object-cover"
-                          />
+                        <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[#EAF2FF] text-brand-blue">
+                          <Plus className="size-4" aria-hidden />
                         </span>
-                        {recipient.firstName}
-                      </button>
-                    ))}
+                        <span>
+                          <span className="block text-sm font-semibold text-navy">
+                            Add someone you care for
+                          </span>
+                          <span className="mt-0.5 block text-xs text-navy/50">
+                            Set up a care profile in 3 minutes.
+                          </span>
+                        </span>
+                      </Link>
+                      <Link
+                        href="/careseeker/profile"
+                        onClick={() => setMenuOpen(false)}
+                        className="mt-0.5 flex items-center justify-between rounded-xl px-2.5 py-2.5 text-sm font-semibold text-brand-blue hover:bg-[#EAF2FF]/60"
+                      >
+                        Manage people you care for
+                        <ChevronRight className="size-4" aria-hidden />
+                      </Link>
+                    </div>
                   </div>
                 ) : null}
               </div>
@@ -160,13 +243,14 @@ export function CareseekerTopbar({
                 onClick={() => {
                   setNotificationsOpen((open) => !open);
                   setUserMenuOpen(false);
+                  setMenuOpen(false);
                 }}
                 className="relative inline-flex size-10 items-center justify-center rounded-full border border-[#E8EEF5] bg-white text-navy hover:bg-surface-soft"
               >
                 <Bell className="size-4" aria-hidden />
                 {unreadNotifications > 0 ? (
                   <span className="absolute -top-1 -right-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[0.625rem] font-bold text-white">
-                    +{unreadNotifications}
+                    +{unreadNotifications > 9 ? "9" : unreadNotifications}
                   </span>
                 ) : null}
               </button>
@@ -183,6 +267,7 @@ export function CareseekerTopbar({
                 onClick={() => {
                   setUserMenuOpen((open) => !open);
                   setNotificationsOpen(false);
+                  setMenuOpen(false);
                 }}
                 className="inline-flex items-center gap-2 rounded-full border border-[#E8EEF5] bg-white py-1.5 pr-2.5 pl-1.5 hover:bg-surface-soft"
               >
@@ -207,33 +292,83 @@ export function CareseekerTopbar({
               </button>
 
               {userMenuOpen ? (
-                <div className="absolute top-full right-0 z-40 mt-2 w-48 overflow-hidden rounded-xl border border-[#E8EEF5] bg-white py-1 shadow-lg">
-                  <Link
-                    href="/careseeker/profile"
-                    onClick={() => setUserMenuOpen(false)}
-                    className="flex items-center gap-2 px-3.5 py-2.5 text-sm text-navy hover:bg-surface-soft"
-                  >
-                    <UserRound className="size-4 text-navy/55" aria-hidden />
-                    My profile
-                  </Link>
-                  <Link
-                    href="/careseeker/settings"
-                    onClick={() => setUserMenuOpen(false)}
-                    className="flex items-center gap-2 px-3.5 py-2.5 text-sm text-navy hover:bg-surface-soft"
-                  >
-                    <Settings className="size-4 text-navy/55" aria-hidden />
-                    Settings
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setUserMenuOpen(false);
-                      setLogoutOpen(true);
-                    }}
-                    className="flex w-full items-center gap-2 px-3.5 py-2.5 text-left text-sm text-danger hover:bg-danger/5"
-                  >
-                    Log out
-                  </button>
+                <div className="absolute top-full right-0 z-40 mt-2 w-[min(100vw-2rem,16.5rem)] overflow-hidden rounded-2xl border border-[#E8EEF5] bg-white shadow-xl">
+                  <div className="flex items-center gap-3 border-b border-[#E8EEF5] px-3.5 py-3">
+                    <span className="relative size-11 shrink-0 overflow-hidden rounded-full bg-surface-soft">
+                      <Image
+                        src={mockUser.avatarUrl}
+                        alt=""
+                        fill
+                        sizes="44px"
+                        className="object-cover"
+                      />
+                    </span>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-bold text-navy">
+                        {displayFullName}
+                      </p>
+                      <p className="truncate text-xs text-navy/50">
+                        {displayEmail}
+                      </p>
+                    </div>
+                  </div>
+
+                  <nav className="py-1.5">
+                    <Link
+                      href="/careseeker/profile"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-navy hover:bg-surface-soft"
+                    >
+                      <UserRound className="size-4 text-navy/55" aria-hidden />
+                      My profile
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        setNotificationsOpen(true);
+                      }}
+                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm text-navy hover:bg-surface-soft"
+                    >
+                      <Bell className="size-4 text-navy/55" aria-hidden />
+                      <span className="flex-1">Notifications</span>
+                      {unreadNotifications > 0 ? (
+                        <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-danger px-1.5 text-[0.625rem] font-bold text-white">
+                          {unreadNotifications}
+                        </span>
+                      ) : null}
+                    </button>
+                    <Link
+                      href="/careseeker/settings"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-navy hover:bg-surface-soft"
+                    >
+                      <Settings className="size-4 text-navy/55" aria-hidden />
+                      Settings
+                    </Link>
+                    <Link
+                      href="/careseeker/help"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-navy hover:bg-surface-soft"
+                    >
+                      <Headphones className="size-4 text-navy/55" aria-hidden />
+                      Help &amp; Support
+                    </Link>
+                  </nav>
+
+                  <div className="border-t border-[#E8EEF5] py-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        setLogoutOpen(true);
+                      }}
+                      className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-left text-sm font-medium text-danger hover:bg-danger/5"
+                    >
+                      <LogOut className="size-4" aria-hidden />
+                      Log out
+                    </button>
+                  </div>
                 </div>
               ) : null}
             </div>

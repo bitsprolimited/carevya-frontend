@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowRight, ChevronDown, Paperclip, X } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, Paperclip, X } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
@@ -10,12 +11,13 @@ import { cn } from "@/lib/utils";
 const ISSUE_OPTIONS = [
   "Caregiver arrived late",
   "Caregiver didn't show up",
-  "Care quality concern",
-  "Payment or pricing issue",
-  "Booking or schedule problem",
-  "App or technical issue",
-  "Other",
+  "Safety or wellbeing concern",
+  "Disagreement about the agreed price",
+  "Unprofessional behaviour",
+  "Something else",
 ] as const;
+
+type OpenMenu = "issue" | "booking" | null;
 
 export function ReportIssueModal({
   open,
@@ -27,27 +29,52 @@ export function ReportIssueModal({
   onSubmitted?: () => void;
 }) {
   const titleId = useId();
+  const rootRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bookings = useBookingsStore((state) => state.bookings);
 
   const [issue, setIssue] = useState<(typeof ISSUE_OPTIONS)[number]>(
     ISSUE_OPTIONS[0],
   );
-  const [bookingId, setBookingId] = useState("");
+  const [bookingId, setBookingId] = useState<string | null>(
+    bookings[0]?.id ?? null,
+  );
   const [details, setDetails] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
   const [safetyConcern, setSafetyConcern] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
 
   useEffect(() => {
     if (!open) return;
     setIssue(ISSUE_OPTIONS[0]);
-    setBookingId(bookings[0]?.id ?? "");
+    setBookingId(bookings[0]?.id ?? null);
     setDetails("");
     setFileName(null);
     setSafetyConcern(false);
     setSubmitting(false);
+    setOpenMenu(null);
   }, [open, bookings]);
+
+  useEffect(() => {
+    if (!openMenu) return;
+    function onPointerDown(event: MouseEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        setOpenMenu(null);
+      }
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [openMenu]);
+
+  const selectedBooking =
+    bookingId == null
+      ? null
+      : (bookings.find((item) => item.id === bookingId) ?? null);
+
+  const bookingLabel = selectedBooking
+    ? `${selectedBooking.caregiverFirstName} · ${selectedBooking.careStartsLabel.split("·")[0]?.trim() || selectedBooking.dateTimeLabel}`
+    : "Not about a booking";
 
   async function handleSubmit() {
     if (!details.trim()) return;
@@ -65,7 +92,10 @@ export function ReportIssueModal({
       showCloseButton={false}
       className="max-w-lg"
     >
-      <div className="rounded-2xl border border-[#E8EEF5] bg-white p-5 shadow-xl sm:p-6">
+      <div
+        ref={rootRef}
+        className="rounded-2xl border border-[#E8EEF5] bg-white p-5 shadow-xl sm:p-6"
+      >
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2
@@ -89,56 +119,148 @@ export function ReportIssueModal({
         </div>
 
         <div className="mt-5 space-y-4">
-          <label className="block">
-            <span className="mb-1.5 block text-sm font-semibold text-navy">
+          <div className="relative">
+            <p className="mb-1.5 text-sm font-semibold text-navy">
               What happened?
-            </span>
-            <span className="relative block">
-              <select
-                value={issue}
-                onChange={(event) =>
-                  setIssue(event.target.value as (typeof ISSUE_OPTIONS)[number])
-                }
-                className="h-11 w-full appearance-none rounded-xl border border-[#D7E0EA] bg-white px-3.5 pr-10 text-sm text-navy outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                {ISSUE_OPTIONS.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-navy/40"
-                aria-hidden
-              />
-            </span>
-          </label>
+            </p>
+            <button
+              type="button"
+              onClick={() =>
+                setOpenMenu((current) =>
+                  current === "issue" ? null : "issue",
+                )
+              }
+              className={cn(
+                "flex h-11 w-full items-center justify-between rounded-xl border bg-white px-3.5 text-left text-sm text-navy",
+                openMenu === "issue"
+                  ? "border-brand-blue ring-2 ring-brand-blue/20"
+                  : "border-[#D7E0EA]",
+              )}
+            >
+              <span className="truncate">{issue}</span>
+              <ChevronDown className="size-4 shrink-0 text-navy/40" aria-hidden />
+            </button>
+            {openMenu === "issue" ? (
+              <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-[#E8EEF5] bg-white py-1 shadow-xl">
+                {ISSUE_OPTIONS.map((option) => {
+                  const selected = issue === option;
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => {
+                        setIssue(option);
+                        if (option === "Safety or wellbeing concern") {
+                          setSafetyConcern(true);
+                        }
+                        setOpenMenu(null);
+                      }}
+                      className={cn(
+                        "flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left text-sm",
+                        selected
+                          ? "bg-[#EAF2FF] font-semibold text-brand-blue"
+                          : "text-navy hover:bg-surface-soft",
+                      )}
+                    >
+                      {option}
+                      {selected ? (
+                        <Check className="size-4 shrink-0" aria-hidden />
+                      ) : null}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
 
-          <label className="block">
-            <span className="mb-1.5 block text-sm font-semibold text-navy">
+          <div className="relative">
+            <p className="mb-1.5 text-sm font-semibold text-navy">
               Related booking
-            </span>
-            <span className="relative block">
-              <select
-                value={bookingId}
-                onChange={(event) => setBookingId(event.target.value)}
-                className="h-11 w-full appearance-none rounded-xl border border-[#D7E0EA] bg-white px-3.5 pr-10 text-sm text-navy outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <option value="">No related booking</option>
-                {bookings.map((booking) => (
-                  <option key={booking.id} value={booking.id}>
-                    {booking.caregiverFirstName} ·{" "}
-                    {booking.careStartsLabel.split("·")[0]?.trim() ||
-                      booking.dateTimeLabel}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown
-                className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-navy/40"
-                aria-hidden
-              />
-            </span>
-          </label>
+            </p>
+            <button
+              type="button"
+              onClick={() =>
+                setOpenMenu((current) =>
+                  current === "booking" ? null : "booking",
+                )
+              }
+              className={cn(
+                "flex h-11 w-full items-center justify-between rounded-xl border bg-white px-3.5 text-left text-sm text-navy",
+                openMenu === "booking"
+                  ? "border-brand-blue ring-2 ring-brand-blue/20"
+                  : "border-[#D7E0EA]",
+              )}
+            >
+              <span className="truncate">{bookingLabel}</span>
+              <ChevronDown className="size-4 shrink-0 text-navy/40" aria-hidden />
+            </button>
+            {openMenu === "booking" ? (
+              <div className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border border-[#E8EEF5] bg-white py-1 shadow-xl">
+                {bookings.slice(0, 6).map((booking) => {
+                  const selected = bookingId === booking.id;
+                  const careLabel =
+                    booking.careType.split("·")[0]?.trim() || booking.careType;
+                  return (
+                    <button
+                      key={booking.id}
+                      type="button"
+                      onClick={() => {
+                        setBookingId(booking.id);
+                        setOpenMenu(null);
+                      }}
+                      className={cn(
+                        "flex w-full items-center gap-3 px-3 py-2.5 text-left",
+                        selected ? "bg-[#EAF2FF]" : "hover:bg-surface-soft",
+                      )}
+                    >
+                      <span className="relative size-9 shrink-0 overflow-hidden rounded-full bg-surface-soft">
+                        <Image
+                          src={booking.avatarUrl}
+                          alt=""
+                          fill
+                          sizes="36px"
+                          className="object-cover object-top"
+                        />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold text-navy">
+                          {booking.caregiverName} · {careLabel}
+                        </span>
+                        <span className="mt-0.5 block truncate text-xs text-navy/50">
+                          {booking.careStartsLabel} · Booking{" "}
+                          {booking.reference}
+                        </span>
+                      </span>
+                      {selected ? (
+                        <Check
+                          className="size-4 shrink-0 text-brand-blue"
+                          aria-hidden
+                        />
+                      ) : null}
+                    </button>
+                  );
+                })}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBookingId(null);
+                    setOpenMenu(null);
+                  }}
+                  className={cn(
+                    "flex w-full items-center justify-between border-t border-[#E8EEF5] px-3.5 py-3 text-left text-sm font-semibold",
+                    bookingId == null
+                      ? "text-brand-blue"
+                      : "text-navy hover:bg-surface-soft",
+                  )}
+                >
+                  Not about a booking
+                  {bookingId == null ? (
+                    <Check className="size-4 shrink-0" aria-hidden />
+                  ) : null}
+                </button>
+              </div>
+            ) : null}
+          </div>
 
           <label className="block">
             <span className="mb-1.5 block text-sm font-semibold text-navy">
@@ -167,9 +289,7 @@ export function ReportIssueModal({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className={cn(
-                "flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#D7E0EA] bg-[#F8FAFC] px-4 py-4 text-sm font-medium text-navy/65 transition-colors hover:border-brand-blue/40 hover:bg-[#EAF2FF]/40",
-              )}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#D7E0EA] bg-[#F8FAFC] px-4 py-4 text-sm font-medium text-navy/65 transition-colors hover:border-brand-blue/40 hover:bg-[#EAF2FF]/40"
             >
               <Paperclip className="size-4 shrink-0" aria-hidden />
               {fileName ? fileName : "Add photos or documents (optional)"}
