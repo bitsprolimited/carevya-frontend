@@ -16,18 +16,24 @@ export function CaregiverCard({
   return (
     <article className="flex w-[15.5rem] shrink-0 flex-col overflow-hidden rounded-2xl border border-[#E8EEF5] bg-white shadow-sm sm:w-[16.5rem]">
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-soft">
-        <Image
-          src={caregiver.imageUrl}
-          alt=""
-          fill
-          sizes="264px"
-          className="object-cover object-top"
-        />
+        <Link
+          href={`/careseeker/caregivers/${caregiver.id}`}
+          className="absolute inset-0"
+          aria-label={`View ${caregiver.name}`}
+        >
+          <Image
+            src={caregiver.imageUrl}
+            alt=""
+            fill
+            sizes="264px"
+            className="object-cover object-top"
+          />
+        </Link>
         <button
           type="button"
           aria-label={caregiver.saved ? "Remove from saved" : "Save caregiver"}
           onClick={() => onToggleSave?.(caregiver.id)}
-          className="absolute top-3 right-3 inline-flex size-8 items-center justify-center rounded-full bg-white/95 text-navy shadow-sm transition-colors hover:bg-white"
+          className="absolute top-3 right-3 z-10 inline-flex size-8 items-center justify-center rounded-full bg-white/95 text-navy shadow-sm transition-colors hover:bg-white"
         >
           <Heart
             className={cn(
@@ -42,7 +48,12 @@ export function CaregiverCard({
       <div className="flex flex-1 flex-col p-3.5">
         <div className="flex items-center gap-1.5">
           <h3 className="truncate text-sm font-bold text-navy">
-            {caregiver.name}
+            <Link
+              href={`/careseeker/caregivers/${caregiver.id}`}
+              className="hover:text-brand-blue"
+            >
+              {caregiver.name}
+            </Link>
           </h3>
           {caregiver.verified ? (
             <BadgeCheck
