@@ -12,8 +12,11 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import { BookCaregiverModal } from "@/features/dashboard/components/book-caregiver-modal";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
+import { MessageCaregiverModal } from "@/features/dashboard/components/message-caregiver-modal";
 import { getCaregiverProfile } from "@/features/dashboard/data/caregiver-profiles";
 import type {
   AvailabilitySlot,
@@ -73,6 +76,8 @@ function Card({
 export function CaregiverProfileView({ caregiverId }: { caregiverId: string }) {
   const loaded = getCaregiverProfile(caregiverId) as CaregiverProfile;
   const [saved, setSaved] = useState(Boolean(loaded.saved));
+  const [messageOpen, setMessageOpen] = useState(false);
+  const [bookOpen, setBookOpen] = useState(false);
   const profile = loaded;
 
   return (
@@ -330,18 +335,21 @@ export function CaregiverProfileView({ caregiverId }: { caregiverId: string }) {
                   </li>
                 ))}
               </ul>
-              <Link
-                href={`/careseeker/bookings/new?caregiver=${profile.id}`}
-                className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-full bg-brand-blue text-sm font-semibold text-white transition-colors hover:bg-brand-blue-hover"
+              <Button
+                type="button"
+                onClick={() => setBookOpen(true)}
+                className="mt-5 h-11 w-full rounded-full"
               >
                 Book caregiver →
-              </Link>
-              <Link
-                href={`/careseeker/messages?caregiver=${profile.id}`}
-                className="mt-2.5 inline-flex h-11 w-full items-center justify-center rounded-full border border-[#D7E0EA] bg-white text-sm font-semibold text-navy transition-colors hover:bg-surface-soft"
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setMessageOpen(true)}
+                className="mt-2.5 h-11 w-full rounded-full"
               >
                 Message {profile.firstName}
-              </Link>
+              </Button>
               <p className="mt-3 flex items-start gap-2 text-xs leading-relaxed text-navy/55">
                 <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden />
                 No payment on CareVYA. You&apos;ll agree the price with{" "}
@@ -378,6 +386,18 @@ export function CaregiverProfileView({ caregiverId }: { caregiverId: string }) {
           </aside>
         </div>
       </div>
+
+      <MessageCaregiverModal
+        open={messageOpen}
+        onClose={() => setMessageOpen(false)}
+        caregiver={profile}
+      />
+      <BookCaregiverModal
+        open={bookOpen}
+        onClose={() => setBookOpen(false)}
+        caregiver={profile}
+        onMessage={() => setMessageOpen(true)}
+      />
     </CareseekerShell>
   );
 }
