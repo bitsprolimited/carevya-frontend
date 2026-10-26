@@ -116,7 +116,7 @@ export function LoginForm({
 
       closeModal();
       onClose?.();
-      router.push("/careseeker/profile");
+      router.push("/careseeker/care-profile");
     } catch {
       setBannerError("We couldn't sign you in. Please try again.");
     } finally {

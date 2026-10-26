@@ -59,7 +59,7 @@ export function DashboardRightPanel({
           ))}
         </ul>
         <Link
-          href="/careseeker/profile"
+          href="/careseeker/care-profile"
           className="mt-3 inline-flex text-sm font-semibold text-brand-blue hover:text-brand-blue-hover"
         >
           + Add a Care Recipient

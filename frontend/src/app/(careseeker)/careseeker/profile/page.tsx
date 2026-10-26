@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { CareProfileWizard } from "@/features/care-profile/components/care-profile-wizard";
+import { ProfileView } from "@/features/dashboard/components/profile-view";
 
 export const metadata: Metadata = {
-  title: "Set Up Care Profile",
-  description:
-    "Tell us who needs care so we can match you with the right caregivers.",
+  title: "My Profile",
+  description: "Manage your CareVYA account and care recipients.",
 };
 
-export default function CareseekerProfilePage() {
-  return <CareProfileWizard />;
+export default function CareseekerMyProfilePage() {
+  return <ProfileView />;
 }

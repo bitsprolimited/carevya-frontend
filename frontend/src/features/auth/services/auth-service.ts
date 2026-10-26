@@ -64,7 +64,7 @@ export async function signInWithEmail(input: {
 export async function signInWithGoogle(): Promise<AuthResult> {
   const { error } = await authClient.signIn.social({
     provider: "google",
-    callbackURL: "/careseeker/profile",
+    callbackURL: "/careseeker/care-profile",
   });
 
   if (error) {
