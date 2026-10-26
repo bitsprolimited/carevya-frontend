@@ -25,6 +25,8 @@ export function BookingDetailsDrawer({
   onAcceptProposal,
   onCancel,
   onReport,
+  onReview,
+  onViewAgreement,
 }: {
   booking: Booking | null;
   open: boolean;
@@ -34,6 +36,8 @@ export function BookingDetailsDrawer({
   onAcceptProposal: () => void;
   onCancel: () => void;
   onReport: () => void;
+  onReview?: () => void;
+  onViewAgreement?: () => void;
 }) {
   useEffect(() => {
     if (!open) return;
@@ -54,6 +58,7 @@ export function BookingDetailsDrawer({
   const hasProposal = Boolean(booking.timeProposal);
   const canConfirm = booking.status === "accepted";
   const canAcceptProposal = booking.status === "pending" && hasProposal;
+  const isConfirmed = booking.status === "confirmed";
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -239,11 +244,16 @@ export function BookingDetailsDrawer({
               </div>
             </dl>
 
-            <div className="flex items-center justify-between gap-3 rounded-2xl bg-[#F3F6FB] px-4 py-3">
-              <span className="text-sm text-navy/60">Agreed price</span>
-              <span className="text-base font-bold text-navy">
-                {booking.agreedPriceLabel}
-              </span>
+            <div className="rounded-2xl bg-[#F3F6FB] px-4 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-sm text-navy/60">Agreed price</span>
+                <span className="text-base font-bold text-navy">
+                  {booking.agreedPriceLabel}
+                </span>
+              </div>
+              {booking.paymentNote ? (
+                <p className="mt-1.5 text-xs text-navy/55">{booking.paymentNote}</p>
+              ) : null}
             </div>
           </div>
         </div>
@@ -257,6 +267,32 @@ export function BookingDetailsDrawer({
             >
               Find similar caregivers →
             </Link>
+          ) : isConfirmed ? (
+            <>
+              <Button
+                type="button"
+                onClick={onMessage}
+                className="h-11 w-full rounded-full"
+              >
+                Message {booking.caregiverFirstName} →
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => onViewAgreement?.() ?? onMessage()}
+                className="mt-2.5 h-11 w-full rounded-full"
+              >
+                View agreement in chat
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => onReview?.()}
+                className="mt-2.5 h-11 w-full rounded-full"
+              >
+                Confirm completion &amp; review
+              </Button>
+            </>
           ) : (
             <>
               {canConfirm ? (
@@ -304,7 +340,7 @@ export function BookingDetailsDrawer({
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-danger hover:underline"
               >
                 <Trash2 className="size-3.5" aria-hidden />
-                Cancel request
+                {isConfirmed ? "Cancel booking" : "Cancel request"}
               </button>
               <button
                 type="button"

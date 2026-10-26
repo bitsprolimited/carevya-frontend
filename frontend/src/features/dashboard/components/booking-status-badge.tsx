@@ -10,6 +10,11 @@ const statusStyles: Record<
     className: "bg-[#E9F9F1] text-emerald-dark",
     dot: "bg-emerald",
   },
+  confirmed: {
+    label: "Confirmed",
+    className: "bg-[#E9F9F1] text-emerald-dark",
+    dot: "bg-emerald",
+  },
   pending: {
     label: "Pending",
     className: "bg-[#FFF6E5] text-amber-700",

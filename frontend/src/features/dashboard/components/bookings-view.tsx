@@ -3,27 +3,29 @@
 import { CalendarDays, ChevronDown, Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { BookingDetailsDrawer } from "@/features/dashboard/components/booking-details-drawer";
 import { BookingStatusBadge } from "@/features/dashboard/components/booking-status-badge";
+import { CareReviewModal } from "@/features/dashboard/components/care-review-modal";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { MessageCaregiverModal } from "@/features/dashboard/components/message-caregiver-modal";
 import { getCaregiverProfile } from "@/features/dashboard/data/caregiver-profiles";
 import { mockRecipients } from "@/features/dashboard/data/mock";
-import { mockBookings } from "@/features/dashboard/data/mock-bookings";
-import type {
-  Booking,
-  BookingStatus,
-} from "@/features/dashboard/types/bookings";
+import { useBookingsStore } from "@/features/dashboard/hooks/use-bookings-store";
 import { cn } from "@/lib/utils";
 
-type TabFilter = "all" | BookingStatus;
+type TabFilter = "all" | "pending" | "accepted" | "declined";
 
 const TIMEFRAMES = ["This month", "Last month", "All time"] as const;
 
 export function BookingsView() {
-  const [bookings, setBookings] = useState<Booking[]>(mockBookings);
+  const router = useRouter();
+  const bookings = useBookingsStore((state) => state.bookings);
+  const updateBooking = useBookingsStore((state) => state.updateBooking);
+  const removeBooking = useBookingsStore((state) => state.removeBooking);
+
   const [tab, setTab] = useState<TabFilter>("all");
   const [timeframe, setTimeframe] =
     useState<(typeof TIMEFRAMES)[number]>("This month");
@@ -31,6 +33,7 @@ export function BookingsView() {
   const [recipientId, setRecipientId] = useState(mockRecipients[0]?.id ?? null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messageOpen, setMessageOpen] = useState(false);
+  const [reviewOpen, setReviewOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   const selectedRecipient =
@@ -40,17 +43,23 @@ export function BookingsView() {
     () => ({
       all: bookings.length,
       pending: bookings.filter((item) => item.status === "pending").length,
-      accepted: bookings.filter((item) => item.status === "accepted").length,
+      accepted: bookings.filter(
+        (item) => item.status === "accepted" || item.status === "confirmed",
+      ).length,
       declined: bookings.filter((item) => item.status === "declined").length,
     }),
     [bookings],
   );
 
-  const visible = useMemo(
-    () =>
-      bookings.filter((item) => (tab === "all" ? true : item.status === tab)),
-    [bookings, tab],
-  );
+  const visible = useMemo(() => {
+    return bookings.filter((item) => {
+      if (tab === "all") return true;
+      if (tab === "accepted") {
+        return item.status === "accepted" || item.status === "confirmed";
+      }
+      return item.status === tab;
+    });
+  }, [bookings, tab]);
 
   const selected = bookings.find((item) => item.id === selectedId) ?? null;
   const selectedProfile = selected
@@ -64,12 +73,6 @@ export function BookingsView() {
   function showToast(message: string) {
     setToast(message);
     window.setTimeout(() => setToast(null), 2200);
-  }
-
-  function updateBooking(id: string, patch: Partial<Booking>) {
-    setBookings((current) =>
-      current.map((item) => (item.id === id ? { ...item, ...patch } : item)),
-    );
   }
 
   const tabs: { id: TabFilter; label: string; count: number }[] = [
@@ -225,13 +228,49 @@ export function BookingsView() {
                           >
                             Find similar
                           </Link>
+                        ) : booking.status === "accepted" ? (
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={`/careseeker/bookings/${booking.id}/confirm`}
+                              className="inline-flex h-8 items-center justify-center rounded-lg bg-brand-blue px-3 text-xs font-semibold text-white hover:bg-brand-blue-hover"
+                            >
+                              Confirm
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedId(booking.id)}
+                              className="inline-flex h-8 items-center justify-center rounded-lg border border-[#D7E0EA] bg-white px-3 text-xs font-semibold text-navy hover:bg-surface-soft"
+                            >
+                              View
+                            </button>
+                          </div>
+                        ) : booking.status === "confirmed" ? (
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedId(booking.id);
+                                setReviewOpen(true);
+                              }}
+                              className="inline-flex h-8 items-center justify-center rounded-lg bg-brand-blue px-3 text-xs font-semibold text-white hover:bg-brand-blue-hover"
+                            >
+                              Review
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setSelectedId(booking.id)}
+                              className="inline-flex h-8 items-center justify-center rounded-lg border border-[#D7E0EA] bg-white px-3 text-xs font-semibold text-navy hover:bg-surface-soft"
+                            >
+                              View
+                            </button>
+                          </div>
                         ) : (
                           <button
                             type="button"
                             onClick={() => setSelectedId(booking.id)}
                             className="inline-flex h-8 items-center justify-center rounded-lg border border-[#D7E0EA] bg-white px-3 text-xs font-semibold text-navy hover:bg-surface-soft"
                           >
-                            View
+                            {booking.timeProposal ? "Review time" : "View"}
                           </button>
                         )}
                       </td>
@@ -254,15 +293,20 @@ export function BookingsView() {
 
       <BookingDetailsDrawer
         booking={selected}
-        open={Boolean(selected)}
+        open={Boolean(selected) && !reviewOpen}
         onClose={() => setSelectedId(null)}
-        onMessage={() => {
-          setMessageOpen(true);
+        onMessage={() => setMessageOpen(true)}
+        onViewAgreement={() => {
+          setSelectedId(null);
+          router.push("/careseeker/messages");
+        }}
+        onReview={() => {
+          setReviewOpen(true);
         }}
         onConfirm={() => {
           if (!selected) return;
-          showToast(`Booking with ${selected.caregiverFirstName} confirmed`);
           setSelectedId(null);
+          router.push(`/careseeker/bookings/${selected.id}/confirm`);
         }}
         onAcceptProposal={() => {
           if (!selected?.timeProposal) return;
@@ -270,7 +314,7 @@ export function BookingsView() {
           updateBooking(selected.id, {
             status: "accepted",
             dateTimeLabel: suggested.includes("–")
-              ? suggested.split("–")[0]?.trim() + " · 10:00 AM"
+              ? `${suggested.split("–")[0]?.trim()} · 10:00 AM`
               : suggested,
             timeProposal: undefined,
             timeline: [
@@ -304,13 +348,22 @@ export function BookingsView() {
         }}
         onCancel={() => {
           if (!selected) return;
-          setBookings((current) =>
-            current.filter((item) => item.id !== selected.id),
-          );
+          removeBooking(selected.id);
           setSelectedId(null);
-          showToast("Request cancelled");
+          showToast(
+            selected.status === "confirmed"
+              ? "Booking cancelled"
+              : "Request cancelled",
+          );
         }}
         onReport={() => showToast("Issue reported")}
+      />
+
+      <CareReviewModal
+        open={reviewOpen}
+        onClose={() => setReviewOpen(false)}
+        booking={selected}
+        onSubmitted={() => showToast("Thanks for your review")}
       />
 
       {selectedProfile ? (
