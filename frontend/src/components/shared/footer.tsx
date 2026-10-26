@@ -14,11 +14,15 @@ const sectionLinks = [
   { href: "/waitlist#verify", label: "Verification Protocol" },
 ] as const;
 
+// Set `published: true` once the destination page exists.
 const legalLinks = [
-  { href: "/privacy", label: "Privacy Policy" },
-  { href: "/terms", label: "Terms of Trust" },
-  { href: "/standards", label: "Care Standards" },
+  { href: "/privacy", label: "Privacy Policy", published: true },
+  { href: "/terms", label: "Terms of Trust", published: true },
+  // Hidden: /standards currently returns a 404.
+  { href: "/standards", label: "Care Standards", published: false },
 ] as const;
+
+const visibleLegalLinks = legalLinks.filter((link) => link.published);
 
 const trustBadges = [
   {
@@ -85,15 +89,31 @@ function LinkedInIcon({ className, ...props }: IconProps) {
   );
 }
 
+// Set `published: true` once the real account URL is in place.
 const socialLinks: {
   href: string;
   label: string;
   Icon: ComponentType<{ className?: string }>;
+  published: boolean;
 }[] = [
-  { href: "https://www.instagram.com/care_vya?stkn=MW10ZHc5eTdsZHhlMw==", label: "Instagram", Icon: InstagramIcon },
-  { href: "https://x.com", label: "X", Icon: XIcon },
-  { href: "https://linkedin.com", label: "LinkedIn", Icon: LinkedInIcon },
+  {
+    href: "https://www.instagram.com/care_vya?stkn=MW10ZHc5eTdsZHhlMw==",
+    label: "Instagram",
+    Icon: InstagramIcon,
+    published: true,
+  },
+  // Hidden: placeholder homepage link, no official account yet.
+  { href: "https://x.com", label: "X", Icon: XIcon, published: false },
+  // Hidden: placeholder homepage link, no official account yet.
+  {
+    href: "https://linkedin.com",
+    label: "LinkedIn",
+    Icon: LinkedInIcon,
+    published: false,
+  },
 ];
+
+const visibleSocialLinks = socialLinks.filter((link) => link.published);
 
 function scrollToTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -183,21 +203,23 @@ export function Footer() {
             ))}
           </ul>
 
-          <ul className="flex items-center gap-3">
-            {socialLinks.map(({ href, label, Icon }) => (
-              <li key={label}>
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="inline-flex size-10 items-center justify-center rounded-full bg-white text-navy transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 focus-visible:ring-offset-footer"
-                >
-                  <Icon className="size-4" />
-                </a>
-              </li>
-            ))}
-          </ul>
+          {visibleSocialLinks.length > 0 ? (
+            <ul className="flex items-center gap-3">
+              {visibleSocialLinks.map(({ href, label, Icon }) => (
+                <li key={label}>
+                  <a
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    className="inline-flex size-10 items-center justify-center rounded-full bg-white text-navy transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 focus-visible:ring-offset-footer"
+                  >
+                    <Icon className="size-4" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </div>
 
         <div className="mt-10 flex flex-col gap-6 border-t border-white/10 pt-8 lg:mt-12 lg:flex-row lg:items-center lg:justify-between lg:gap-8">
@@ -213,7 +235,7 @@ export function Footer() {
             aria-label="Legal"
             className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/75 lg:shrink-0"
           >
-            {legalLinks.map((link) => (
+            {visibleLegalLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}

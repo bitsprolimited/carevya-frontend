@@ -87,7 +87,7 @@ const communities: readonly CommunityBlock[] = [
     features: [
       {
         title: "Guaranteed Payment",
-        description: "No chasing payments. Get paid for every work you do.",
+        description: "No chasing payments. Get paid for every job you do.",
       },
       {
         title: "Safety & Check-in Support",
