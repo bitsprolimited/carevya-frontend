@@ -15,6 +15,7 @@ export function CareseekerTopbar({
   onRecipientChange,
   searchQuery,
   onSearchChange,
+  showSearch = true,
 }: {
   title: string;
   subtitle: string;
@@ -22,6 +23,8 @@ export function CareseekerTopbar({
   onRecipientChange?: (id: string) => void;
   searchQuery?: string;
   onSearchChange?: (value: string) => void;
+  /** Hide recipient + search (e.g. Messages page). */
+  showSearch?: boolean;
 }) {
   const { data: session } = useSession();
   const displayFullName = session?.user?.name?.trim() || mockUser.fullName;
@@ -52,69 +55,78 @@ export function CareseekerTopbar({
         <p className="mt-1 text-sm text-navy/55">{subtitle}</p>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center lg:max-w-2xl lg:justify-end">
-        <div className="relative flex h-11 min-w-0 flex-1 items-center rounded-full border border-[#D7E0EA] bg-white pl-1.5 pr-3 shadow-sm">
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setMenuOpen((open) => !open)}
-              className="inline-flex items-center gap-2 rounded-full bg-[#F3F6FB] py-1.5 pr-2.5 pl-1.5 text-sm font-semibold text-navy"
-            >
-              <span className="relative size-7 overflow-hidden rounded-full bg-surface-soft">
-                {selectedRecipient ? (
-                  <Image
-                    src={selectedRecipient.avatarUrl}
-                    alt=""
-                    fill
-                    sizes="28px"
-                    className="object-cover"
-                  />
-                ) : null}
-              </span>
-              {selectedRecipient?.firstName ?? "Select"}
-              <ChevronDown className="size-3.5 text-navy/50" aria-hidden />
-            </button>
-            {menuOpen ? (
-              <div className="absolute top-full left-0 z-20 mt-2 min-w-[12rem] overflow-hidden rounded-xl border border-[#E8EEF5] bg-white py-1 shadow-lg">
-                {mockRecipients.map((recipient) => (
-                  <button
-                    key={recipient.id}
-                    type="button"
-                    onClick={() => selectRecipient(recipient.id)}
-                    className={cn(
-                      "flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-surface-soft",
-                      recipient.id === activeRecipientId
-                        ? "font-semibold text-brand-blue"
-                        : "text-navy",
-                    )}
-                  >
-                    <span className="relative size-6 overflow-hidden rounded-full bg-surface-soft">
-                      <Image
-                        src={recipient.avatarUrl}
-                        alt=""
-                        fill
-                        sizes="24px"
-                        className="object-cover"
-                      />
-                    </span>
-                    {recipient.firstName}
-                  </button>
-                ))}
-              </div>
-            ) : null}
+      <div
+        className={cn(
+          "flex flex-col gap-3 sm:flex-row sm:items-center",
+          showSearch
+            ? "flex-1 lg:max-w-2xl lg:justify-end"
+            : "shrink-0 justify-end",
+        )}
+      >
+        {showSearch ? (
+          <div className="relative flex h-11 min-w-0 flex-1 items-center rounded-full border border-[#D7E0EA] bg-white pl-1.5 pr-3 shadow-sm">
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setMenuOpen((open) => !open)}
+                className="inline-flex items-center gap-2 rounded-full bg-[#F3F6FB] py-1.5 pr-2.5 pl-1.5 text-sm font-semibold text-navy"
+              >
+                <span className="relative size-7 overflow-hidden rounded-full bg-surface-soft">
+                  {selectedRecipient ? (
+                    <Image
+                      src={selectedRecipient.avatarUrl}
+                      alt=""
+                      fill
+                      sizes="28px"
+                      className="object-cover"
+                    />
+                  ) : null}
+                </span>
+                {selectedRecipient?.firstName ?? "Select"}
+                <ChevronDown className="size-3.5 text-navy/50" aria-hidden />
+              </button>
+              {menuOpen ? (
+                <div className="absolute top-full left-0 z-20 mt-2 min-w-[12rem] overflow-hidden rounded-xl border border-[#E8EEF5] bg-white py-1 shadow-lg">
+                  {mockRecipients.map((recipient) => (
+                    <button
+                      key={recipient.id}
+                      type="button"
+                      onClick={() => selectRecipient(recipient.id)}
+                      className={cn(
+                        "flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-surface-soft",
+                        recipient.id === activeRecipientId
+                          ? "font-semibold text-brand-blue"
+                          : "text-navy",
+                      )}
+                    >
+                      <span className="relative size-6 overflow-hidden rounded-full bg-surface-soft">
+                        <Image
+                          src={recipient.avatarUrl}
+                          alt=""
+                          fill
+                          sizes="24px"
+                          className="object-cover"
+                        />
+                      </span>
+                      {recipient.firstName}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => {
+                setLocalQuery(event.target.value);
+                onSearchChange?.(event.target.value);
+              }}
+              placeholder={`Find care for ${selectedRecipient?.firstName ?? "someone"}`}
+              className="min-w-0 flex-1 border-0 bg-transparent px-3 text-sm text-navy outline-none placeholder:text-navy/40"
+            />
+            <Search className="size-4 shrink-0 text-navy/40" aria-hidden />
           </div>
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => {
-              setLocalQuery(event.target.value);
-              onSearchChange?.(event.target.value);
-            }}
-            placeholder={`Find care for ${selectedRecipient?.firstName ?? "someone"}`}
-            className="min-w-0 flex-1 border-0 bg-transparent px-3 text-sm text-navy outline-none placeholder:text-navy/40"
-          />
-          <Search className="size-4 shrink-0 text-navy/40" aria-hidden />
-        </div>
+        ) : null}
 
         <div className="flex items-center gap-2 self-end sm:self-auto">
           <button
