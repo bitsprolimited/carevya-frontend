@@ -241,7 +241,7 @@ export function SettingsView() {
               Need help or want to report a problem?
             </p>
             <Link
-              href="/contact"
+              href="/careseeker/help"
               className="mt-4 inline-flex h-11 w-full items-center justify-center rounded-full bg-white text-sm font-semibold text-navy shadow-sm hover:bg-surface-soft"
             >
               Contact support

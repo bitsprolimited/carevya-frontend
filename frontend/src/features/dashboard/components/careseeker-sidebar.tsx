@@ -28,7 +28,7 @@ const menuLinks = [
 
 const accountLinks = [
   { href: "/careseeker/settings", label: "Settings", icon: Settings },
-  { href: "/contact", label: "Help & Support", icon: Headphones },
+  { href: "/careseeker/help", label: "Help & Support", icon: Headphones },
 ] as const;
 
 function NavItem({
@@ -145,7 +145,7 @@ export function CareseekerSidebar({
               Talk to a CareVYA team member any time, day or night (24/7).
             </p>
             <Link
-              href="/contact"
+              href="/careseeker/help"
               onClick={onNavigate}
               className="mt-3 inline-flex h-9 w-full items-center justify-center rounded-full bg-white text-xs font-semibold text-navy transition-colors hover:bg-white/90"
             >
