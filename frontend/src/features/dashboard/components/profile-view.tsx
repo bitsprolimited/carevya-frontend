@@ -337,7 +337,7 @@ export function ProfileView() {
                     </div>
                   </div>
                   <Link
-                    href="/careseeker/care-profile"
+                    href={`/careseeker/recipients/${recipient.id}`}
                     className="inline-flex h-9 shrink-0 items-center justify-center rounded-full border border-[#D7E0EA] bg-white px-4 text-xs font-semibold text-navy hover:bg-surface-soft"
                   >
                     View care profile
