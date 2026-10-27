@@ -170,7 +170,7 @@ export function CaregiverProfileView({ caregiverId }: { caregiverId: string }) {
               </p>
             </Card>
 
-            <Card title="Services & details">
+            <Card title="Services">
               <div className="space-y-4">
                 <div>
                   <p className="mb-2 text-xs font-semibold tracking-wide text-navy/45 uppercase">
