@@ -3,12 +3,13 @@
 import { Eye, EyeOff, Pencil } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { mockRecipients, mockUser } from "@/features/dashboard/data/mock";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { useSession } from "@/lib/auth-client";
 
 function Field({
@@ -47,26 +48,21 @@ function Field({
 }
 
 export function ProfileView() {
+  const hydrated = useHydrated();
   const { data: session } = useSession();
-  const sessionName = session?.user?.name?.trim() || mockUser.fullName;
-  const sessionParts = sessionName.split(/\s+/);
-  const sessionEmail = session?.user?.email || "gracebill@gmail.com";
-  const sessionPhone =
-    (session?.user as { phone?: string } | undefined)?.phone ||
-    "+234 809 221 3340";
-
+  const fallbackParts = mockUser.fullName.split(/\s+/);
   const [editing, setEditing] = useState(false);
-  const [firstName, setFirstName] = useState(sessionParts[0] || "Grace");
+  const [firstName, setFirstName] = useState(fallbackParts[0] || "Grace");
   const [lastName, setLastName] = useState(
-    sessionParts.slice(1).join(" ") || "Bills",
+    fallbackParts.slice(1).join(" ") || "Bills",
   );
-  const [email, setEmail] = useState(sessionEmail);
-  const [phone, setPhone] = useState(sessionPhone);
+  const [email, setEmail] = useState(mockUser.email);
+  const [phone, setPhone] = useState("+234 809 221 3340");
   const [draft, setDraft] = useState({
-    firstName,
-    lastName,
-    email,
-    phone,
+    firstName: fallbackParts[0] || "Grace",
+    lastName: fallbackParts.slice(1).join(" ") || "Bills",
+    email: mockUser.email,
+    phone: "+234 809 221 3340",
   });
 
   const [newPassword, setNewPassword] = useState("");
@@ -75,6 +71,21 @@ export function ProfileView() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [passwordSaved, setPasswordSaved] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
+
+  useEffect(() => {
+    if (!hydrated || !session?.user) return;
+    const name = session.user.name?.trim() || mockUser.fullName;
+    const parts = name.split(/\s+/);
+    const nextFirst = parts[0] || "Grace";
+    const nextLast = parts.slice(1).join(" ") || "Bills";
+    const nextEmail = session.user.email || mockUser.email;
+    const nextPhone =
+      (session.user as { phone?: string }).phone || "+234 809 221 3340";
+    setFirstName(nextFirst);
+    setLastName(nextLast);
+    setEmail(nextEmail);
+    setPhone(nextPhone);
+  }, [hydrated, session]);
 
   const fullName = `${firstName} ${lastName}`.trim();
 

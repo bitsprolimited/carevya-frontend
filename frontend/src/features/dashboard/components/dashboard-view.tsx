@@ -29,6 +29,7 @@ import {
   type Caregiver,
   type DashboardFilters,
 } from "@/features/dashboard/types";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -45,8 +46,11 @@ const QUICK_CHIPS: { value: CareCategory | "live_in"; label: string }[] = [
 ];
 
 export function DashboardView() {
+  const hydrated = useHydrated();
   const { data: session } = useSession();
-  const displayFirstName = firstNameFrom(session?.user?.name);
+  const displayFirstName = firstNameFrom(
+    hydrated ? session?.user?.name : null,
+  );
 
   const [selectedRecipientId, setSelectedRecipientId] = useState(
     mockRecipients[0]?.id ?? null,

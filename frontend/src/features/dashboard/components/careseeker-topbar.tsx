@@ -20,6 +20,7 @@ import { NotificationsDropdown } from "@/features/dashboard/components/notificat
 import { mockRecipients, mockUser } from "@/features/dashboard/data/mock";
 import { useNotificationsStore } from "@/features/dashboard/hooks/use-notifications-store";
 import type { CareRecipient } from "@/features/dashboard/types";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -41,9 +42,13 @@ export function CareseekerTopbar({
   /** Hide recipient + search (e.g. Messages page). */
   showSearch?: boolean;
 }) {
+  const hydrated = useHydrated();
   const { data: session } = useSession();
-  const displayFullName = session?.user?.name?.trim() || mockUser.fullName;
-  const displayEmail = session?.user?.email || mockUser.email;
+  // Keep SSR + first client paint on mock data to avoid hydration mismatches.
+  const displayFullName =
+    (hydrated && session?.user?.name?.trim()) || mockUser.fullName;
+  const displayEmail =
+    (hydrated && session?.user?.email) || mockUser.email;
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
