@@ -9,13 +9,20 @@ import { cn } from "@/lib/utils";
 export function CaregiverCard({
   caregiver,
   onToggleSave,
+  className,
 }: {
   caregiver: Caregiver;
   onToggleSave?: (id: string) => void;
+  className?: string;
 }) {
   return (
-    <article className="flex w-[15.5rem] shrink-0 flex-col overflow-hidden rounded-2xl border border-[#E8EEF5] bg-white shadow-sm sm:w-[16.5rem]">
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-soft">
+    <article
+      className={cn(
+        "flex min-w-0 flex-col overflow-hidden rounded-2xl border border-[#E8EEF5] bg-white shadow-sm",
+        className,
+      )}
+    >
+      <div className="relative aspect-[5/4] w-full overflow-hidden bg-surface-soft">
         <Link
           href={`/careseeker/caregivers/${caregiver.id}`}
           className="absolute inset-0"
@@ -25,7 +32,7 @@ export function CaregiverCard({
             src={caregiver.imageUrl}
             alt=""
             fill
-            sizes="264px"
+            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 280px"
             className="object-cover object-top"
           />
         </Link>
@@ -62,7 +69,9 @@ export function CaregiverCard({
             />
           ) : null}
         </div>
-        <p className="mt-0.5 text-xs text-navy/55">{caregiver.categoryLabel}</p>
+        <p className="mt-0.5 truncate text-xs text-navy/55">
+          {caregiver.categoryLabel}
+        </p>
 
         <div className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-navy/70">
           <span className="inline-flex items-center gap-1">
@@ -72,14 +81,16 @@ export function CaregiverCard({
             />
             {caregiver.rating.toFixed(1)}
           </span>
-          <span className="inline-flex items-center gap-1">
-            <MapPin className="size-3.5 text-navy/45" aria-hidden />
-            {caregiver.area}, {caregiver.city}
+          <span className="inline-flex min-w-0 items-center gap-1 truncate">
+            <MapPin className="size-3.5 shrink-0 text-navy/45" aria-hidden />
+            <span className="truncate">
+              {caregiver.area}, {caregiver.city}
+            </span>
           </span>
         </div>
 
         <div className="mt-auto flex items-end justify-between gap-2 pt-3">
-          <p className="text-xs font-semibold text-navy">
+          <p className="min-w-0 truncate text-xs font-semibold text-navy">
             {caregiver.priceLabel}
           </p>
           <Link

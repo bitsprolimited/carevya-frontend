@@ -77,7 +77,7 @@ export function CareseekerSidebar({
     <>
       <aside
         className={cn(
-          "flex h-full w-[15.5rem] shrink-0 flex-col border-r border-[#E8EEF5] bg-white",
+          "flex h-full w-[14rem] shrink-0 flex-col border-r border-[#E8EEF5] bg-white",
           className,
         )}
       >

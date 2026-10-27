@@ -22,8 +22,8 @@ export function DashboardRightPanel({
   onSelectDay: (day: number) => void;
 }) {
   return (
-    <aside className="flex w-full shrink-0 flex-col gap-5 xl:w-[20rem]">
-      <section className="rounded-2xl border border-[#E8EEF5] bg-white p-4 shadow-sm">
+    <aside className="flex w-full shrink-0 flex-col gap-4">
+      <section className="rounded-2xl border border-[#E8EEF5] bg-white p-3.5 shadow-sm sm:p-4">
         <h2 className="text-sm font-bold text-navy">Caring for</h2>
         <ul className="mt-3 space-y-2">
           {recipients.map((recipient) => (
@@ -46,8 +46,7 @@ export function DashboardRightPanel({
                     {recipient.fullName}
                   </span>
                   <span className="block truncate text-xs text-navy/50">
-                    {recipient.relationship}, {recipient.age}, {recipient.area},{" "}
-                    {recipient.city}
+                    {recipient.relationship}, {recipient.age} · {recipient.area}
                   </span>
                 </span>
                 <ChevronRight
@@ -66,7 +65,7 @@ export function DashboardRightPanel({
         </Link>
       </section>
 
-      <section className="rounded-2xl border border-[#E8EEF5] bg-white p-4 shadow-sm">
+      <section className="rounded-2xl border border-[#E8EEF5] bg-white p-3.5 shadow-sm sm:p-4">
         <div className="flex items-center justify-between gap-2">
           <h2 className="text-sm font-bold text-navy">Care Appointments</h2>
           <Link

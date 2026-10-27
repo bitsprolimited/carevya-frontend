@@ -1,20 +1,17 @@
 "use client";
 
 import {
-  Bell,
   CalendarDays,
   Check,
-  ChevronDown,
   Clock3,
   MessageCircle,
-  Search,
   SlidersHorizontal,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 import { CaregiverCard } from "@/features/dashboard/components/caregiver-card";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
+import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { DashboardEmptyState } from "@/features/dashboard/components/dashboard-empty-state";
 import { DashboardRightPanel } from "@/features/dashboard/components/dashboard-right-panel";
 import { FiltersDrawer } from "@/features/dashboard/components/filters-drawer";
@@ -23,7 +20,6 @@ import {
   mockCaregivers,
   mockRecipients,
   mockStats,
-  mockUser,
 } from "@/features/dashboard/data/mock";
 import { filterCaregivers } from "@/features/dashboard/lib/filter-caregivers";
 import {
@@ -37,7 +33,7 @@ import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 function firstNameFrom(name: string | undefined | null): string {
-  return name?.trim().split(/\s+/)[0] || mockUser.firstName;
+  return name?.trim().split(/\s+/)[0] || "Grace";
 }
 
 const QUICK_CHIPS: { value: CareCategory | "live_in"; label: string }[] = [
@@ -51,7 +47,6 @@ const QUICK_CHIPS: { value: CareCategory | "live_in"; label: string }[] = [
 export function DashboardView() {
   const { data: session } = useSession();
   const displayFirstName = firstNameFrom(session?.user?.name);
-  const displayFullName = session?.user?.name?.trim() || mockUser.fullName;
 
   const [selectedRecipientId, setSelectedRecipientId] = useState(
     mockRecipients[0]?.id ?? null,
@@ -64,7 +59,6 @@ export function DashboardView() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDay, setSelectedDay] = useState(15);
   const [caregivers, setCaregivers] = useState<Caregiver[]>(mockCaregivers);
-  const [recipientMenuOpen, setRecipientMenuOpen] = useState(false);
 
   const selectedRecipient =
     mockRecipients.find((item) => item.id === selectedRecipientId) ??
@@ -88,9 +82,9 @@ export function DashboardView() {
     return mockRecipients
       .map((recipient) => ({
         recipient,
-        caregivers: filtered.filter((item) =>
-          item.recipientIds.includes(recipient.id),
-        ),
+        caregivers: filtered
+          .filter((item) => item.recipientIds.includes(recipient.id))
+          .slice(0, 3),
       }))
       .filter((group) => group.caregivers.length > 0);
   }, [filtered]);
@@ -126,128 +120,22 @@ export function DashboardView() {
   function selectRecipient(id: string) {
     setSelectedRecipientId(id);
     setFilters((current) => ({ ...current, recipientId: id }));
-    setRecipientMenuOpen(false);
   }
 
   return (
     <CareseekerShell>
       <div className="flex min-h-0 flex-1 flex-col xl:flex-row">
-        <div className="min-w-0 flex-1 px-4 py-5 sm:px-6 lg:px-8">
-          <header className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="min-w-0">
-              <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-[1.75rem]">
-                Hello {displayFirstName}
-              </h1>
-              <p className="mt-1 text-sm text-navy/55">
-                Your care journey starts here.
-              </p>
-            </div>
+        <div className="min-w-0 flex-1 px-4 py-5 sm:px-5 lg:px-6">
+          <CareseekerTopbar
+            title={`Hello ${displayFirstName}`}
+            subtitle="Your care journey starts here."
+            recipientId={selectedRecipientId}
+            onRecipientChange={selectRecipient}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+          />
 
-            <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:items-center lg:max-w-2xl lg:justify-end">
-              <div className="relative flex h-11 min-w-0 flex-1 items-center rounded-full border border-[#D7E0EA] bg-white pl-1.5 pr-3 shadow-sm">
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setRecipientMenuOpen((open) => !open)}
-                    className="inline-flex items-center gap-2 rounded-full bg-[#F3F6FB] py-1.5 pr-2.5 pl-1.5 text-sm font-semibold text-navy"
-                  >
-                    <span className="relative size-7 overflow-hidden rounded-full bg-surface-soft">
-                      {selectedRecipient ? (
-                        <Image
-                          src={selectedRecipient.avatarUrl}
-                          alt=""
-                          fill
-                          sizes="28px"
-                          className="object-cover"
-                        />
-                      ) : null}
-                    </span>
-                    {selectedRecipient?.firstName ?? "Select"}
-                    <ChevronDown className="size-3.5 text-navy/50" aria-hidden />
-                  </button>
-                  {recipientMenuOpen ? (
-                    <div className="absolute top-full left-0 z-20 mt-2 min-w-[12rem] overflow-hidden rounded-xl border border-[#E8EEF5] bg-white py-1 shadow-lg">
-                      {mockRecipients.map((recipient) => (
-                        <button
-                          key={recipient.id}
-                          type="button"
-                          onClick={() => selectRecipient(recipient.id)}
-                          className={cn(
-                            "flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-surface-soft",
-                            recipient.id === selectedRecipientId
-                              ? "font-semibold text-brand-blue"
-                              : "text-navy",
-                          )}
-                        >
-                          <span className="relative size-6 overflow-hidden rounded-full bg-surface-soft">
-                            <Image
-                              src={recipient.avatarUrl}
-                              alt=""
-                              fill
-                              sizes="24px"
-                              className="object-cover"
-                            />
-                          </span>
-                          {recipient.firstName}
-                        </button>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder={`Find care for ${selectedRecipient?.firstName ?? "someone"}`}
-                  className="min-w-0 flex-1 border-0 bg-transparent px-3 text-sm text-navy outline-none placeholder:text-navy/40"
-                />
-                <Search className="size-4 shrink-0 text-navy/40" aria-hidden />
-              </div>
-
-              <div className="flex items-center gap-2 self-end sm:self-auto">
-                <button
-                  type="button"
-                  aria-label="Notifications"
-                  className="relative inline-flex size-10 items-center justify-center rounded-full border border-[#E8EEF5] bg-white text-navy hover:bg-surface-soft"
-                >
-                  <Bell className="size-4" aria-hidden />
-                  {mockUser.notificationCount > 0 ? (
-                    <span className="absolute -top-1 -right-1 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[0.625rem] font-bold text-white">
-                      +{mockUser.notificationCount}
-                    </span>
-                  ) : null}
-                </button>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 rounded-full border border-[#E8EEF5] bg-white py-1.5 pr-2.5 pl-1.5 hover:bg-surface-soft"
-                >
-                  <span className="relative size-8 overflow-hidden rounded-full bg-surface-soft">
-                    <Image
-                      src={mockUser.avatarUrl}
-                      alt=""
-                      fill
-                      sizes="32px"
-                      className="object-cover"
-                    />
-                  </span>
-                  <span className="hidden text-left sm:block">
-                    <span className="block text-xs font-semibold text-navy">
-                      {displayFullName}
-                    </span>
-                    <span className="block text-[0.6875rem] text-navy/45">
-                      {mockUser.roleLabel}
-                    </span>
-                  </span>
-                  <ChevronDown
-                    className="size-3.5 text-navy/45"
-                    aria-hidden
-                  />
-                </button>
-              </div>
-            </div>
-          </header>
-
-          <div className="mt-6 flex flex-wrap items-center gap-2">
+          <div className="mt-5 flex flex-wrap items-center gap-2">
             {QUICK_CHIPS.map((chip) => {
               const selected =
                 chip.value === "live_in"
@@ -265,7 +153,7 @@ export function DashboardView() {
                     toggleCategoryChip(chip.value);
                   }}
                   className={cn(
-                    "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold transition-colors sm:text-sm",
+                    "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors sm:px-3.5 sm:py-2 sm:text-sm",
                     selected
                       ? "border-brand-blue bg-[#E8F0FE] text-brand-blue"
                       : "border-[#D7E0EA] bg-white text-navy/65 hover:border-navy/30",
@@ -317,36 +205,39 @@ export function DashboardView() {
               onClearFilters={clearFilters}
             />
           ) : (
-            <div className="mt-8 space-y-8">
-              {recommendationsByRecipient.map(({ recipient, caregivers: list }) => (
-                <section key={recipient.id}>
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <h2 className="text-base font-bold text-navy sm:text-lg">
-                      Recommended for {recipient.firstName}
-                    </h2>
-                    <Link
-                      href="/careseeker/caregivers"
-                      className="text-sm font-semibold text-brand-blue hover:text-brand-blue-hover"
-                    >
-                      See all &gt;
-                    </Link>
-                  </div>
-                  <div className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2">
-                    {list.map((caregiver) => (
-                      <CaregiverCard
-                        key={caregiver.id}
-                        caregiver={caregiver}
-                        onToggleSave={toggleSave}
-                      />
-                    ))}
-                  </div>
-                </section>
-              ))}
+            <div className="mt-7 space-y-8">
+              {recommendationsByRecipient.map(
+                ({ recipient, caregivers: list }) => (
+                  <section key={recipient.id}>
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <h2 className="text-base font-bold text-navy sm:text-lg">
+                        Recommended for {recipient.firstName}
+                      </h2>
+                      <Link
+                        href="/careseeker/caregivers"
+                        className="text-sm font-semibold text-brand-blue hover:text-brand-blue-hover"
+                      >
+                        See all &gt;
+                      </Link>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {list.map((caregiver) => (
+                        <CaregiverCard
+                          key={caregiver.id}
+                          caregiver={caregiver}
+                          onToggleSave={toggleSave}
+                          className="w-full"
+                        />
+                      ))}
+                    </div>
+                  </section>
+                ),
+              )}
             </div>
           )}
         </div>
 
-        <div className="border-t border-[#E8EEF5] bg-[#F8FAFC] px-4 py-5 sm:px-6 xl:w-[22rem] xl:shrink-0 xl:border-t-0 xl:border-l xl:px-5">
+        <div className="border-t border-[#E8EEF5] bg-[#F8FAFC] px-4 py-5 sm:px-5 xl:w-[17.5rem] xl:shrink-0 xl:border-t-0 xl:border-l xl:px-4 2xl:w-[19.5rem] 2xl:px-5">
           <DashboardRightPanel
             recipients={mockRecipients}
             appointments={mockAppointments}
@@ -400,18 +291,18 @@ function StatCard({
   return (
     <div
       className={cn(
-        "flex items-start justify-between gap-3 rounded-2xl border px-4 py-3.5",
+        "flex items-start justify-between gap-2 rounded-2xl border px-3.5 py-3 sm:px-4 sm:py-3.5",
         tones.card,
       )}
     >
-      <div>
+      <div className="min-w-0">
         <p className="text-2xl font-bold tracking-tight text-navy">{count}</p>
         <p className="mt-0.5 text-sm font-semibold text-navy">{label}</p>
         <p className="mt-0.5 text-xs text-navy/55">{detail}</p>
       </div>
       <span
         className={cn(
-          "inline-flex size-10 shrink-0 items-center justify-center rounded-xl shadow-sm",
+          "inline-flex size-9 shrink-0 items-center justify-center rounded-xl shadow-sm sm:size-10",
           tones.icon,
         )}
       >

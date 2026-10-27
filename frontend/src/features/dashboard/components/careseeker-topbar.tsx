@@ -99,12 +99,12 @@ export function CareseekerTopbar({
           className={cn(
             "flex flex-col gap-3 sm:flex-row sm:items-center",
             showSearch
-              ? "flex-1 lg:max-w-2xl lg:justify-end"
+              ? "flex-1 lg:max-w-xl xl:max-w-lg 2xl:max-w-xl lg:justify-end"
               : "shrink-0 justify-end",
           )}
         >
           {showSearch ? (
-            <div className="relative flex h-11 min-w-0 flex-1 items-center rounded-full border border-[#D7E0EA] bg-white pl-1.5 pr-3 shadow-sm">
+            <div className="relative flex h-10 min-w-0 flex-1 items-center rounded-full border border-[#D7E0EA] bg-white pl-1.5 pr-3 shadow-sm sm:h-11">
               <div className="relative" ref={recipientMenuRef}>
                 <button
                   type="button"
