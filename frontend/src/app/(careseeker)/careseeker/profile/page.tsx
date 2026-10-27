@@ -7,6 +7,6 @@ export const metadata: Metadata = {
     "Tell us who needs care so we can match you with the right caregivers.",
 };
 
-export default function CareseekerProfilePage() {
+export default function familyProfilePage() {
   return <CareProfileWizard />;
 }

@@ -6,11 +6,12 @@ import Link from "next/link";
 import type { ComponentType, FormEvent, SVGProps } from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { ApiError, apiFetch } from "@/lib/api";
 import { assets } from "@/lib/assets";
 import { cn } from "@/lib/utils";
 
 const quickLinks = [
-  { href: "/home", label: "Home" },
+  { href: "/", label: "Home" },
   { href: "/about", label: "About Us" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/contact", label: "Contact Us" },
@@ -113,10 +114,36 @@ function FooterNavColumn({
 
 export function SiteFooter({ className }: { className?: string }) {
   const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
+    "idle",
+  );
+  const [message, setMessage] = useState<string | null>(null);
 
-  function handleSubscribe(event: FormEvent<HTMLFormElement>) {
+  async function handleSubscribe(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setEmail("");
+    if (status === "loading") return;
+
+    setStatus("loading");
+    setMessage(null);
+
+    try {
+      await apiFetch("/api/newsletter", {
+        method: "POST",
+        body: { email: email.trim() },
+      });
+      setStatus("success");
+      setMessage("You're subscribed! Thanks for joining our newsletter.");
+      setEmail("");
+    } catch (err) {
+      // Keep the typed email so the user can retry.
+      setStatus("error");
+      if (err instanceof ApiError) {
+        const body = err.body as { error?: string } | null;
+        setMessage(body?.error ?? "Something went wrong. Please try again.");
+      } else {
+        setMessage("Network error. Check your connection and try again.");
+      }
+    }
   }
 
   return (
@@ -128,7 +155,7 @@ export function SiteFooter({ className }: { className?: string }) {
         <div className="grid gap-10 lg:grid-cols-[1.35fr_0.85fr_0.95fr_1.1fr] lg:gap-8 xl:gap-12">
           <div>
             <Link
-              href="/home"
+              href="/"
               className="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 focus-visible:ring-offset-footer"
             >
               <span className="relative size-9 shrink-0 overflow-hidden sm:size-10">
@@ -218,17 +245,36 @@ export function SiteFooter({ className }: { className?: string }) {
               name="email"
               required
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(event) => {
+                setEmail(event.target.value);
+                if (status !== "idle" && status !== "loading") {
+                  setStatus("idle");
+                  setMessage(null);
+                }
+              }}
+              disabled={status === "loading"}
               placeholder="johndoe@gmail.com"
               className="min-w-0 flex-1 rounded-full bg-transparent px-4 py-2.5 text-sm text-navy outline-none placeholder:text-muted"
             />
             <Button
               type="submit"
+              disabled={status === "loading"}
               className="h-10 shrink-0 rounded-full px-5 text-sm sm:h-11 sm:px-6"
             >
-              Subscribe
+              {status === "loading" ? "Subscribing..." : "Subscribe"}
             </Button>
           </form>
+          {message ? (
+            <p
+              role={status === "error" ? "alert" : "status"}
+              className={cn(
+                "mt-3 px-2 text-sm font-medium",
+                status === "error" ? "text-red-300" : "text-emerald",
+              )}
+            >
+              {message}
+            </p>
+          ) : null}
         </div>
 
         <div className="mt-12 flex flex-col gap-3 border-t border-on-media/10 pt-6 text-xs text-on-media/55 sm:text-sm lg:flex-row lg:items-center lg:justify-between">
