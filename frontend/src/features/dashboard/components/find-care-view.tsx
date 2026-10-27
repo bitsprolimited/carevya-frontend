@@ -2,21 +2,26 @@
 
 import { ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
 import { useMemo, useState } from "react";
+import { BookedCaregiverCard } from "@/features/dashboard/components/booked-caregiver-card";
 import { CaregiverCard } from "@/features/dashboard/components/caregiver-card";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { FiltersDrawer } from "@/features/dashboard/components/filters-drawer";
+import { MessageCaregiverModal } from "@/features/dashboard/components/message-caregiver-modal";
 import {
   buildFindCareCatalog,
   FIND_CARE_PAGE_SIZE,
 } from "@/features/dashboard/data/find-care-catalog";
+import { getCaregiverProfile } from "@/features/dashboard/data/caregiver-profiles";
 import { mockRecipients } from "@/features/dashboard/data/mock";
+import { useBookingsStore } from "@/features/dashboard/hooks/use-bookings-store";
 import { filterCaregivers } from "@/features/dashboard/lib/filter-caregivers";
 import {
   defaultDashboardFilters,
   type Caregiver,
   type DashboardFilters,
 } from "@/features/dashboard/types";
+import type { Booking } from "@/features/dashboard/types/bookings";
 import { cn } from "@/lib/utils";
 
 type FindCareTab = "all" | "saved" | "booked" | "contacted";
@@ -24,6 +29,7 @@ type FindCareTab = "all" | "saved" | "booked" | "contacted";
 const INITIAL_CATALOG = buildFindCareCatalog();
 
 export function FindCareView() {
+  const bookings = useBookingsStore((state) => state.bookings);
   const [catalog, setCatalog] = useState<Caregiver[]>(INITIAL_CATALOG);
   const [tab, setTab] = useState<FindCareTab>("all");
   const [page, setPage] = useState(1);
@@ -37,9 +43,26 @@ export function FindCareView() {
     categories: [],
     recipientId: null,
   }));
+  const [messageBooking, setMessageBooking] = useState<Booking | null>(null);
 
   const selectedRecipient =
     mockRecipients.find((item) => item.id === recipientId) ?? mockRecipients[0];
+
+  const bookedBookings = useMemo(() => {
+    let list = bookings.filter(
+      (item) => item.status === "accepted" || item.status === "confirmed",
+    );
+    const query = searchQuery.trim().toLowerCase();
+    if (query) {
+      list = list.filter(
+        (item) =>
+          item.caregiverName.toLowerCase().includes(query) ||
+          item.careType.toLowerCase().includes(query) ||
+          item.locationLabel.toLowerCase().includes(query),
+      );
+    }
+    return list;
+  }, [bookings, searchQuery]);
 
   const filtered = useMemo(() => {
     let list = filterCaregivers(catalog, filters);
@@ -54,7 +77,6 @@ export function FindCareView() {
       );
     }
     if (tab === "saved") list = list.filter((item) => item.saved);
-    if (tab === "booked") list = list.filter((item) => item.booked);
     if (tab === "contacted") list = list.filter((item) => item.contacted);
     return list;
   }, [catalog, filters, searchQuery, tab]);
@@ -63,18 +85,26 @@ export function FindCareView() {
     () => ({
       all: catalog.length,
       saved: catalog.filter((item) => item.saved).length,
-      booked: catalog.filter((item) => item.booked).length,
+      booked: bookings.filter(
+        (item) => item.status === "accepted" || item.status === "confirmed",
+      ).length,
       contacted: catalog.filter((item) => item.contacted).length,
     }),
-    [catalog],
+    [catalog, bookings],
   );
 
+  const showBookedList = tab === "booked";
+  const listForPagination = showBookedList ? bookedBookings : filtered;
   const totalPages = Math.max(
     1,
-    Math.ceil(filtered.length / FIND_CARE_PAGE_SIZE),
+    Math.ceil(listForPagination.length / FIND_CARE_PAGE_SIZE),
   );
   const safePage = Math.min(page, totalPages);
   const pageItems = filtered.slice(
+    (safePage - 1) * FIND_CARE_PAGE_SIZE,
+    safePage * FIND_CARE_PAGE_SIZE,
+  );
+  const bookedPageItems = bookedBookings.slice(
     (safePage - 1) * FIND_CARE_PAGE_SIZE,
     safePage * FIND_CARE_PAGE_SIZE,
   );
@@ -85,6 +115,10 @@ export function FindCareView() {
     { id: "booked", label: "Booked", count: counts.booked },
     { id: "contacted", label: "Contacted", count: counts.contacted },
   ];
+
+  const messageProfile = messageBooking
+    ? getCaregiverProfile(messageBooking.caregiverId)
+    : null;
 
   function toggleSave(id: string) {
     setCatalog((current) =>
@@ -103,6 +137,10 @@ export function FindCareView() {
     setSearchQuery("");
     setPage(1);
   }
+
+  const isEmpty = showBookedList
+    ? bookedBookings.length === 0
+    : pageItems.length === 0;
 
   return (
     <CareseekerShell>
@@ -160,20 +198,42 @@ export function FindCareView() {
           </button>
         </div>
 
-        {pageItems.length === 0 ? (
+        {isEmpty ? (
           <div className="mt-10 rounded-2xl border border-[#E8EEF5] bg-white px-6 py-16 text-center shadow-sm">
-            <p className="text-base font-bold text-navy">No caregivers found</p>
-            <p className="mt-2 text-sm text-navy/55">
-              Try another tab, clear filters, or search for{" "}
-              {selectedRecipient?.firstName ?? "someone"} again.
+            <p className="text-base font-bold text-navy">
+              {showBookedList ? "No booked caregivers" : "No caregivers found"}
             </p>
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="mt-5 inline-flex h-10 items-center justify-center rounded-full bg-brand-blue px-5 text-sm font-semibold text-white hover:bg-brand-blue-hover"
-            >
-              Clear filters
-            </button>
+            <p className="mt-2 text-sm text-navy/55">
+              {showBookedList
+                ? "When a caregiver accepts your request, they’ll show up here."
+                : `Try another tab, clear filters, or search for ${selectedRecipient?.firstName ?? "someone"} again.`}
+            </p>
+            {!showBookedList ? (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="mt-5 inline-flex h-10 items-center justify-center rounded-full bg-brand-blue px-5 text-sm font-semibold text-white hover:bg-brand-blue-hover"
+              >
+                Clear filters
+              </button>
+            ) : null}
+          </div>
+        ) : showBookedList ? (
+          <div className="mt-5 space-y-4">
+            <p className="text-sm text-navy/55">
+              {bookedBookings.length} booked caregiver
+              {bookedBookings.length === 1 ? "" : "s"}
+            </p>
+            <ul className="space-y-3">
+              {bookedPageItems.map((booking) => (
+                <li key={booking.id}>
+                  <BookedCaregiverCard
+                    booking={booking}
+                    onMessage={() => setMessageBooking(booking)}
+                  />
+                </li>
+              ))}
+            </ul>
           </div>
         ) : (
           <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -188,7 +248,7 @@ export function FindCareView() {
           </div>
         )}
 
-        {filtered.length > 0 ? (
+        {!isEmpty && listForPagination.length > FIND_CARE_PAGE_SIZE ? (
           <nav
             aria-label="Pagination"
             className="mt-8 mb-2 flex items-center justify-center gap-1.5"
@@ -244,9 +304,17 @@ export function FindCareView() {
           setPage(1);
         }}
         recipients={mockRecipients}
-        resultCount={filtered.length}
+        resultCount={showBookedList ? bookedBookings.length : filtered.length}
         onClear={clearFilters}
       />
+
+      {messageProfile ? (
+        <MessageCaregiverModal
+          open={Boolean(messageBooking)}
+          onClose={() => setMessageBooking(null)}
+          caregiver={messageProfile}
+        />
+      ) : null}
     </CareseekerShell>
   );
 }

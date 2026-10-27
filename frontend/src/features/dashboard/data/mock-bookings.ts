@@ -31,6 +31,7 @@ export const mockBookings: Booking[] = [
     privacyNote:
       "Emeka can now see Folake’s care plan, health notes, home address and emergency contact for this booking.",
     confirmByLabel: "Confirm by Wed 14 Oct",
+    paymentNote: "Pay Emeka directly, as agreed",
     timeline: [
       {
         id: "t1",
@@ -85,6 +86,7 @@ export const mockBookings: Booking[] = [
     agreedOnLabel: "Fri 10 Oct · in Messages",
     privacyNote:
       "Chinedu can now see Folake’s pickup address and emergency contact for this booking.",
+    paymentNote: "Pick-up from home, return trip included",
     timeline: [
       {
         id: "t1",
