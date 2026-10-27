@@ -94,6 +94,7 @@ export const mockCaregivers: Caregiver[] = [
     languages: ["English", "Igbo", "Yoruba"],
     imageUrl: assets.aboutMemberDevG,
     saved: true,
+    booked: true,
     recipientIds: ["folake"],
   },
   {
@@ -111,6 +112,7 @@ export const mockCaregivers: Caregiver[] = [
     gender: "female",
     languages: ["English", "Hausa", "Yoruba"],
     imageUrl: assets.aboutMemberDesD,
+    contacted: true,
     recipientIds: ["folake"],
   },
   {
@@ -146,6 +148,7 @@ export const mockCaregivers: Caregiver[] = [
     languages: ["English", "Igbo"],
     imageUrl: assets.homeCommitmentPortraitA,
     saved: true,
+    booked: true,
     recipientIds: ["musa", "folake"],
   },
   {
@@ -196,6 +199,7 @@ export const mockCaregivers: Caregiver[] = [
     gender: "male",
     languages: ["English", "Igbo"],
     imageUrl: assets.aboutMemberDevE,
+    contacted: true,
     recipientIds: ["musa", "folake"],
   },
   {

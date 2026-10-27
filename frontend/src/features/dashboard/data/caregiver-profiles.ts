@@ -1,3 +1,4 @@
+import { buildFindCareCatalog } from "@/features/dashboard/data/find-care-catalog";
 import { mockCaregivers } from "@/features/dashboard/data/mock";
 import type { Caregiver } from "@/features/dashboard/types";
 import type {
@@ -191,11 +192,14 @@ export function getCaregiverProfile(id: string): CaregiverProfile | null {
   const override = profileOverrides[id];
   if (override) return override;
 
-  const caregiver = mockCaregivers.find((item) => item.id === id);
+  const caregiver =
+    mockCaregivers.find((item) => item.id === id) ??
+    buildFindCareCatalog().find((item) => item.id === id);
   if (!caregiver) return null;
   return buildDefaultProfile(caregiver);
 }
 
 export function getCaregiverProfileIds(): string[] {
-  return mockCaregivers.map((item) => item.id);
+  const catalogIds = buildFindCareCatalog().map((item) => item.id);
+  return Array.from(new Set([...mockCaregivers.map((item) => item.id), ...catalogIds]));
 }

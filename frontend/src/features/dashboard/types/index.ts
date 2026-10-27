@@ -42,6 +42,8 @@ export type Caregiver = {
   languages: string[];
   imageUrl: string;
   saved?: boolean;
+  booked?: boolean;
+  contacted?: boolean;
   recipientIds: string[];
 };
 
