@@ -10,60 +10,42 @@ import {
   Mail,
   Phone,
   ShieldCheck,
-  Smartphone,
   UserRound,
   X,
 } from "lucide-react";
 import Link from "next/link";
-import {
-  useEffect,
-  useRef,
-  useState,
-  type FormEvent,
-  type KeyboardEvent,
-} from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import {
   FieldError,
   PasswordStrengthMeter,
   inputWrapperClass,
-  otpInputClass,
 } from "@/features/auth/components/auth-feedback";
-import { signUpfamily } from "@/features/auth/services/auth-service";
 import {
-  PLACEHOLDER_OTP,
-  resendOtpPlaceholder,
-  verifyOtpPlaceholder,
-} from "@/features/auth/services/auth-placeholder";
+  EMPTY_OTP,
+  OtpInput,
+} from "@/features/auth/components/otp-input";
+import {
+  getOtpErrorKind,
+  getPasswordChecks,
+  sendEmailVerificationOtp,
+  signInWithEmail,
+  signUpfamily,
+  verifyEmailOtp,
+} from "@/features/auth/services/auth-service";
 
 type SignupStep = "signup" | "verify" | "success";
 
-const CODE_EXPIRY_SECONDS = 10 * 60;
+// Better Auth defaults: OTP valid for 5 minutes, 3 attempts. Match the backend config.
+const CODE_EXPIRY_SECONDS = 5 * 60;
 const MAX_OTP_ATTEMPTS = 3;
+const RESEND_COOLDOWN_SECONDS = 30;
 
 const inputClass =
   "min-w-0 flex-1 bg-transparent text-sm text-navy outline-none placeholder:text-navy/40";
 
 const signupInputBase =
   "flex h-11 items-center gap-3 rounded-full border bg-white px-4 transition focus-within:ring-2";
-
-function maskPhone(value: string): string {
-  const digits = value.replace(/\D/g, "");
-  let local = digits;
-
-  if (local.startsWith("234") && local.length >= 13) {
-    local = local.slice(3);
-  }
-  if (local.startsWith("0") && local.length >= 11) {
-    local = local.slice(1);
-  }
-
-  if (local.length >= 10) {
-    return `+234 ${local.slice(0, 3)} *** ${local.slice(-4)}`;
-  }
-
-  return value.trim() || "your phone number";
-}
 
 function formatExpiry(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60);
@@ -72,8 +54,7 @@ function formatExpiry(totalSeconds: number): string {
 }
 
 function getFirstName(name: string): string {
-  const first = name.trim().split(/\s+/)[0];
-  return first || "there";
+  return name.trim().split(/\s+/)[0] ?? "";
 }
 
 function SuccessBurstIcon() {
@@ -108,20 +89,27 @@ function SuccessBurstIcon() {
 type SignupFlowProps = {
   onLogin?: () => void;
   onClose?: () => void;
+  /**
+   * Open directly on the verification step for this email, e.g. when a user
+   * with an unverified account tries to log in. A fresh code is sent on mount.
+   */
+  verifyEmail?: string;
 };
 
-export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
-  const [step, setStep] = useState<SignupStep>("signup");
+export function SignupFlow({ onLogin, onClose, verifyEmail }: SignupFlowProps) {
+  const [step, setStep] = useState<SignupStep>(
+    verifyEmail ? "verify" : "signup",
+  );
 
   const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(verifyEmail ?? "");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otp, setOtp] = useState<string[]>([...EMPTY_OTP]);
   const [expiresIn, setExpiresIn] = useState(CODE_EXPIRY_SECONDS);
   const [otpAttemptsLeft, setOtpAttemptsLeft] = useState(MAX_OTP_ATTEMPTS);
   const [otpError, setOtpError] = useState("");
@@ -132,14 +120,14 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
     form?: string;
   }>({});
   const [submitting, setSubmitting] = useState(false);
+  const [resendIn, setResendIn] = useState(
+    verifyEmail ? RESEND_COOLDOWN_SECONDS : 0,
+  );
+  const [signedIn, setSignedIn] = useState(false);
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
+  const sentInitialOtp = useRef(false);
 
-  const passwordChecks = [
-    { label: "At least 8 characters", valid: password.length >= 8 },
-    { label: "One uppercase letter", valid: /[A-Z]/.test(password) },
-    { label: "One lowercase letter", valid: /[a-z]/.test(password) },
-    { label: "One number", valid: /\d/.test(password) },
-  ];
+  const passwordChecks = getPasswordChecks(password);
 
   const passwordScore = passwordChecks.filter(
     (check) => check.valid,
@@ -150,6 +138,15 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
 
   function clearSignupErrors() {
     setFieldErrors({});
+  }
+
+  function startVerifyStep() {
+    setOtp([...EMPTY_OTP]);
+    setOtpError("");
+    setOtpAttemptsLeft(MAX_OTP_ATTEMPTS);
+    setExpiresIn(CODE_EXPIRY_SECONDS);
+    setResendIn(RESEND_COOLDOWN_SECONDS);
+    setStep("verify");
   }
 
   async function handleSignup(event: FormEvent<HTMLFormElement>) {
@@ -204,12 +201,8 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
         return;
       }
 
-      // Better Auth email verification uses links; keep OTP UI as a temporary gate.
-      setOtp(["", "", "", "", "", ""]);
-      setOtpError("");
-      setOtpAttemptsLeft(MAX_OTP_ATTEMPTS);
-      setExpiresIn(CODE_EXPIRY_SECONDS);
-      setStep("verify");
+      // The backend emails an OTP on signup. The account is NOT verified yet.
+      startVerifyStep();
     } catch {
       setFieldErrors({
         form: "We couldn't create your account. Please try again.",
@@ -224,39 +217,26 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
 
     const timer = window.setInterval(() => {
       setExpiresIn((current) => (current <= 0 ? 0 : current - 1));
+      setResendIn((current) => (current <= 0 ? 0 : current - 1));
     }, 1000);
 
     return () => window.clearInterval(timer);
   }, [step]);
 
-  function updateOtp(index: number, value: string) {
-    setOtpError("");
-    const digits = value.replace(/\D/g, "");
-    if (!digits) {
-      setOtp((current) =>
-        current.map((item, i) => (i === index ? "" : item)),
-      );
-      return;
-    }
-
-    const digit = digits.slice(-1);
-    setOtp((current) =>
-      current.map((item, i) => (i === index ? digit : item)),
-    );
-
-    if (index < 5) {
-      otpRefs.current[index + 1]?.focus();
-    }
-  }
-
-  function handleOtpKeyDown(
-    index: number,
-    event: KeyboardEvent<HTMLInputElement>,
-  ) {
-    if (event.key === "Backspace" && !otp[index] && index > 0) {
-      otpRefs.current[index - 1]?.focus();
-    }
-  }
+  // Opened from an unverified login: send a fresh code once (ref guards dev double-mount).
+  useEffect(() => {
+    if (!verifyEmail || sentInitialOtp.current) return;
+    sentInitialOtp.current = true;
+    void sendEmailVerificationOtp({ email: verifyEmail }).then((result) => {
+      if (!result.success) {
+        setOtpError(
+          getOtpErrorKind(result) === "rate-limited"
+            ? "A code was sent recently. Check your email or wait a moment before resending."
+            : result.message,
+        );
+      }
+    });
+  }, [verifyEmail]);
 
   async function handleVerification(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -283,22 +263,50 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
 
     setSubmitting(true);
     try {
-      // Placeholder until verification API exists.
-      const result = await verifyOtpPlaceholder({
+      const result = await verifyEmailOtp({
         email: email.trim(),
-        phone: phone.trim(),
-        code: otp.join(""),
+        otp: otp.join(""),
       });
 
       if (!result.success) {
-        const nextAttempts = Math.max(otpAttemptsLeft - 1, 0);
-        setOtpAttemptsLeft(nextAttempts);
-        setOtpError(
-          `That code is incorrect. Check your email and try again. You have ${nextAttempts} attempt${nextAttempts === 1 ? "" : "s"} left.`,
-        );
+        const kind = getOtpErrorKind(result);
+        if (kind === "too-many-attempts") {
+          setOtpAttemptsLeft(0);
+          setOtpError(
+            "Too many incorrect attempts. Tap 'Resend code' to get a new one.",
+          );
+        } else if (kind === "expired") {
+          setExpiresIn(0);
+          setOtpError(
+            "The code entered has expired. Tap 'Resend code' to get a new one.",
+          );
+        } else if (kind === "invalid") {
+          const nextAttempts = Math.max(otpAttemptsLeft - 1, 0);
+          setOtpAttemptsLeft(nextAttempts);
+          setOtpError(
+            nextAttempts > 0
+              ? `That code is incorrect. Check your email and try again. You have ${nextAttempts} attempt${nextAttempts === 1 ? "" : "s"} left.`
+              : "Too many incorrect attempts. Tap 'Resend code' to get a new one.",
+          );
+        } else if (kind === "rate-limited") {
+          setOtpError("Too many requests. Please wait a moment and try again.");
+        } else {
+          setOtpError(result.message);
+        }
         return;
       }
 
+           // Some backends auto-sign-in after verification; otherwise sign in with
+      // the password we still hold (only available on the signup path).
+      let hasSession = result.signedIn;
+      if (!hasSession && password) {
+        const login = await signInWithEmail({
+          email: email.trim(),
+          password,
+        });
+        hasSession = login.success;
+      }
+      setSignedIn(hasSession);
       setStep("success");
     } catch {
       setOtpError("We couldn't verify that code. Please try again.");
@@ -311,14 +319,21 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
     setOtpError("");
     setSubmitting(true);
     try {
-      // Placeholder until resend-code API exists.
-      await resendOtpPlaceholder({
-        email: email.trim(),
-        phone: phone.trim(),
-      });
-      setOtp(["", "", "", "", "", ""]);
+      const result = await sendEmailVerificationOtp({ email: email.trim() });
+
+      if (!result.success) {
+        setOtpError(
+          getOtpErrorKind(result) === "rate-limited"
+            ? "Too many requests. Please wait a moment before requesting another code."
+            : result.message,
+        );
+        return;
+      }
+
+      setOtp([...EMPTY_OTP]);
       setOtpAttemptsLeft(MAX_OTP_ATTEMPTS);
       setExpiresIn(CODE_EXPIRY_SECONDS);
+      setResendIn(RESEND_COOLDOWN_SECONDS);
       otpRefs.current[0]?.focus();
     } catch {
       setOtpError("We couldn't resend the code. Please try again.");
@@ -594,26 +609,19 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
       {step === "verify" && (
         <>
           <div className="mb-7 text-center">
-            <div className="mb-4 flex items-center justify-center gap-3">
+            <div className="mb-4 flex items-center justify-center">
               <span className="inline-flex size-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
                 <Mail className="size-5" aria-hidden />
-              </span>
-              <span className="inline-flex size-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
-                <Smartphone className="size-5" aria-hidden />
               </span>
             </div>
 
             <h1 className="text-xl font-bold tracking-tight text-navy sm:text-[1.375rem]">
-              Verify with email or phone number
+              Verify your email
             </h1>
 
             <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-navy/60">
               We sent a 6-digit code to{" "}
-              <span className="font-semibold text-navy break-all">{email}</span>{" "}
-              and{" "}
-              <span className="font-semibold text-navy">
-                {maskPhone(phone)}
-              </span>
+              <span className="font-semibold text-navy break-all">{email}</span>
               . Enter it below to verify your account.
             </p>
           </div>
@@ -624,25 +632,14 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
                 Verification code
               </label>
 
-              <div className="grid grid-cols-6 gap-2 sm:gap-2.5">
-                {otp.map((digit, index) => (
-                  <input
-                    key={index}
-                    ref={(node) => {
-                      otpRefs.current[index] = node;
-                    }}
-                    aria-label={`Verification digit ${index + 1}`}
-                    inputMode="numeric"
-                    autoComplete={index === 0 ? "one-time-code" : "off"}
-                    maxLength={1}
-                    value={digit}
-                    onChange={(event) => updateOtp(index, event.target.value)}
-                    onKeyDown={(event) => handleOtpKeyDown(index, event)}
-                    className={otpInputClass(otpHasError)}
-                    aria-invalid={otpHasError}
-                  />
-                ))}
-              </div>
+              <OtpInput
+                value={otp}
+                onChange={setOtp}
+                inputRefs={otpRefs}
+                hasError={otpHasError}
+                onEdit={() => setOtpError("")}
+                labelPrefix="Verification digit"
+              />
 
               {otpError ? <FieldError>{otpError}</FieldError> : null}
 
@@ -662,10 +659,10 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
                 <button
                   type="button"
                   onClick={handleResendCode}
-                  disabled={submitting}
+                  disabled={submitting || resendIn > 0}
                   className="shrink-0 font-semibold text-brand-blue hover:text-brand-blue-hover disabled:opacity-50"
                 >
-                  Resend code
+                  {resendIn > 0 ? `Resend code in ${resendIn}s` : "Resend code"}
                 </button>
               </div>
             </div>
@@ -677,10 +674,7 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
               />
               <p>
                 It can take a few minutes if you don&apos;t see it in your
-                inbox. Please check your spam folder.{" "}
-                <span className="font-medium text-navy">
-                  Dev placeholder code: {PLACEHOLDER_OTP}
-                </span>
+                inbox. Please check your spam folder.
               </p>
             </div>
 
@@ -699,12 +693,16 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
               type="button"
               onClick={() => {
                 setOtpError("");
+                if (verifyEmail && onLogin) {
+                  onLogin();
+                  return;
+                }
                 setStep("signup");
               }}
               className="flex w-full items-center justify-center gap-1.5 text-sm font-medium text-brand-blue hover:text-brand-blue-hover"
             >
               <ArrowLeft className="size-3.5" aria-hidden />
-              Back to Sign Up
+              {verifyEmail && onLogin ? "Back to Log in" : "Back to Sign Up"}
             </button>
           </form>
         </>
@@ -719,7 +717,9 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
           </h1>
 
           <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-navy/60">
-            Welcome to CareVYA, {getFirstName(fullName)}. Next, tell us about
+            Welcome to CareVYA
+            {getFirstName(fullName) ? `, ${getFirstName(fullName)}` : ""}. Next,
+            tell us about
             the person who needs care so we can match you with the right
             caregivers.
           </p>
@@ -735,20 +735,33 @@ export function SignupFlow({ onLogin, onClose }: SignupFlowProps) {
             </p>
           </div>
 
-          <Link
-            href="/family/profile"
-            className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand-blue px-4 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            Set Up Care Profile
-            <ArrowRight className="size-4" aria-hidden />
-          </Link>
+          {signedIn ? (
+            <>
+              <Link
+                href="/family/profile"
+                className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand-blue px-4 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                Set Up Care Profile
+                <ArrowRight className="size-4" aria-hidden />
+              </Link>
 
-          <Link
-            href="/dashboard"
-            className="mt-4 inline-block text-sm font-medium text-brand-blue hover:text-brand-blue-hover"
-          >
-            Skip &amp; Go to Dashboard
-          </Link>
+              <Link
+                href="/dashboard"
+                className="mt-4 inline-block text-sm font-medium text-brand-blue hover:text-brand-blue-hover"
+              >
+                Skip &amp; Go to Dashboard
+              </Link>
+            </>
+          ) : (
+            <Button
+              type="button"
+              onClick={onLogin}
+              className="mt-6 h-12 w-full rounded-full text-[0.9375rem]"
+            >
+              Log in to continue
+              <ArrowRight className="size-4" aria-hidden />
+            </Button>
+          )}
 
           <div className="mt-6 border-t border-[#E2E8F0] pt-5">
             <p className="text-xs text-navy/55">

@@ -28,18 +28,19 @@ import {
   inputWrapperClass,
   otpInputClass,
 } from "@/features/auth/components/auth-feedback";
-import { requestPasswordResetEmail } from "@/features/auth/services/auth-service";
 import {
-  PLACEHOLDER_OTP,
-  resetPasswordPlaceholder,
-  sendRecoveryCodePlaceholder,
-  verifyRecoveryCodePlaceholder,
-} from "@/features/auth/services/auth-placeholder";
+  checkPasswordResetOtp,
+  getOtpErrorKind,
+  resetPasswordWithOtp,
+  sendPasswordResetOtp,
+} from "@/features/auth/services/auth-service";
 
 type ResetStep = "request" | "code" | "password" | "success";
 
-const CODE_EXPIRY_SECONDS = 10 * 60;
+// Better Auth defaults: OTP valid for 5 minutes, 3 attempts. Match the backend config.
+const CODE_EXPIRY_SECONDS = 5 * 60;
 const MAX_OTP_ATTEMPTS = 3;
+const RESEND_COOLDOWN_SECONDS = 30;
 
 const inputClass =
   "min-w-0 flex-1 bg-transparent text-sm text-navy outline-none placeholder:text-navy/35";
@@ -146,6 +147,7 @@ export function ForgotPasswordFlow({
   const [otpAttemptsLeft, setOtpAttemptsLeft] = useState(MAX_OTP_ATTEMPTS);
   const [submitting, setSubmitting] = useState(false);
   const [submittedPassword, setSubmittedPassword] = useState(false);
+  const [resendIn, setResendIn] = useState(0);
   const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   const passwordChecks = [
@@ -168,6 +170,7 @@ export function ForgotPasswordFlow({
 
     const timer = window.setInterval(() => {
       setExpiresIn((current) => (current <= 0 ? 0 : current - 1));
+      setResendIn((current) => (current <= 0 ? 0 : current - 1));
     }, 1000);
 
     return () => window.clearInterval(timer);
@@ -220,37 +223,36 @@ export function ForgotPasswordFlow({
 
     setSubmitting(true);
     try {
-      const result = await requestPasswordResetEmail({
+      const result = await sendPasswordResetOtp({
         email: identifier.trim(),
       });
 
       if (!result.success) {
         const message = result.message.toLowerCase();
-        if (
+        if (getOtpErrorKind(result) === "rate-limited") {
+          setIdentifierError(
+            "Too many requests. Please wait a moment before trying again.",
+          );
+        } else if (
           message.includes("not found") ||
           message.includes("no user") ||
           message.includes("doesn't exist") ||
           message.includes("does not exist")
         ) {
           setIdentifierError(
-            "We couldn't find an account with that email or phone number. Check for typos and try again.",
+            "We couldn't find an account with that email. Check for typos and try again.",
           );
         } else {
-          // Better Auth often returns a generic success; still show designed copy for unknown failures.
-          setIdentifierError(
-            "We couldn't find an account with that email or phone number. Check for typos and try again.",
-          );
+          setIdentifierError(result.message);
         }
         return;
       }
 
-      // Better Auth sends a recovery link (logged in the server console for now).
-      // Keep the designed OTP steps available for UI demo with the placeholder code.
-      await sendRecoveryCodePlaceholder({ identifier: identifier.trim() });
       setOtp(["", "", "", "", "", ""]);
       setOtpError("");
       setOtpAttemptsLeft(MAX_OTP_ATTEMPTS);
       setExpiresIn(CODE_EXPIRY_SECONDS);
+      setResendIn(RESEND_COOLDOWN_SECONDS);
       setStep("code");
     } catch {
       setIdentifierError("We couldn't send a recovery code. Please try again.");
@@ -284,17 +286,36 @@ export function ForgotPasswordFlow({
 
     setSubmitting(true);
     try {
-      const result = await verifyRecoveryCodePlaceholder({
-        identifier: identifier.trim(),
-        code: otp.join(""),
+      const result = await checkPasswordResetOtp({
+        email: identifier.trim(),
+        otp: otp.join(""),
       });
 
       if (!result.success) {
-        const nextAttempts = Math.max(otpAttemptsLeft - 1, 0);
-        setOtpAttemptsLeft(nextAttempts);
-        setOtpError(
-          `This code is incorrect. You have ${nextAttempts} attempt${nextAttempts === 1 ? "" : "s"} left.`,
-        );
+        const kind = getOtpErrorKind(result);
+        if (kind === "too-many-attempts") {
+          setOtpAttemptsLeft(0);
+          setOtpError(
+            "Too many incorrect attempts. Tap 'Resend code' to get a new one.",
+          );
+        } else if (kind === "expired") {
+          setExpiresIn(0);
+          setOtpError(
+            "The code entered has expired. Tap 'Resend code' to get a new one.",
+          );
+        } else if (kind === "invalid") {
+          const nextAttempts = Math.max(otpAttemptsLeft - 1, 0);
+          setOtpAttemptsLeft(nextAttempts);
+          setOtpError(
+            nextAttempts > 0
+              ? `This code is incorrect. You have ${nextAttempts} attempt${nextAttempts === 1 ? "" : "s"} left.`
+              : "Too many incorrect attempts. Tap 'Resend code' to get a new one.",
+          );
+        } else if (kind === "rate-limited") {
+          setOtpError("Too many requests. Please wait a moment and try again.");
+        } else {
+          setOtpError(result.message);
+        }
         return;
       }
 
@@ -315,10 +336,23 @@ export function ForgotPasswordFlow({
     setOtpError("");
     setSubmitting(true);
     try {
-      await sendRecoveryCodePlaceholder({ identifier: identifier.trim() });
+      const result = await sendPasswordResetOtp({
+        email: identifier.trim(),
+      });
+
+      if (!result.success) {
+        setOtpError(
+          getOtpErrorKind(result) === "rate-limited"
+            ? "Too many requests. Please wait a moment before requesting another code."
+            : result.message,
+        );
+        return;
+      }
+
       setOtp(["", "", "", "", "", ""]);
       setOtpAttemptsLeft(MAX_OTP_ATTEMPTS);
       setExpiresIn(CODE_EXPIRY_SECONDS);
+      setResendIn(RESEND_COOLDOWN_SECONDS);
       otpRefs.current[0]?.focus();
     } catch {
       setOtpError("We couldn't resend the code. Please try again.");
@@ -351,11 +385,36 @@ export function ForgotPasswordFlow({
 
     setSubmitting(true);
     try {
-      await resetPasswordPlaceholder({
-        identifier: identifier.trim(),
-        code: otp.join(""),
+      const result = await resetPasswordWithOtp({
+        email: identifier.trim(),
+        otp: otp.join(""),
         password,
       });
+
+      if (!result.success) {
+        const kind = getOtpErrorKind(result);
+        if (kind === "expired" || kind === "too-many-attempts") {
+          // The code can no longer be used; send the user back to get a new one.
+          setOtp(["", "", "", "", "", ""]);
+          setOtpAttemptsLeft(kind === "expired" ? MAX_OTP_ATTEMPTS : 0);
+          setExpiresIn(0);
+          setOtpError(
+            kind === "expired"
+              ? "Your recovery code has expired. Tap 'Resend code' to get a new one."
+              : "Too many incorrect attempts. Tap 'Resend code' to get a new one.",
+          );
+          setStep("code");
+        } else if (kind === "invalid") {
+          setOtp(["", "", "", "", "", ""]);
+          setOtpError("That code is no longer valid. Tap 'Resend code' to get a new one.");
+          setStep("code");
+        } else {
+          // e.g. password rejected by backend rules; the code is still valid.
+          setPasswordError(result.message);
+        }
+        return;
+      }
+
       setStep("success");
     } catch {
       setPasswordError("We couldn't update your password. Please try again.");
@@ -430,7 +489,7 @@ export function ForgotPasswordFlow({
                 aria-hidden
               />
               <p>
-                Your account is protected. Recovery codes expire in 10 minutes
+                Your account is protected. Recovery codes expire in 5 minutes
                 and are never shared with caregivers or anyone else.
               </p>
             </div>
@@ -523,10 +582,10 @@ export function ForgotPasswordFlow({
                 <button
                   type="button"
                   onClick={handleResendCode}
-                  disabled={submitting}
+                  disabled={submitting || resendIn > 0}
                   className="shrink-0 font-semibold text-brand-blue hover:text-brand-blue-hover disabled:opacity-50"
                 >
-                  Resend code
+                  {resendIn > 0 ? `Resend code in ${resendIn}s` : "Resend code"}
                 </button>
               </div>
             </div>
@@ -538,10 +597,7 @@ export function ForgotPasswordFlow({
               />
               <p>
                 Keep this code private. CareVYA will never ask for your recovery
-                code by phone, SMS or WhatsApp.{" "}
-                <span className="font-medium text-navy">
-                  Dev placeholder code: {PLACEHOLDER_OTP}
-                </span>
+                code by phone, SMS or WhatsApp.
               </p>
             </div>
 
