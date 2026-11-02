@@ -12,6 +12,7 @@ import {
 } from "@/features/auth/components/auth-feedback";
 import { useAuthModalStore } from "@/features/auth/hooks/use-auth-modal-store";
 import {
+  isEmailNotVerified,
   signInWithEmail,
   signInWithGoogle,
 } from "@/features/auth/services/auth-service";
@@ -44,16 +45,23 @@ const inputClass =
 
 const MAX_LOGIN_ATTEMPTS = 5;
 
+// Set to true once Google OAuth credentials are configured on the backend.
+// Until then the button only returns "Provider not found".
+const GOOGLE_SIGN_IN_ENABLED = false;
+
 type LoginFormProps = {
   onCreateAccount?: () => void;
   onForgotPassword?: () => void;
   onClose?: () => void;
+  /** Called when the account exists but its email isn't verified yet. */
+  onVerifyEmail?: (email: string) => void;
 };
 
 export function LoginForm({
   onCreateAccount,
   onForgotPassword,
   onClose,
+  onVerifyEmail,
 }: LoginFormProps) {
   const router = useRouter();
   const closeModal = useAuthModalStore((state) => state.closeModal);
@@ -76,14 +84,12 @@ export function LoginForm({
     clearErrors();
 
     if (!identifier.trim() || !password) {
-      setBannerError(
-        "Enter your email address or phone number and password.",
-      );
+      setBannerError("Enter your email address and password.");
       return;
     }
 
-    if (!identifier.includes("@")) {
-      setBannerError("Please sign in with your email address for now.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier.trim())) {
+      setBannerError("Please enter a valid email address.");
       return;
     }
 
@@ -103,10 +109,23 @@ export function LoginForm({
       });
 
       if (!result.success) {
+        // Unverified accounts can't sign in: send them to the OTP screen.
+        // This is not a wrong-password attempt, so it doesn't use up an attempt.
+        if (isEmailNotVerified(result)) {
+          if (onVerifyEmail) {
+            onVerifyEmail(identifier.trim());
+          } else {
+            setBannerError(
+              "Please verify your email address before logging in.",
+            );
+          }
+          return;
+        }
+
         const nextAttempts = Math.max(attemptsLeft - 1, 0);
         setAttemptsLeft(nextAttempts);
         setBannerError(
-          `We couldn't log you in. The email, phone number or password you entered is incorrect. You have ${nextAttempts} attempt${nextAttempts === 1 ? "" : "s"} left.`,
+          `We couldn't log you in. The email or password you entered is incorrect. You have ${nextAttempts} attempt${nextAttempts === 1 ? "" : "s"} left.`,
         );
         setPasswordError(
           "Incorrect password. Try again or reset your password.",
@@ -169,13 +188,13 @@ export function LoginForm({
             htmlFor="login-identifier"
             className="block text-sm font-medium text-navy"
           >
-            Email Address or Phone Number
+            Email Address
           </label>
           <div className={inputWrapperClass(false)}>
             <Mail className="size-[1.125rem] shrink-0 text-navy/40" aria-hidden />
             <input
               id="login-identifier"
-              type="text"
+              type="email"
               autoComplete="username"
               inputMode="email"
               value={identifier}
@@ -183,7 +202,7 @@ export function LoginForm({
                 setIdentifier(e.target.value);
                 clearErrors();
               }}
-              placeholder="e.g. +234 803 123 4567 or adebayo@family.ng"
+              placeholder="e.g. adebayo@family.ng"
               className={inputClass}
             />
           </div>
@@ -265,21 +284,25 @@ export function LoginForm({
         </Button>
       </form>
 
-      <div className="my-6 flex items-center gap-3 text-[0.6875rem] font-medium tracking-[0.08em] text-navy/45 uppercase">
-        <span className="h-px flex-1 bg-[#E2E8F0]" aria-hidden />
-        Or continue with
-        <span className="h-px flex-1 bg-[#E2E8F0]" aria-hidden />
-      </div>
+      {GOOGLE_SIGN_IN_ENABLED ? (
+        <>
+          <div className="my-6 flex items-center gap-3 text-[0.6875rem] font-medium tracking-[0.08em] text-navy/45 uppercase">
+            <span className="h-px flex-1 bg-[#E2E8F0]" aria-hidden />
+            Or continue with
+            <span className="h-px flex-1 bg-[#E2E8F0]" aria-hidden />
+          </div>
 
-      <button
-        type="button"
-        onClick={handleGoogleSignIn}
-        disabled={submitting}
-        className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-full border border-[#D7DEE8] bg-white text-sm font-medium text-navy transition-colors hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
-      >
-        <GoogleIcon className="size-5" />
-        Sign in with Google
-      </button>
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={submitting}
+            className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-full border border-[#D7DEE8] bg-white text-sm font-medium text-navy transition-colors hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-50"
+          >
+            <GoogleIcon className="size-5" />
+            Sign in with Google
+          </button>
+        </>
+      ) : null}
 
       {onCreateAccount ? (
         <p className="mt-7 text-center text-sm text-navy/60">
