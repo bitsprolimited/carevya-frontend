@@ -5,13 +5,17 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useMemo, useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { resetPasswordWithToken } from "@/features/auth/services/auth-service";
+import { resetPasswordWithOtp } from "@/features/auth/services/auth-service";
 
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const token = useMemo(
-    () => searchParams.get("token") ?? "",
+  const email = useMemo(
+    () => searchParams.get("email") ?? "",
+    [searchParams],
+  );
+  const otp = useMemo(
+    () => searchParams.get("otp") ?? "",
     [searchParams],
   );
 
@@ -26,8 +30,8 @@ function ResetPasswordForm() {
     event.preventDefault();
     setError("");
 
-    if (!token) {
-      setError("Missing reset token. Open the link from your recovery email.");
+    if (!email || !otp) {
+      setError("Your reset session has expired. Please start the process again.");
       return;
     }
 
@@ -43,9 +47,10 @@ function ResetPasswordForm() {
 
     setSubmitting(true);
     try {
-      const result = await resetPasswordWithToken({
-        token,
-        newPassword: password,
+      const result = await resetPasswordWithOtp({
+        email,
+        otp,
+        password,
       });
 
       if (!result.success) {

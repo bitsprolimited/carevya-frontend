@@ -1,4 +1,8 @@
-import { inferAdditionalFields } from "better-auth/client/plugins";
+import {
+  emailOTPClient,
+  inferAdditionalFields,
+  phoneNumberClient,
+} from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
 
 function getAuthBaseUrl(): string {
@@ -23,11 +27,19 @@ export const authClient = createAuthClient({
   plugins: [
     inferAdditionalFields({
       user: {
-        phone: {
+        // Better Auth's phone-number plugin names this field `phoneNumber`.
+        phoneNumber: {
+          type: "string",
+        },
+        role: {
           type: "string",
         },
       },
     }),
+    // OTP-based email verification, password reset and email change.
+    emailOTPClient(),
+    // Phone number OTP verification.
+    phoneNumberClient(),
   ],
 });
 
@@ -38,4 +50,6 @@ export const {
   useSession,
   requestPasswordReset,
   resetPassword,
+  emailOtp,
+  phoneNumber,
 } = authClient;

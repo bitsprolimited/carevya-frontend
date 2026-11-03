@@ -4,21 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { ApiError, apiFetch } from "@/lib/api";
+import {
+  contactMessageSchema,
+  type ContactMessageInput,
+} from "@/lib/contact-schema";
 import { cn } from "@/lib/utils";
-
-const contactMessageSchema = z.object({
-  firstName: z.string().trim().min(1, "First name is required"),
-  lastName: z.string().trim().min(1, "Last name is required"),
-  email: z.string().trim().email("Enter a valid email address"),
-  phone: z.string().trim().optional(),
-  subject: z.string().trim().min(1, "Subject is required"),
-  message: z.string().trim().min(1, "Message is required"),
-});
-
-type ContactMessageInput = z.infer<typeof contactMessageSchema>;
 
 const defaults: ContactMessageInput = {
   firstName: "",
@@ -70,6 +63,7 @@ function FieldLabel({
 
 export function ContactFormSection() {
   const [submitted, setSubmitted] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -80,9 +74,25 @@ export function ContactFormSection() {
     defaultValues: defaults,
   });
 
-  function onSubmit(_data: ContactMessageInput) {
-    setSubmitted(true);
-    reset(defaults);
+  async function onSubmit(data: ContactMessageInput) {
+    setSubmitted(false);
+    setServerError(null);
+
+    try {
+      await apiFetch("/api/contact", { method: "POST", body: data });
+      setSubmitted(true);
+      reset(defaults);
+    } catch (err) {
+      // Keep the user's input so they can retry.
+      if (err instanceof ApiError) {
+        const body = err.body as { error?: string } | null;
+        setServerError(
+          body?.error ?? "Something went wrong. Please try again.",
+        );
+      } else {
+        setServerError("Network error. Check your connection and try again.");
+      }
+    }
   }
 
   return (
@@ -222,8 +232,17 @@ export function ContactFormSection() {
                   role="status"
                   className="rounded-2xl bg-emerald/10 px-4 py-3 text-sm font-medium text-emerald-dark"
                 >
-                  Thanks — your message has been noted. Our team will get back
+                  Thanks — your message has been sent. Our team will get back
                   to you soon.
+                </p>
+              ) : null}
+
+              {serverError ? (
+                <p
+                  role="alert"
+                  className="rounded-2xl bg-danger/10 px-4 py-3 text-sm font-medium text-danger"
+                >
+                  {serverError}
                 </p>
               ) : null}
 
@@ -234,8 +253,10 @@ export function ContactFormSection() {
                   disabled={isSubmitting}
                   className="h-12 w-full max-w-md rounded-full px-8 text-base sm:h-14 sm:text-lg"
                 >
-                  Send message
-                  <ArrowRight className="size-4" aria-hidden />
+                  {isSubmitting ? "Sending..." : "Send message"}
+                  {isSubmitting ? null : (
+                    <ArrowRight className="size-4" aria-hidden />
+                  )}
                 </Button>
               </div>
             </form>

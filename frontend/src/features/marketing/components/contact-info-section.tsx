@@ -66,13 +66,13 @@ const details = [
   { label: "Location", value: "Lagos, Nigeria" },
   {
     label: "Email support",
-    value: "carevya@gmail.com",
-    href: "mailto:carevya@gmail.com",
+    value: "hello@carevya.com.ng",
+    href: "mailto:hello@carevya.com.ng",
   },
   {
     label: "Phone number",
-    value: "+234 908 1237 218",
-    href: "tel:+2349081237218",
+    value: "+234 806 081 4178",
+    href: "tel:+2348060814178",
   },
 ] as const;
 

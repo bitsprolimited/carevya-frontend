@@ -1,5 +1,6 @@
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 
-export default function RootPage() {
-  redirect("/waitlist");
+
+export default function HomeRedirectPage() {
+  permanentRedirect("/");
 }

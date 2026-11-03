@@ -41,9 +41,9 @@ export function GetStartedView() {
       <div className="grid w-full gap-6 sm:grid-cols-2">
         <RoleCard
           Icon={UserRound}
-          title="I'm a Careseeker"
+          title="I'm a family"
           description="I'm looking for verified, compassionate elder companions, specialized nurses, or vetted caregivers for my family."
-          ctaLabel="Sign up as Careseeker"
+          ctaLabel="Sign up as family"
           onClick={() => openModal("signup")}
         />
         <RoleCard

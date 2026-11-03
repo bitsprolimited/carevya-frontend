@@ -47,7 +47,7 @@ const communities: readonly CommunityBlock[] = [
     fadeSide: "right",
     iconSrc: assets.communityFamilyIcon,
     footerIconSrc: assets.communityFamilyWaitlistIcon,
-    labelDesktop: "FOR FAMILIES & CARESEEKERS",
+    labelDesktop: "FOR FAMILIES & familyS",
     labelMobile: "FOR FAMILIES & RELATIVES",
     title: "Compassion you can lean on",
     body: "Whether you live far away, work long hours, or manage care from abroad, stay informed and confident every day.",

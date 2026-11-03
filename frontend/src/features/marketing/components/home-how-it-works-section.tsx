@@ -47,7 +47,7 @@ export function HomeHowItWorksSection() {
             </h2>
             <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
               A thoughtful care-matching process built on transparent
-              verification, type of care needed and location of Careseeker.
+              verification, type of care needed and location of family.
             </p>
             <p className="mt-5 flex items-start gap-2.5 text-sm font-medium text-muted md:text-base">
               <span
