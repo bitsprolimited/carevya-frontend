@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { assets } from "@/lib/assets";
-import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -28,7 +27,6 @@ export function HomeHeader({ variant = "solid" }: HomeHeaderProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
-  const openWaitlistModal = useWaitlistStore((state) => state.openModal);
   const isTransparent = variant === "transparent";
 
   useEffect(() => {
@@ -105,13 +103,12 @@ export function HomeHeader({ variant = "solid" }: HomeHeaderProps) {
           </nav>
 
           <div className="ml-auto flex items-center gap-2">
-            <Button
-              type="button"
-              className="hidden h-10 rounded-full px-6 text-sm font-semibold md:inline-flex"
-              onClick={openWaitlistModal}
+            <Link
+              href="/get-started"
+              className="hidden h-10 items-center justify-center rounded-full bg-brand-blue px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 md:inline-flex"
             >
               Get Started
-            </Button>
+            </Link>
 
             <Button
               type="button"
@@ -158,16 +155,13 @@ export function HomeHeader({ variant = "solid" }: HomeHeaderProps) {
                 {link.label}
               </Link>
             ))}
-            <Button
-              type="button"
-              className="mt-2 w-full rounded-full"
-              onClick={() => {
-                setOpen(false);
-                openWaitlistModal();
-              }}
+            <Link
+              href="/get-started"
+              className="mt-2 inline-flex h-11 w-full items-center justify-center rounded-full bg-brand-blue px-5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              onClick={() => setOpen(false)}
             >
               Get Started
-            </Button>
+            </Link>
           </nav>
         </div>
       </header>

@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MotionConfig } from "motion/react";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 type AppProvidersProps = {
   children: ReactNode;
@@ -20,10 +20,16 @@ export function AppProviders({ children }: AppProvidersProps) {
         },
       }),
   );
+  /** Avoid SSR/client mismatch from `prefers-reduced-motion`. */
+  const [reducedMotion, setReducedMotion] = useState<"never" | "user">("never");
+
+  useEffect(() => {
+    setReducedMotion("user");
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MotionConfig reducedMotion="user">{children}</MotionConfig>
+      <MotionConfig reducedMotion={reducedMotion}>{children}</MotionConfig>
     </QueryClientProvider>
   );
 }

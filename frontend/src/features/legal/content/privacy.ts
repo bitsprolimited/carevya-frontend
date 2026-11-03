@@ -1,23 +1,20 @@
 import type { LegalSection } from "@/features/legal/content/terms";
 
 export const PRIVACY_INTRO =
-  "Placeholder Privacy Policy copy. Replace this lorem ipsum with the approved CareVYA privacy policy before launch.";
+  "This Privacy Policy explains how CareVYA collects and processes personal information in connection with the Platform. It should be reviewed, amended and approved by qualified legal counsel in Nigeria before publication or launch.";
 
 export const PRIVACY_LAST_UPDATED = "October 2026";
 
+/** Sourced from Terms §24 — Privacy and Personal Data. */
 export const PRIVACY_SECTIONS: LegalSection[] = [
   {
     id: "section-1",
     number: 1,
-    title: "Introduction",
+    title: "Overview",
     blocks: [
       {
         type: "p",
-        text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-      },
-      {
-        type: "p",
-        text: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        text: "CareVYA collects and processes personal information in accordance with this Privacy Policy and applicable Nigerian data-protection requirements.",
       },
     ],
   },
@@ -28,20 +25,24 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     blocks: [
       {
         type: "p",
-        text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet.",
-      },
-      {
-        type: "p",
-        text: "This may include:",
+        text: "Depending on how the Platform is used, information may include:",
       },
       {
         type: "ul",
         items: [
-          "Lorem ipsum dolor sit amet",
-          "Consectetur adipiscing elit",
-          "Sed do eiusmod tempor incididunt",
-          "Ut labore et dolore magna aliqua",
-          "Quis nostrud exercitation ullamco",
+          "Identity information",
+          "Contact information",
+          "Location",
+          "Profile information",
+          "Identity documents",
+          "Qualifications",
+          "References",
+          "Payment-related information",
+          "Care-recipient information",
+          "Health or care-related information",
+          "Communications",
+          "Reviews and ratings",
+          "Technical and usage information",
         ],
       },
     ],
@@ -49,81 +50,48 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
   {
     id: "section-3",
     number: 3,
-    title: "How We Use Your Information",
+    title: "How We Use Personal Data",
     blocks: [
       {
         type: "p",
-        text: "Curabitur sodales ligula in libero. Sed dignissim lacinia nunc. Curabitur tortor. Pellentesque nibh. Aenean quam. In scelerisque sem at dolor. Maecenas mattis.",
+        text: "CareVYA will process personal data for legitimate purposes connected with operating, securing and improving the Platform, including where necessary:",
       },
       {
-        type: "p",
-        text: "Sed convallis tristique sem. Proin ut ligula vel nunc egestas porttitor. Morbi lectus risus, iaculis vel, suscipit quis, luctus non, massa.",
+        type: "ul",
+        items: [
+          "Account management",
+          "Verification",
+          "Care matching",
+          "Booking",
+          "Payment",
+          "Customer support",
+          "Safety",
+          "Fraud prevention",
+          "Dispute resolution",
+          "Legal compliance",
+        ],
       },
     ],
   },
   {
     id: "section-4",
     number: 4,
-    title: "Sharing and Disclosure",
+    title: "Sensitive and Health-Related Information",
     blocks: [
       {
         type: "p",
-        text: "Fusce ac turpis quis ligula lacinia aliquet. Mauris ipsum. Nulla metus metus, ullamcorper vel, tincidunt sed, euismod in, nibh. Quisque volutpat condimentum velit.",
-      },
-      {
-        type: "ul",
-        items: [
-          "Class aptent taciti sociosqu ad litora",
-          "Torquent per conubia nostra",
-          "Inceptos himenaeos",
-          "Nam nec ante",
-        ],
+        text: "Sensitive or health-related information will receive appropriate safeguards.",
       },
     ],
   },
   {
     id: "section-5",
     number: 5,
-    title: "Data Security",
+    title: "Further Details and Data-Subject Rights",
     blocks: [
       {
         type: "p",
-        text: "Sed lacinia, urna non tincidunt mattis, tortor neque adipiscing diam, a cursus ipsum ante quis turpis. Nulla facilisi. Ut fringilla. Suspendisse potenti. Nunc feugiat mi a tellus consequat imperdiet.",
-      },
-    ],
-  },
-  {
-    id: "section-6",
-    number: 6,
-    title: "Your Rights",
-    blocks: [
-      {
-        type: "p",
-        text: "Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Morbi lacinia molestie dui. Praesent blandit dolor. Sed non quam. In vel mi sit amet augue congue elementum.",
-      },
-      {
-        type: "ul",
-        items: [
-          "Access your personal information",
-          "Request correction of inaccurate data",
-          "Request deletion where applicable",
-          "Object to certain processing activities",
-        ],
-      },
-    ],
-  },
-  {
-    id: "section-7",
-    number: 7,
-    title: "Contact",
-    blocks: [
-      {
-        type: "p",
-        text: "Mauris tincidunt sem sed arcu. Nunc posuere. Nullam malesuada pellentesque erat. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi.",
-      },
-      {
-        type: "p",
-        text: "For privacy questions, contact CareVYA through the Contact page and mark your request as a privacy enquiry.",
+        text: "This Privacy Policy provides information about data collection, processing, sharing, retention, security and data-subject rights. For questions or privacy requests, contact CareVYA through the Contact page and mark your request as a privacy or data-protection enquiry.",
       },
     ],
   },

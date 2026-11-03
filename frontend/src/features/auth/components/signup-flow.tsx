@@ -738,7 +738,7 @@ export function SignupFlow({ onLogin, onClose, verifyEmail }: SignupFlowProps) {
           {signedIn ? (
             <>
               <Link
-                href="/family/profile"
+                href="/careseeker/care-profile"
                 className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand-blue px-4 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Set Up Care Profile
@@ -746,7 +746,7 @@ export function SignupFlow({ onLogin, onClose, verifyEmail }: SignupFlowProps) {
               </Link>
 
               <Link
-                href="/dashboard"
+                href="/careseeker"
                 className="mt-4 inline-block text-sm font-medium text-brand-blue hover:text-brand-blue-hover"
               >
                 Skip &amp; Go to Dashboard

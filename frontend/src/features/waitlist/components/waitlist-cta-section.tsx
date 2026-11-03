@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useWaitlistStore } from "@/features/waitlist/hooks/use-waitlist-store";
 import { assets } from "@/lib/assets";
@@ -13,6 +14,7 @@ export function WaitlistCtaSection({
   ctaLabel = "Join Waitlist Now",
 }: WaitlistCtaSectionProps) {
   const openModal = useWaitlistStore((state) => state.openModal);
+  const goesToGetStarted = ctaLabel.toLowerCase().includes("get started");
 
   return (
     <section
@@ -48,13 +50,22 @@ export function WaitlistCtaSection({
           zero spam, no endless sales calls, only respectful, reliable updates.
         </p>
 
-        <Button
-          type="button"
-          className="mt-8 h-12 rounded-full px-8 text-base sm:mt-10 sm:h-14 sm:px-10 sm:text-lg"
-          onClick={openModal}
-        >
-          {ctaLabel}
-        </Button>
+        {goesToGetStarted ? (
+          <Link
+            href="/get-started"
+            className="mt-8 inline-flex h-12 items-center justify-center rounded-full bg-brand-blue px-8 text-base font-semibold text-white shadow-sm transition-colors hover:bg-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:mt-10 sm:h-14 sm:px-10 sm:text-lg"
+          >
+            {ctaLabel}
+          </Link>
+        ) : (
+          <Button
+            type="button"
+            className="mt-8 h-12 rounded-full px-8 text-base sm:mt-10 sm:h-14 sm:px-10 sm:text-lg"
+            onClick={openModal}
+          >
+            {ctaLabel}
+          </Button>
+        )}
       </div>
     </section>
   );
