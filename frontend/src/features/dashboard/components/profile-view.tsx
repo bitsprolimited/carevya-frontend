@@ -9,6 +9,16 @@ import { Input } from "@/components/ui/input";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { mockRecipients, mockUser } from "@/features/dashboard/data/mock";
+import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
+import {
+  changePassword,
+  confirmEmailChange,
+  getPasswordChecks,
+  requestEmailChange,
+  sendPhoneOtp,
+  updateUserProfile,
+  verifyPhoneOtp,
+} from "@/features/auth/services/auth-service";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { useSession } from "@/lib/auth-client";
 
@@ -50,6 +60,10 @@ function Field({
 export function ProfileView() {
   const hydrated = useHydrated();
   const { data: session } = useSession();
+  const loadRecipients = useCareRecipientsStore((state) => state.load);
+  const storeRecipients = useCareRecipientsStore((state) => state.items);
+  const recipients =
+    hydrated && storeRecipients.length ? storeRecipients : mockRecipients;
   const fallbackParts = mockUser.fullName.split(/\s+/);
   const [editing, setEditing] = useState(false);
   const [firstName, setFirstName] = useState(fallbackParts[0] || "Grace");
@@ -64,13 +78,30 @@ export function ProfileView() {
     email: mockUser.email,
     phone: "+234 809 221 3340",
   });
+  const [sessionEmail, setSessionEmail] = useState(mockUser.email);
 
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [passwordSaved, setPasswordSaved] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
+  const [emailChangePending, setEmailChangePending] = useState<string | null>(
+    null,
+  );
+  const [emailChangeOtp, setEmailChangeOtp] = useState("");
+  const [pendingNewEmail, setPendingNewEmail] = useState("");
+  const [confirmingEmail, setConfirmingEmail] = useState(false);
+  const [phoneOtpSent, setPhoneOtpSent] = useState(false);
+  const [phoneOtp, setPhoneOtp] = useState("");
+  const [phoneBusy, setPhoneBusy] = useState(false);
+  const [phoneMessage, setPhoneMessage] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
 
   useEffect(() => {
     if (!hydrated || !session?.user) return;
@@ -80,14 +111,30 @@ export function ProfileView() {
     const nextLast = parts.slice(1).join(" ") || "Bills";
     const nextEmail = session.user.email || mockUser.email;
     const nextPhone =
-      (session.user as { phone?: string }).phone || "+234 809 221 3340";
+      (session.user as { phoneNumber?: string; phone?: string }).phoneNumber ||
+      (session.user as { phone?: string }).phone ||
+      "+234 809 221 3340";
     setFirstName(nextFirst);
     setLastName(nextLast);
     setEmail(nextEmail);
     setPhone(nextPhone);
+    setSessionEmail(nextEmail);
+    setDraft({
+      firstName: nextFirst,
+      lastName: nextLast,
+      email: nextEmail,
+      phone: nextPhone,
+    });
   }, [hydrated, session]);
 
+  useEffect(() => {
+    if (!hydrated) return;
+    void loadRecipients();
+  }, [hydrated, loadRecipients]);
+
   const fullName = `${firstName} ${lastName}`.trim();
+  const passwordChecks = getPasswordChecks(newPassword);
+  const passwordValid = passwordChecks.every((check) => check.valid);
 
   function startEdit() {
     setDraft({ firstName, lastName, email, phone });
@@ -102,15 +149,86 @@ export function ProfileView() {
     setEditing(false);
   }
 
-  function saveProfile() {
+  async function saveProfile() {
+    setProfileError(null);
+    setEmailChangePending(null);
+    setSavingProfile(true);
+    const name = `${firstName} ${lastName}`.trim();
+    const emailChanged =
+      email.trim().toLowerCase() !== sessionEmail.trim().toLowerCase();
+
+    if (emailChanged) {
+      const emailResult = await requestEmailChange({ newEmail: email.trim() });
+      if (!emailResult.success) {
+        setSavingProfile(false);
+        setProfileError(emailResult.message);
+        return;
+      }
+      setPendingNewEmail(email.trim());
+      setEmailChangeOtp("");
+      setEmailChangePending(
+        `We sent a verification code to ${email.trim()}. Enter it below to finish changing your address.`,
+      );
+    }
+
+    const profileResult = await updateUserProfile({
+      name,
+      phoneNumber: phone,
+    });
+    setSavingProfile(false);
+
+    if (!profileResult.success) {
+      setProfileError(profileResult.message);
+      return;
+    }
+
     setEditing(false);
+    setProfileSaved(true);
+    if (!emailChanged) {
+      setSessionEmail(email);
+    }
+    window.setTimeout(() => setProfileSaved(false), 2500);
+  }
+
+  async function handleConfirmEmailChange() {
+    if (!pendingNewEmail || emailChangeOtp.trim().length < 4) return;
+    setConfirmingEmail(true);
+    setProfileError(null);
+    const result = await confirmEmailChange({
+      newEmail: pendingNewEmail,
+      otp: emailChangeOtp.trim(),
+    });
+    setConfirmingEmail(false);
+    if (!result.success) {
+      setProfileError(result.message);
+      return;
+    }
+    setSessionEmail(pendingNewEmail);
+    setEmail(pendingNewEmail);
+    setEmailChangePending(null);
+    setPendingNewEmail("");
+    setEmailChangeOtp("");
     setProfileSaved(true);
     window.setTimeout(() => setProfileSaved(false), 2500);
   }
 
-  function handlePasswordSave() {
-    if (newPassword.length < 8 || newPassword !== confirmPassword) return;
+  async function handlePasswordSave() {
+    if (!passwordValid || newPassword !== confirmPassword || !currentPassword) {
+      return;
+    }
+    setPasswordError(null);
+    setSavingPassword(true);
+    const result = await changePassword({
+      currentPassword,
+      newPassword,
+    });
+    setSavingPassword(false);
+    if (!result.success) {
+      setPasswordError(result.message);
+      return;
+    }
     setPasswordSaved(true);
+    setCurrentPassword("");
     setNewPassword("");
     setConfirmPassword("");
     window.setTimeout(() => setPasswordSaved(false), 2500);
@@ -187,6 +305,78 @@ export function ProfileView() {
             </div>
 
             {editing ? (
+              <div className="mt-4 rounded-xl border border-[#E8EEF5] bg-[#F8FAFC] p-3">
+                <p className="text-xs font-medium text-navy/60">
+                  Verify phone with OTP
+                </p>
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    disabled={phoneBusy || !phone.trim()}
+                    onClick={() => {
+                      void (async () => {
+                        setPhoneBusy(true);
+                        setPhoneMessage(null);
+                        const result = await sendPhoneOtp({ phone });
+                        setPhoneBusy(false);
+                        if (!result.success) {
+                          setPhoneMessage(result.message);
+                          return;
+                        }
+                        setPhoneOtpSent(true);
+                        setPhoneMessage("Code sent. Enter it below.");
+                      })();
+                    }}
+                    className="h-10 rounded-full px-4 text-xs"
+                  >
+                    {phoneBusy ? "Sending…" : "Send OTP"}
+                  </Button>
+                  {phoneOtpSent ? (
+                    <>
+                      <Input
+                        value={phoneOtp}
+                        onChange={(event) => setPhoneOtp(event.target.value)}
+                        placeholder="OTP code"
+                        className="h-10 rounded-xl border-[#D7E0EA]"
+                        inputMode="numeric"
+                      />
+                      <Button
+                        type="button"
+                        disabled={phoneBusy || phoneOtp.trim().length < 4}
+                        onClick={() => {
+                          void (async () => {
+                            setPhoneBusy(true);
+                            setPhoneMessage(null);
+                            const result = await verifyPhoneOtp({
+                              phone,
+                              code: phoneOtp.trim(),
+                              updatePhoneNumber: true,
+                            });
+                            setPhoneBusy(false);
+                            if (!result.success) {
+                              setPhoneMessage(result.message);
+                              return;
+                            }
+                            setPhoneMessage("Phone verified.");
+                            setPhoneOtpSent(false);
+                            setPhoneOtp("");
+                          })();
+                        }}
+                        className="h-10 rounded-full px-4 text-xs"
+                      >
+                        Verify
+                      </Button>
+                    </>
+                  ) : null}
+                </div>
+                {phoneMessage ? (
+                  <p className="mt-2 text-xs text-navy/60">{phoneMessage}</p>
+                ) : null}
+              </div>
+            ) : null}
+
+            {editing ? (
               <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-end">
                 <Button
                   type="button"
@@ -198,11 +388,44 @@ export function ProfileView() {
                 </Button>
                 <Button
                   type="button"
-                  onClick={saveProfile}
+                  onClick={() => void saveProfile()}
+                  disabled={savingProfile}
                   className="h-10 rounded-full px-5"
                 >
-                  Save changes
+                  {savingProfile ? "Saving…" : "Save changes"}
                 </Button>
+              </div>
+            ) : null}
+            {profileError ? (
+              <p className="mt-3 text-center text-xs text-red-600" role="alert">
+                {profileError}
+              </p>
+            ) : null}
+            {emailChangePending ? (
+              <div className="mt-3 space-y-2" role="status">
+                <p className="text-center text-xs text-navy/70">
+                  {emailChangePending}
+                </p>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Input
+                    value={emailChangeOtp}
+                    onChange={(event) => setEmailChangeOtp(event.target.value)}
+                    placeholder="Enter verification code"
+                    className="h-10 rounded-xl border-[#D7E0EA]"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => void handleConfirmEmailChange()}
+                    disabled={
+                      confirmingEmail || emailChangeOtp.trim().length < 4
+                    }
+                    className="h-10 shrink-0 rounded-full px-5"
+                  >
+                    {confirmingEmail ? "Confirming…" : "Confirm email"}
+                  </Button>
+                </div>
               </div>
             ) : null}
             {profileSaved ? (
@@ -218,6 +441,35 @@ export function ProfileView() {
           <section className="rounded-2xl border border-[#E8EEF5] bg-white p-5 shadow-sm">
             <h2 className="text-base font-bold text-navy">Change password</h2>
             <div className="mt-4 space-y-4">
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-medium text-navy/55">
+                  Current password
+                </span>
+                <span className="relative block">
+                  <Input
+                    type={showCurrent ? "text" : "password"}
+                    value={currentPassword}
+                    onChange={(event) => setCurrentPassword(event.target.value)}
+                    className="h-11 rounded-xl border-[#D7E0EA] pr-11"
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    aria-label={
+                      showCurrent ? "Hide password" : "Show password"
+                    }
+                    onClick={() => setShowCurrent((value) => !value)}
+                    className="absolute top-1/2 right-3 -translate-y-1/2 text-navy/40 hover:text-navy"
+                  >
+                    {showCurrent ? (
+                      <EyeOff className="size-4" />
+                    ) : (
+                      <Eye className="size-4" />
+                    )}
+                  </button>
+                </span>
+              </label>
+
               <label className="block">
                 <span className="mb-1.5 block text-xs font-medium text-navy/55">
                   New Password
@@ -284,14 +536,22 @@ export function ProfileView() {
 
               <Button
                 type="button"
-                onClick={handlePasswordSave}
+                onClick={() => void handlePasswordSave()}
                 disabled={
-                  newPassword.length < 8 || newPassword !== confirmPassword
+                  savingPassword ||
+                  !currentPassword ||
+                  !passwordValid ||
+                  newPassword !== confirmPassword
                 }
                 className="h-11 w-full rounded-full"
               >
-                Update password
+                {savingPassword ? "Updating…" : "Update password"}
               </Button>
+              {passwordError ? (
+                <p className="text-center text-xs text-red-600" role="alert">
+                  {passwordError}
+                </p>
+              ) : null}
               {passwordSaved ? (
                 <p
                   className="text-center text-xs font-medium text-emerald"
@@ -316,7 +576,7 @@ export function ProfileView() {
           </div>
 
           <ul className="mt-4 space-y-3">
-            {mockRecipients.map((recipient) => {
+            {recipients.map((recipient) => {
               const initials = recipient.fullName
                 .split(/\s+/)
                 .map((part) => part[0])

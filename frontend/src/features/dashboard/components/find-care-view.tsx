@@ -1,7 +1,8 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, SlidersHorizontal } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
 import { BookedCaregiverCard } from "@/features/dashboard/components/booked-caregiver-card";
 import { CaregiverCard } from "@/features/dashboard/components/caregiver-card";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
@@ -22,6 +23,7 @@ import {
   type DashboardFilters,
 } from "@/features/dashboard/types";
 import type { Booking } from "@/features/dashboard/types/bookings";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 
 type FindCareTab = "all" | "saved" | "booked" | "contacted";
@@ -29,6 +31,12 @@ type FindCareTab = "all" | "saved" | "booked" | "contacted";
 const INITIAL_CATALOG = buildFindCareCatalog();
 
 export function FindCareView() {
+  const hydrated = useHydrated();
+  const loadRecipients = useCareRecipientsStore((state) => state.load);
+  const storeRecipients = useCareRecipientsStore((state) => state.items);
+  const recipients =
+    hydrated && storeRecipients.length ? storeRecipients : mockRecipients;
+
   const bookings = useBookingsStore((state) => state.bookings);
   const [catalog, setCatalog] = useState<Caregiver[]>(INITIAL_CATALOG);
   const [tab, setTab] = useState<FindCareTab>("all");
@@ -45,8 +53,21 @@ export function FindCareView() {
   }));
   const [messageBooking, setMessageBooking] = useState<Booking | null>(null);
 
+  useEffect(() => {
+    if (!hydrated) return;
+    void loadRecipients();
+  }, [hydrated, loadRecipients]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    if (recipientId && recipients.some((item) => item.id === recipientId)) {
+      return;
+    }
+    if (recipients[0]?.id) setRecipientId(recipients[0].id);
+  }, [hydrated, recipients, recipientId]);
+
   const selectedRecipient =
-    mockRecipients.find((item) => item.id === recipientId) ?? mockRecipients[0];
+    recipients.find((item) => item.id === recipientId) ?? recipients[0];
 
   const bookedBookings = useMemo(() => {
     let list = bookings.filter(
@@ -303,7 +324,7 @@ export function FindCareView() {
           setFilters({ ...next, recipientId: null });
           setPage(1);
         }}
-        recipients={mockRecipients}
+        recipients={recipients}
         resultCount={showBookedList ? bookedBookings.length : filtered.length}
         onClear={clearFilters}
       />

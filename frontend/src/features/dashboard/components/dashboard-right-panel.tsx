@@ -10,16 +10,20 @@ import type {
 import { mockWeekDays } from "@/features/dashboard/data/mock";
 import { cn } from "@/lib/utils";
 
+type WeekDay = { label: string; day: number };
+
 export function DashboardRightPanel({
   recipients,
   appointments,
   selectedDay,
   onSelectDay,
+  weekDays = mockWeekDays,
 }: {
   recipients: CareRecipient[];
   appointments: DashboardAppointment[];
   selectedDay: number;
   onSelectDay: (day: number) => void;
+  weekDays?: readonly WeekDay[];
 }) {
   return (
     <aside className="flex w-full shrink-0 flex-col gap-4">
@@ -77,7 +81,7 @@ export function DashboardRightPanel({
         </div>
 
         <div className="mt-3 flex justify-between gap-1">
-          {mockWeekDays.map((day) => {
+          {weekDays.map((day) => {
             const active = day.day === selectedDay;
             return (
               <button

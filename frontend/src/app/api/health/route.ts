@@ -1,10 +1,9 @@
-
 import { NextResponse } from "next/server";
 import type { HealthResponse } from "@/features/waitlist/types";
 import { backendUrl } from "@/lib/backend";
 
 const WAITLIST_HEALTH_API_URL =
-  process.env.WAITLIST_HEALTH_API_URL ?? backendUrl("/");
+  process.env.WAITLIST_HEALTH_API_URL ?? backendUrl("/health");
 
 function errorResponse(status: number) {
   return NextResponse.json(
@@ -18,25 +17,30 @@ function errorResponse(status: number) {
 }
 
 export async function GET() {
-  if (!WAITLIST_HEALTH_API_URL) {
-    console.error("WAITLIST_HEALTH_API_URL is not set");
-    return errorResponse(500);
-  }
-
   try {
     const upstream = await fetch(WAITLIST_HEALTH_API_URL, {
       headers: { Accept: "application/json" },
-      cache: "no-store", // health should always be live
+      cache: "no-store",
       signal: AbortSignal.timeout(30_000),
     });
 
-    const data = await upstream.json().catch(() => null);
+    const payload = await upstream.json().catch(() => null);
 
-    if (!upstream.ok || !data) {
+    if (!upstream.ok || !payload) {
       return errorResponse(upstream.status || 502);
     }
 
-    return NextResponse.json(data as HealthResponse, { status: 200 });
+    // Nest wraps as { statusCode, message, data: { status, uptime, timestamp } }
+    const data =
+      payload &&
+      typeof payload === "object" &&
+      "data" in payload &&
+      payload.data &&
+      typeof payload.data === "object"
+        ? (payload.data as HealthResponse)
+        : (payload as HealthResponse);
+
+    return NextResponse.json(data, { status: 200 });
   } catch (err) {
     console.error("Health upstream error:", err);
     return errorResponse(502);

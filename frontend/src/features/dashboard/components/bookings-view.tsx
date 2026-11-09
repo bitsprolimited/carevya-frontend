@@ -4,7 +4,8 @@ import { CalendarDays, Check, ChevronDown, Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
 import { BookingDetailsDrawer } from "@/features/dashboard/components/booking-details-drawer";
 import { BookingStatusBadge } from "@/features/dashboard/components/booking-status-badge";
 import { CareReviewModal } from "@/features/dashboard/components/care-review-modal";
@@ -14,6 +15,7 @@ import { MessageCaregiverModal } from "@/features/dashboard/components/message-c
 import { getCaregiverProfile } from "@/features/dashboard/data/caregiver-profiles";
 import { mockRecipients } from "@/features/dashboard/data/mock";
 import { useBookingsStore } from "@/features/dashboard/hooks/use-bookings-store";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
 
 type TabFilter = "all" | "pending" | "accepted" | "declined";
@@ -27,6 +29,12 @@ const TIMEFRAMES = [
 ] as const;
 
 export function BookingsView() {
+  const hydrated = useHydrated();
+  const loadRecipients = useCareRecipientsStore((state) => state.load);
+  const storeRecipients = useCareRecipientsStore((state) => state.items);
+  const recipients =
+    hydrated && storeRecipients.length ? storeRecipients : mockRecipients;
+
   const router = useRouter();
   const bookings = useBookingsStore((state) => state.bookings);
   const updateBooking = useBookingsStore((state) => state.updateBooking);
@@ -42,8 +50,21 @@ export function BookingsView() {
   const [reviewOpen, setReviewOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!hydrated) return;
+    void loadRecipients();
+  }, [hydrated, loadRecipients]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    if (recipientId && recipients.some((item) => item.id === recipientId)) {
+      return;
+    }
+    if (recipients[0]?.id) setRecipientId(recipients[0].id);
+  }, [hydrated, recipients, recipientId]);
+
   const selectedRecipient =
-    mockRecipients.find((item) => item.id === recipientId) ?? mockRecipients[0];
+    recipients.find((item) => item.id === recipientId) ?? recipients[0];
 
   const counts = useMemo(
     () => ({

@@ -3,7 +3,7 @@ import { backendUrl } from "@/lib/backend";
 import { newsletterSchema } from "@/lib/newsletter-schema";
 
 const NEWSLETTER_API_URL =
-  process.env.NEWSLETTER_API_URL ?? backendUrl("/newsletter");
+  process.env.NEWSLETTER_API_URL ?? backendUrl("/newsletter/subscribe");
 
 export async function POST(req: Request) {
   let body: unknown;

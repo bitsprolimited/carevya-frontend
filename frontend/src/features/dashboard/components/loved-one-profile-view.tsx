@@ -21,11 +21,21 @@ import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
-import { EditLovedOneDrawer } from "@/features/dashboard/components/edit-loved-one-drawer";
+import {
+  EditLovedOneDrawer,
+  type LovedOneEditSection,
+  type LovedOneEditPayload,
+} from "@/features/dashboard/components/edit-loved-one-drawer";
 import type {
   LovedOneProfile,
   LovedOneTab,
 } from "@/features/dashboard/types/loved-one";
+import {
+  replaceEmergencyContacts,
+  saveCareRecipientCarePlan,
+  saveCareRecipientHealth,
+  updateCareRecipient,
+} from "@/features/care-recipients/services/care-recipients-service";
 import { cn } from "@/lib/utils";
 
 const TABS: { id: LovedOneTab; label: string }[] = [
@@ -838,14 +848,23 @@ function RightPanel({ profile }: { profile: LovedOneProfile }) {
 
 export function LovedOneProfileView({
   profile: initial,
+  recipientId,
 }: {
   profile: LovedOneProfile;
+  recipientId?: string;
 }) {
   const router = useRouter();
   const [profile, setProfile] = useState(initial);
   const [tab, setTab] = useState<LovedOneTab>("overview");
   const [editOpen, setEditOpen] = useState(false);
+  const [editSection, setEditSection] =
+    useState<LovedOneEditSection>("overview");
   const [toast, setToast] = useState<string | null>(null);
+
+  function openEditor(section: LovedOneEditSection) {
+    setEditSection(section);
+    setEditOpen(true);
+  }
 
   useEffect(() => {
     setProfile(initial);
@@ -927,7 +946,7 @@ export function LovedOneProfileView({
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => setEditOpen(true)}
+                onClick={() => openEditor("overview")}
                 className="h-11 rounded-full px-5"
               >
                 <Pencil className="size-4" aria-hidden />
@@ -975,20 +994,20 @@ export function LovedOneProfileView({
             {tab === "overview" ? (
               <OverviewTab
                 profile={profile}
-                onEdit={() => setEditOpen(true)}
+                onEdit={() => openEditor("overview")}
                 onHealth={() => setTab("health")}
               />
             ) : null}
             {tab === "health" ? (
               <HealthTab
                 profile={profile}
-                onEdit={() => setEditOpen(true)}
+                onEdit={() => openEditor("health")}
               />
             ) : null}
             {tab === "care-plan" ? (
               <CarePlanTab
                 profile={profile}
-                onEdit={() => setEditOpen(true)}
+                onEdit={() => openEditor("care-plan")}
               />
             ) : null}
             {tab === "history" ? <HistoryTab profile={profile} /> : null}
@@ -1002,7 +1021,7 @@ export function LovedOneProfileView({
                     sharing: { ...current.sharing, [key]: value },
                   }))
                 }
-                onEdit={() => setEditOpen(true)}
+                onEdit={() => openEditor("contacts")}
               />
             ) : null}
           </div>
@@ -1015,9 +1034,94 @@ export function LovedOneProfileView({
         open={editOpen}
         onClose={() => setEditOpen(false)}
         profile={profile}
-        onSave={(patch) => {
-          setProfile((current) => ({ ...current, ...patch }));
-          showToast(`${profile.firstName}'s details updated`);
+        section={editSection}
+        onSave={async (payload: LovedOneEditPayload) => {
+          const id = recipientId ?? profile.id;
+          try {
+            if (payload.section === "health" && payload.health) {
+              await saveCareRecipientHealth(id, payload.health);
+            } else if (payload.section === "care-plan" && payload.carePlan) {
+              await saveCareRecipientCarePlan(id, payload.carePlan);
+            } else if (payload.section === "contacts" && payload.contacts) {
+              await replaceEmergencyContacts(id, payload.contacts);
+            } else if (payload.basics) {
+              const rel = payload.basics.relationship.toLowerCase();
+              const relationship = (
+                [
+                  "mother",
+                  "father",
+                  "grandparent",
+                  "sibling",
+                  "other",
+                ] as const
+              ).includes(rel as "mother")
+                ? (rel as
+                    | "mother"
+                    | "father"
+                    | "grandparent"
+                    | "sibling"
+                    | "other")
+                : rel.includes("mother")
+                  ? "mother"
+                  : rel.includes("father")
+                    ? "father"
+                    : rel.includes("grand")
+                      ? "grandparent"
+                      : rel.includes("brother") ||
+                          rel.includes("sister") ||
+                          rel.includes("sibling")
+                        ? "sibling"
+                        : "other";
+              await updateCareRecipient(id, {
+                fullName: payload.basics.fullName,
+                relationship,
+                gender: payload.basics.gender,
+                dateOfBirth: payload.basics.dateOfBirth,
+                addressState: payload.basics.addressState,
+                addressLga: payload.basics.addressLga,
+                addressStreet: payload.basics.addressStreet,
+                languages: payload.basics.languages,
+              });
+            }
+            setProfile((current) => ({
+              ...current,
+              ...payload.profilePatch,
+              about: payload.profilePatch.about
+                ? { ...current.about, ...payload.profilePatch.about }
+                : current.about,
+              healthGlance: payload.profilePatch.healthGlance
+                ? {
+                    ...current.healthGlance,
+                    ...payload.profilePatch.healthGlance,
+                  }
+                : current.healthGlance,
+              careNeeds: payload.profilePatch.careNeeds
+                ? { ...current.careNeeds, ...payload.profilePatch.careNeeds }
+                : current.careNeeds,
+              carePlan: payload.profilePatch.carePlan
+                ? { ...current.carePlan, ...payload.profilePatch.carePlan }
+                : current.carePlan,
+              allergiesDiet: payload.profilePatch.allergiesDiet
+                ? {
+                    ...current.allergiesDiet,
+                    ...payload.profilePatch.allergiesDiet,
+                  }
+                : current.allergiesDiet,
+              doctor: payload.profilePatch.doctor
+                ? { ...current.doctor, ...payload.profilePatch.doctor }
+                : current.doctor,
+              caregiverNotes: payload.profilePatch.caregiverNotes
+                ? {
+                    ...current.caregiverNotes,
+                    ...payload.profilePatch.caregiverNotes,
+                  }
+                : current.caregiverNotes,
+            }));
+            showToast(`${profile.firstName}'s details updated`);
+          } catch {
+            showToast("Could not save changes. Please try again.");
+            throw new Error("save failed");
+          }
         }}
       />
 

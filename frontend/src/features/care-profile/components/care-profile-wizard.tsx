@@ -9,7 +9,21 @@ import {
   Phone,
   User,
 } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { ApiError } from "@/lib/api";
+import {
+  completeOnboarding,
+  getOnboardingProfile,
+  getOnboardingSummary,
+  reviewOnboarding,
+  saveOnboardingStep,
+  type OnboardingStep,
+} from "@/features/onboarding/services/onboarding-service";
+import {
+  draftToStepPayload,
+  profileToDraft,
+} from "@/features/onboarding/lib/map-draft";
+import { uploadFile } from "@/features/uploads/services/upload-service";
 import { Button } from "@/components/ui/button";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { CareProfileComplete } from "@/features/care-profile/components/care-profile-complete";
@@ -118,6 +132,7 @@ type StepNavProps = {
   onContinue: () => void;
   continueLabel?: string;
   continueIcon?: "arrow" | "check";
+  disableContinue?: boolean;
 };
 
 function WhoNeedsCareStep({
@@ -125,6 +140,7 @@ function WhoNeedsCareStep({
   onContinue,
   continueLabel = "Continue",
   continueIcon = "arrow",
+  disableContinue,
 }: StepNavProps) {
   const draft = useCareProfileStore((state) => state.draft);
   const patchDraft = useCareProfileStore((state) => state.patchDraft);
@@ -249,6 +265,7 @@ function WhoNeedsCareStep({
         onContinue={handleContinue}
         continueLabel={continueLabel}
         continueIcon={continueIcon}
+        disableContinue={disableContinue}
       />
     </div>
   );
@@ -259,12 +276,56 @@ function AboutThemStep({
   onContinue,
   continueLabel = "Continue",
   continueIcon = "arrow",
+  disableContinue,
 }: StepNavProps) {
   const draft = useCareProfileStore((state) => state.draft);
   const patchDraft = useCareProfileStore((state) => state.patchDraft);
   const pronouns = getCarePronouns(draft);
   const possess = possessiveLabel(draft);
   const locations = useNigeriaLocations();
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [ninUploading, setNinUploading] = useState(false);
+  const [photoUploadError, setPhotoUploadError] = useState<string | null>(null);
+  const [ninUploadError, setNinUploadError] = useState<string | null>(null);
+
+  async function handlePhotoUpload(file: File) {
+    setPhotoUploading(true);
+    setPhotoUploadError(null);
+    try {
+      const result = await uploadFile("photo", file);
+      patchDraft({
+        photoUrl: result.url,
+        photoName: file.name,
+        photoConfirmed: true,
+      });
+    } catch (err) {
+      setPhotoUploadError(
+        err instanceof Error ? err.message : "Photo upload failed.",
+      );
+    } finally {
+      setPhotoUploading(false);
+    }
+  }
+
+  async function handleNinUpload(file: File) {
+    setNinUploading(true);
+    setNinUploadError(null);
+    try {
+      const result = await uploadFile("nin", file);
+      patchDraft({
+        ninUrl: result.url,
+        ninName: file.name,
+        ninConfirmed: true,
+      });
+    } catch (err) {
+      setNinUploadError(
+        err instanceof Error ? err.message : "NIN upload failed.",
+      );
+    } finally {
+      setNinUploading(false);
+    }
+  }
+
   const [errors, setErrors] = useState<{
     fullName?: string;
     dateOfBirth?: string;
@@ -444,9 +505,9 @@ function AboutThemStep({
               : `Upload your ${pronouns.label}'s image`
           }
           fileName={draft.photoName}
-          onFile={(name) =>
-            patchDraft({ photoName: name, photoConfirmed: Boolean(name) })
-          }
+          onUpload={handlePhotoUpload}
+          uploading={photoUploading}
+          uploadError={photoUploadError}
         />
 
         <UploadBox
@@ -456,9 +517,10 @@ function AboutThemStep({
               : `Upload your ${pronouns.label}'s NIN`
           }
           fileName={draft.ninName}
-          onFile={(name) =>
-            patchDraft({ ninName: name, ninConfirmed: Boolean(name) })
-          }
+          helperText="JPEG, PNG or PDF. Stored securely."
+          onUpload={handleNinUpload}
+          uploading={ninUploading}
+          uploadError={ninUploadError}
         />
 
         <div>
@@ -505,6 +567,7 @@ function AboutThemStep({
         onContinue={handleContinue}
         continueLabel={continueLabel}
         continueIcon={continueIcon}
+        disableContinue={disableContinue}
       />
     </div>
   );
@@ -515,6 +578,7 @@ function CareNeedsStep({
   onContinue,
   continueLabel = "Continue",
   continueIcon = "arrow",
+  disableContinue,
 }: StepNavProps) {
   const draft = useCareProfileStore((state) => state.draft);
   const patchDraft = useCareProfileStore((state) => state.patchDraft);
@@ -674,6 +738,7 @@ function CareNeedsStep({
         onContinue={handleContinue}
         continueLabel={continueLabel}
         continueIcon={continueIcon}
+        disableContinue={disableContinue}
       />
     </div>
   );
@@ -684,6 +749,7 @@ function HealthStep({
   onContinue,
   continueLabel = "Continue",
   continueIcon = "arrow",
+  disableContinue,
 }: StepNavProps) {
   const draft = useCareProfileStore((state) => state.draft);
   const patchDraft = useCareProfileStore((state) => state.patchDraft);
@@ -847,6 +913,7 @@ function HealthStep({
         onContinue={handleContinue}
         continueLabel={continueLabel}
         continueIcon={continueIcon}
+        disableContinue={disableContinue}
       />
     </div>
   );
@@ -857,6 +924,7 @@ function EmergencyConsentStep({
   onContinue,
   continueLabel = "Review details",
   continueIcon = "arrow",
+  disableContinue,
 }: StepNavProps) {
   const draft = useCareProfileStore((state) => state.draft);
   const patchDraft = useCareProfileStore((state) => state.patchDraft);
@@ -1126,7 +1194,7 @@ function EmergencyConsentStep({
         onContinue={handleContinue}
         continueLabel={continueLabel}
         continueIcon={continueIcon}
-        disableContinue={false}
+        disableContinue={disableContinue}
       />
     </div>
   );
@@ -1270,10 +1338,14 @@ function ReviewSummaryStep({
   onBack,
   onEditStep,
   onFinish,
+  finishing,
+  apiMissing,
 }: {
   onBack: () => void;
   onEditStep: (index: number) => void;
   onFinish: () => void;
+  finishing?: boolean;
+  apiMissing?: string[];
 }) {
   const draft = useCareProfileStore((state) => state.draft);
   const patchDraft = useCareProfileStore((state) => state.patchDraft);
@@ -1327,6 +1399,12 @@ function ReviewSummaryStep({
 
   return (
     <div>
+      {apiMissing && apiMissing.length > 0 ? (
+        <ErrorBanner>
+          Still missing: {apiMissing.join(", ")}. Edit the relevant sections
+          below.
+        </ErrorBanner>
+      ) : null}
       {showBanner ? (
         <ErrorBanner>
           A few details still need your attention. Add the missing required
@@ -1544,9 +1622,9 @@ function ReviewSummaryStep({
       <StepActions
         onBack={onBack}
         onContinue={handleFinish}
-        continueLabel="Finish setup"
+        continueLabel={finishing ? "Finishing…" : "Finish setup"}
         continueIcon="arrow"
-        disableContinue={!issues.canFinish}
+        disableContinue={!issues.canFinish || Boolean(finishing)}
       />
     </div>
   );
@@ -1557,13 +1635,76 @@ export function CareProfileWizard() {
   const isReviewing = useCareProfileStore((state) => state.isReviewing);
   const isComplete = useCareProfileStore((state) => state.isComplete);
   const draft = useCareProfileStore((state) => state.draft);
+  const hydrated = useCareProfileStore((state) => state.hydrated);
   const nextStep = useCareProfileStore((state) => state.nextStep);
   const prevStep = useCareProfileStore((state) => state.prevStep);
   const setStepIndex = useCareProfileStore((state) => state.setStepIndex);
   const enterReview = useCareProfileStore((state) => state.enterReview);
   const exitReview = useCareProfileStore((state) => state.exitReview);
   const completeSetup = useCareProfileStore((state) => state.completeSetup);
+  const hydrateDraft = useCareProfileStore((state) => state.hydrateDraft);
   const [editingFromReview, setEditingFromReview] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadPending, setLoadPending] = useState(true);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [finishing, setFinishing] = useState(false);
+  const [reviewMissing, setReviewMissing] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (hydrated) {
+      setLoadPending(false);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const [{ profile }, summary] = await Promise.all([
+          getOnboardingProfile(),
+          getOnboardingSummary().catch(() => null),
+        ]);
+        if (cancelled) return;
+        const complete =
+          summary?.status === "completed" || profile.status === "completed";
+        hydrateDraft(profileToDraft(profile), { complete });
+      } catch (err) {
+        if (cancelled) return;
+        if (err instanceof ApiError && err.status === 403) {
+          hydrateDraft(useCareProfileStore.getState().draft, { complete: true });
+        } else {
+          setLoadError(
+            err instanceof Error ? err.message : "Could not load your profile.",
+          );
+        }
+      } finally {
+        if (!cancelled) setLoadPending(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, hydrateDraft]);
+
+  const persistStep = useCallback(
+    async (uiStepIndex: number): Promise<boolean> => {
+      const apiStep = (uiStepIndex + 1) as OnboardingStep;
+      setSaving(true);
+      setSaveError(null);
+      try {
+        const payload = draftToStepPayload(apiStep, draft);
+        await saveOnboardingStep(apiStep, payload);
+        return true;
+      } catch (err) {
+        setSaveError(
+          err instanceof Error ? err.message : "Could not save this step.",
+        );
+        return false;
+      } finally {
+        setSaving(false);
+      }
+    },
+    [draft],
+  );
 
   const showReviewSummary = isReviewing && !editingFromReview;
 
@@ -1577,13 +1718,51 @@ export function CareProfileWizard() {
     setStepIndex(CARE_PROFILE_STEPS.length - 1);
   }
 
-  function handleContinue() {
+  async function handleContinue() {
+    setSaveError(null);
     if (isReviewing && editingFromReview) {
+      const ok = await persistStep(stepIndex);
+      if (!ok) return;
       returnToReviewSummary();
       return;
     }
     if (!isReviewing) {
+      const ok = await persistStep(stepIndex);
+      if (!ok) return;
       nextStep();
+    }
+  }
+
+  async function handleEnterReview() {
+    setSaveError(null);
+    const ok = await persistStep(stepIndex);
+    if (!ok) return;
+    setReviewMissing([]);
+    try {
+      const result = await reviewOnboarding();
+      if (!result.ok) {
+        setReviewMissing(result.missingFields ?? []);
+      }
+      enterReview();
+    } catch (err) {
+      setSaveError(
+        err instanceof Error ? err.message : "Could not start review.",
+      );
+    }
+  }
+
+  async function handleFinishSetup() {
+    setSaveError(null);
+    setFinishing(true);
+    try {
+      await completeOnboarding();
+      completeSetup();
+    } catch (err) {
+      setSaveError(
+        err instanceof Error ? err.message : "Could not complete setup.",
+      );
+    } finally {
+      setFinishing(false);
     }
   }
 
@@ -1603,11 +1782,25 @@ export function CareProfileWizard() {
     return <CareProfileComplete />;
   }
 
+  if (loadPending) {
+    return (
+      <div className="flex min-h-[40vh] items-center justify-center text-sm text-navy/55">
+        Loading your care profile…
+      </div>
+    );
+  }
+
   const sharedNav: StepNavProps = {
     onBack: stepIndex === 0 && !isReviewing ? undefined : handleBack,
-    onContinue: handleContinue,
-    continueLabel: isReviewing && editingFromReview ? "Save Changes" : "Continue",
+    onContinue: () => void handleContinue(),
+    continueLabel:
+      saving
+        ? "Saving…"
+        : isReviewing && editingFromReview
+          ? "Save Changes"
+          : "Continue",
     continueIcon: isReviewing && editingFromReview ? "check" : "arrow",
+    disableContinue: saving,
   };
 
   return (
@@ -1617,11 +1810,15 @@ export function CareProfileWizard() {
       reviewTitle={getReviewTitle(draft)}
       onSelectStep={isReviewing ? startEditingStep : undefined}
     >
+      {loadError ? <ErrorBanner>{loadError}</ErrorBanner> : null}
+      {saveError ? <ErrorBanner>{saveError}</ErrorBanner> : null}
       {showReviewSummary ? (
         <ReviewSummaryStep
           onBack={handleBack}
           onEditStep={startEditingStep}
-          onFinish={completeSetup}
+          onFinish={() => void handleFinishSetup()}
+          finishing={finishing}
+          apiMissing={reviewMissing}
         />
       ) : null}
       {!showReviewSummary && stepIndex === 0 ? (
@@ -1639,11 +1836,20 @@ export function CareProfileWizard() {
       {!showReviewSummary && stepIndex === 4 ? (
         <EmergencyConsentStep
           onBack={handleBack}
-          onContinue={isReviewing ? handleContinue : enterReview}
+          onContinue={
+            isReviewing
+              ? () => void handleContinue()
+              : () => void handleEnterReview()
+          }
           continueLabel={
-            isReviewing && editingFromReview ? "Save Changes" : "Review details"
+            saving
+              ? "Saving…"
+              : isReviewing && editingFromReview
+                ? "Save Changes"
+                : "Review details"
           }
           continueIcon={isReviewing && editingFromReview ? "check" : "arrow"}
+          disableContinue={saving}
         />
       ) : null}
     </CareProfileShell>
