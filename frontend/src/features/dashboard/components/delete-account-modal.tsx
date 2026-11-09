@@ -4,6 +4,7 @@ import { AlertTriangle, Lock, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
+import { deleteUserAccount } from "@/features/auth/services/auth-service";
 
 export function DeleteAccountModal({
   open,
@@ -18,18 +19,27 @@ export function DeleteAccountModal({
 }) {
   const [confirmText, setConfirmText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const canDelete =
     confirmText.trim().toUpperCase() === "DELETE" && activeBookings === 0;
 
   useEffect(() => {
-    if (!open) setConfirmText("");
+    if (!open) {
+      setConfirmText("");
+      setError(null);
+    }
   }, [open]);
 
   async function handleDelete() {
     if (!canDelete) return;
     setSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 400));
+    setError(null);
+    const result = await deleteUserAccount();
     setSubmitting(false);
+    if (!result.success) {
+      setError(result.message);
+      return;
+    }
     onDeleted?.();
     onClose();
   }
@@ -74,6 +84,12 @@ export function DeleteAccountModal({
             />
           </span>
         </label>
+
+        {error ? (
+          <p className="mt-4 text-sm text-red-600" role="alert">
+            {error}
+          </p>
+        ) : null}
 
         <div className="mt-5 flex flex-col gap-2.5 sm:flex-row">
           <Button

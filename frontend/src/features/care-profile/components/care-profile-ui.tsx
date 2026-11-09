@@ -337,22 +337,42 @@ export function UploadBox({
   helperText = "Photo must be clear and not blurry",
   fileName,
   onFile,
+  onUpload,
+  uploading = false,
+  uploadError,
+  disabled = false,
 }: {
   title: string;
   hint?: string;
   helperText?: string;
   fileName: string;
-  onFile: (name: string) => void;
+  /** Legacy: filename only. Prefer `onUpload` when uploading to the API. */
+  onFile?: (file: File | null) => void;
+  onUpload?: (file: File) => void | Promise<void>;
+  uploading?: boolean;
+  uploadError?: string | null;
+  disabled?: boolean;
 }) {
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium text-navy">{title}</p>
-      <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-[#D7DEE8] bg-white px-4 py-8 text-center transition-colors hover:border-brand-blue/40 hover:bg-[#F8FBFF]">
+      <label
+        className={cn(
+          "flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#D7DEE8] bg-white px-4 py-8 text-center transition-colors",
+          disabled || uploading
+            ? "cursor-not-allowed opacity-70"
+            : "cursor-pointer hover:border-brand-blue/40 hover:bg-[#F8FBFF]",
+        )}
+      >
         <span className="inline-flex size-10 items-center justify-center rounded-full bg-[#F0F6FF] text-brand-blue">
           <Upload className="size-5" aria-hidden />
         </span>
         <span className="mt-3 text-sm font-medium text-navy">
-          {fileName ? "Replace file" : "Click to upload"}
+          {uploading
+            ? "Uploading…"
+            : fileName
+              ? "Replace file"
+              : "Click to upload"}
         </span>
         <span className="mt-1 text-xs text-navy/55">{hint}</span>
         {fileName ? (
@@ -362,14 +382,21 @@ export function UploadBox({
         ) : null}
         <input
           type="file"
-          accept="image/jpeg,image/png"
+          accept="image/jpeg,image/png,application/pdf"
           className="sr-only"
+          disabled={disabled || uploading}
           onChange={(event) => {
-            const file = event.target.files?.[0];
-            onFile(file?.name ?? "");
+            const file = event.target.files?.[0] ?? null;
+            if (onUpload && file) {
+              void onUpload(file);
+            } else {
+              onFile?.(file);
+            }
+            event.target.value = "";
           }}
         />
       </label>
+      {uploadError ? <FieldError>{uploadError}</FieldError> : null}
       <p className="flex items-start gap-1.5 text-xs text-navy/55">
         <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden />
         <span>{helperText}</span>

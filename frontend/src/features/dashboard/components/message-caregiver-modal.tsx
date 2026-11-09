@@ -6,7 +6,9 @@ import { useEffect, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { Toggle } from "@/components/ui/toggle";
+import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
 import { mockRecipients, mockUser } from "@/features/dashboard/data/mock";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { buildCaregiverMessageDraft } from "@/features/dashboard/lib/message-draft";
 import type { CaregiverProfile } from "@/features/dashboard/types/caregiver-profile";
 import { useSession } from "@/lib/auth-client";
@@ -15,7 +17,7 @@ export function MessageCaregiverModal({
   open,
   onClose,
   caregiver,
-  recipientId = mockRecipients[0]?.id,
+  recipientId: recipientIdProp,
   onSent,
 }: {
   open: boolean;
@@ -24,11 +26,17 @@ export function MessageCaregiverModal({
   recipientId?: string;
   onSent?: () => void;
 }) {
+  const hydrated = useHydrated();
+  const storeRecipients = useCareRecipientsStore((state) => state.items);
+  const recipients =
+    hydrated && storeRecipients.length ? storeRecipients : mockRecipients;
+
   const titleId = useId();
   const { data: session } = useSession();
   const seekerName = session?.user?.name?.trim() || mockUser.fullName;
+  const recipientId = recipientIdProp ?? recipients[0]?.id;
   const recipient =
-    mockRecipients.find((item) => item.id === recipientId) ?? mockRecipients[0];
+    recipients.find((item) => item.id === recipientId) ?? recipients[0];
 
   const [message, setMessage] = useState("");
   const [requestCall, setRequestCall] = useState(false);

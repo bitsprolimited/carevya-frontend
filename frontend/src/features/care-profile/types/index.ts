@@ -145,8 +145,10 @@ export type CareProfileDraft = {
   state: string;
   lga: string;
   photoName: string;
+  photoUrl: string;
   photoConfirmed: boolean;
   ninName: string;
+  ninUrl: string;
   ninConfirmed: boolean;
   languages: string[];
   languageOther: string;
@@ -184,8 +186,10 @@ export const initialCareProfileDraft: CareProfileDraft = {
   state: "",
   lga: "",
   photoName: "",
+  photoUrl: "",
   photoConfirmed: false,
   ninName: "",
+  ninUrl: "",
   ninConfirmed: false,
   languages: [],
   languageOther: "",

@@ -8,7 +8,19 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  getDashboardAppointments,
+  getDashboardHome,
+  getDashboardRecommended,
+} from "@/features/dashboard/services/dashboard-service";
+import {
+  mapAppointments,
+  mapHomeStats,
+  mapRecommendedCaregivers,
+  mapWeekDays,
+} from "@/features/dashboard/lib/map-dashboard-api";
+import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
 import { CaregiverCard } from "@/features/dashboard/components/caregiver-card";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
@@ -20,6 +32,7 @@ import {
   mockCaregivers,
   mockRecipients,
   mockStats,
+  mockWeekDays,
 } from "@/features/dashboard/data/mock";
 import { filterCaregivers } from "@/features/dashboard/lib/filter-caregivers";
 import {
@@ -48,6 +61,11 @@ const QUICK_CHIPS: { value: CareCategory | "live_in"; label: string }[] = [
 export function DashboardView() {
   const hydrated = useHydrated();
   const { data: session } = useSession();
+  const loadRecipients = useCareRecipientsStore((state) => state.load);
+  const storeRecipients = useCareRecipientsStore((state) => state.items);
+  const recipients =
+    hydrated && storeRecipients.length ? storeRecipients : mockRecipients;
+
   const displayFirstName = firstNameFrom(
     hydrated ? session?.user?.name : null,
   );
@@ -63,10 +81,60 @@ export function DashboardView() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDay, setSelectedDay] = useState(15);
   const [caregivers, setCaregivers] = useState<Caregiver[]>(mockCaregivers);
+  const [stats, setStats] = useState(mockStats);
+  const [appointments, setAppointments] = useState(mockAppointments);
+  const [weekDays, setWeekDays] = useState<
+    ReadonlyArray<{ label: string; day: number }>
+  >(mockWeekDays);
+  useEffect(() => {
+    if (!hydrated) return;
+    void loadRecipients();
+  }, [hydrated, loadRecipients]);
+
+  useEffect(() => {
+    if (hydrated && recipients[0]?.id && !selectedRecipientId) {
+      setSelectedRecipientId(recipients[0].id);
+    }
+  }, [hydrated, recipients, selectedRecipientId]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    let cancelled = false;
+    void (async () => {
+      const recipientId = selectedRecipientId ?? recipients[0]?.id;
+      try {
+        const [home, appts, recommended] = await Promise.all([
+          getDashboardHome().catch(() => null),
+          getDashboardAppointments().catch(() => null),
+          recipientId
+            ? getDashboardRecommended({ recipientId }).catch(() => null)
+            : Promise.resolve(null),
+        ]);
+        if (cancelled) return;
+        const mappedStats = home ? mapHomeStats(home) : null;
+        if (mappedStats) setStats(mappedStats);
+        if (appts) {
+          const mapped = mapAppointments(appts);
+          if (mapped.length) setAppointments(mapped);
+          const week = mapWeekDays(appts);
+          if (week?.length) setWeekDays(week);
+        }
+        if (recommended) {
+          setCaregivers(
+            mapRecommendedCaregivers(recommended, recipientId ?? ""),
+          );
+        }
+      } catch {
+        // Keep mock fallbacks when dashboard APIs are unavailable.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, selectedRecipientId, recipients]);
 
   const selectedRecipient =
-    mockRecipients.find((item) => item.id === selectedRecipientId) ??
-    mockRecipients[0];
+    recipients.find((item) => item.id === selectedRecipientId) ?? recipients[0];
 
   const filtered = useMemo(() => {
     let list = filterCaregivers(caregivers, filters, { liveInChip });
@@ -83,7 +151,18 @@ export function DashboardView() {
   }, [caregivers, filters, liveInChip, searchQuery]);
 
   const recommendationsByRecipient = useMemo(() => {
-    return mockRecipients
+    const forRecipient = filtered.filter((item) =>
+      item.recipientIds.includes(selectedRecipientId ?? ""),
+    );
+    if (forRecipient.length > 0 && selectedRecipient) {
+      return [
+        {
+          recipient: selectedRecipient,
+          caregivers: forRecipient.slice(0, 3),
+        },
+      ];
+    }
+    return recipients
       .map((recipient) => ({
         recipient,
         caregivers: filtered
@@ -91,7 +170,7 @@ export function DashboardView() {
           .slice(0, 3),
       }))
       .filter((group) => group.caregivers.length > 0);
-  }, [filtered]);
+  }, [filtered, recipients, selectedRecipient, selectedRecipientId]);
 
   const isEmpty = filtered.length === 0;
 
@@ -182,23 +261,23 @@ export function DashboardView() {
             <StatCard
               tone="blue"
               icon={<CalendarDays className="size-5" aria-hidden />}
-              count={mockStats.appointments.count}
+              count={stats.appointments.count}
               label="Care Appointments"
-              detail={mockStats.appointments.detail}
+              detail={stats.appointments.detail}
             />
             <StatCard
               tone="amber"
               icon={<Clock3 className="size-5" aria-hidden />}
-              count={mockStats.pendingRequests.count}
+              count={stats.pendingRequests.count}
               label="Pending requests"
-              detail={mockStats.pendingRequests.detail}
+              detail={stats.pendingRequests.detail}
             />
             <StatCard
               tone="green"
               icon={<MessageCircle className="size-5" aria-hidden />}
-              count={mockStats.unreadMessages.count}
+              count={stats.unreadMessages.count}
               label="Unread messages"
-              detail={mockStats.unreadMessages.detail}
+              detail={stats.unreadMessages.detail}
             />
           </div>
 
@@ -243,8 +322,9 @@ export function DashboardView() {
 
         <div className="border-t border-[#E8EEF5] bg-[#F8FAFC] px-4 py-5 sm:px-5 xl:w-[17.5rem] xl:shrink-0 xl:border-t-0 xl:border-l xl:px-4 2xl:w-[19.5rem] 2xl:px-5">
           <DashboardRightPanel
-            recipients={mockRecipients}
-            appointments={mockAppointments}
+            recipients={recipients}
+            appointments={appointments}
+            weekDays={weekDays}
             selectedDay={selectedDay}
             onSelectDay={setSelectedDay}
           />
@@ -256,7 +336,7 @@ export function DashboardView() {
         onClose={() => setFiltersOpen(false)}
         filters={filters}
         onChange={setFilters}
-        recipients={mockRecipients}
+        recipients={recipients}
         resultCount={filtered.length}
         onClear={clearFilters}
       />

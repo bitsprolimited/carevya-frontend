@@ -2,9 +2,12 @@
 
 import { Moon, Sun } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
+import { AccountSecuritySection } from "@/features/dashboard/components/account-security-section";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { DeleteAccountModal } from "@/features/dashboard/components/delete-account-modal";
@@ -53,6 +56,7 @@ const INITIAL_ROWS: NotificationRow[] = [
 ];
 
 export function SettingsView() {
+  const router = useRouter();
   const bookings = useBookingsStore((state) => state.bookings);
   const activeBookings = useMemo(
     () =>
@@ -235,6 +239,8 @@ export function SettingsView() {
           </div>
         </section>
 
+        <AccountSecuritySection onToast={showToast} />
+
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <section className="rounded-2xl border border-[#C8EBD9] bg-[#E9F9F1] p-5">
             <p className="text-sm font-semibold text-navy">
@@ -270,7 +276,10 @@ export function SettingsView() {
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
         activeBookings={activeBookings}
-        onDeleted={() => showToast("Account deletion requested")}
+        onDeleted={async () => {
+          await signOut();
+          router.push("/");
+        }}
       />
 
       {toast ? (

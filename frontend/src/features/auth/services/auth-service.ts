@@ -341,3 +341,133 @@ export async function confirmEmailChange(input: {
 
   return { success: true, message: "Email updated." };
 }
+
+/* ---------- Account management ---------- */
+
+/** POST /api/auth/update-user */
+export async function updateUserProfile(input: {
+  name?: string;
+  image?: string;
+  phoneNumber?: string;
+}): Promise<AuthResult> {
+  const { error } = await authClient.updateUser({
+    ...(input.name !== undefined ? { name: input.name } : {}),
+    ...(input.image !== undefined ? { image: input.image } : {}),
+    ...(input.phoneNumber !== undefined
+      ? { phoneNumber: toE164Ng(input.phoneNumber) }
+      : {}),
+  });
+
+  if (error) {
+    return failure(error, "We couldn't update your profile.");
+  }
+
+  return { success: true, message: "Profile updated." };
+}
+
+/** POST /api/auth/change-password */
+export async function changePassword(input: {
+  currentPassword: string;
+  newPassword: string;
+  revokeOtherSessions?: boolean;
+}): Promise<AuthResult> {
+  const { error } = await authClient.changePassword({
+    currentPassword: input.currentPassword,
+    newPassword: input.newPassword,
+    revokeOtherSessions: input.revokeOtherSessions ?? false,
+  });
+
+  if (error) {
+    return failure(error, "We couldn't change your password.");
+  }
+
+  return { success: true, message: "Password updated." };
+}
+
+/** POST /api/auth/delete-user */
+export async function deleteUserAccount(input?: {
+  password?: string;
+}): Promise<AuthResult> {
+  const { error } = await authClient.deleteUser({
+    ...(input?.password ? { password: input.password } : {}),
+  });
+
+  if (error) {
+    return failure(error, "We couldn't delete your account.");
+  }
+
+  return { success: true, message: "Account deleted." };
+}
+
+/** GET /api/auth/list-sessions */
+export async function listSessions() {
+  const { data, error } = await authClient.listSessions();
+  if (error) {
+    return failure(error, "We couldn't load your sessions.");
+  }
+  return { success: true as const, data };
+}
+
+/** POST /api/auth/revoke-session */
+export async function revokeSession(token: string): Promise<AuthResult> {
+  const { error } = await authClient.revokeSession({ token });
+  if (error) {
+    return failure(error, "We couldn't revoke that session.");
+  }
+  return { success: true };
+}
+
+/** POST /api/auth/revoke-other-sessions */
+export async function revokeOtherSessions(): Promise<AuthResult> {
+  const { error } = await authClient.revokeOtherSessions();
+  if (error) {
+    return failure(error, "We couldn't revoke other sessions.");
+  }
+  return { success: true };
+}
+
+/** POST /api/auth/revoke-sessions */
+export async function revokeAllSessions(): Promise<AuthResult> {
+  const { error } = await authClient.revokeSessions();
+  if (error) {
+    return failure(error, "We couldn't revoke sessions.");
+  }
+  return { success: true };
+}
+
+/** GET /api/auth/list-accounts */
+export async function listLinkedAccounts() {
+  const { data, error } = await authClient.listAccounts();
+  if (error) {
+    return failure(error, "We couldn't load linked accounts.");
+  }
+  return { success: true as const, data };
+}
+
+/** POST /api/auth/link-social */
+export async function linkSocialAccount(input: {
+  provider: string;
+  callbackURL?: string;
+}): Promise<AuthResult> {
+  const { error } = await authClient.linkSocial({
+    provider: input.provider,
+    callbackURL: input.callbackURL ?? "/careseeker/settings",
+  });
+  if (error) {
+    return failure(error, "We couldn't link that account.");
+  }
+  return { success: true };
+}
+
+/** POST /api/auth/unlink-account */
+export async function unlinkAccount(input: {
+  accountId: string;
+}): Promise<AuthResult> {
+  const { error } = await authClient.unlinkAccount({
+    accountId: input.accountId,
+  });
+  if (error) {
+    return failure(error, "We couldn't unlink that account.");
+  }
+  return { success: true };
+}

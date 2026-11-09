@@ -14,7 +14,9 @@ import Link from "next/link";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
+import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
 import { mockRecipients } from "@/features/dashboard/data/mock";
+import { useHydrated } from "@/hooks/use-hydrated";
 import type { CaregiverProfile } from "@/features/dashboard/types/caregiver-profile";
 import { assets } from "@/lib/assets";
 import { cn } from "@/lib/utils";
@@ -162,6 +164,13 @@ export function BookCaregiverModal({
   caregiver: CaregiverProfile;
   onMessage?: () => void;
 }) {
+  const hydrated = useHydrated();
+  const loadRecipients = useCareRecipientsStore((state) => state.load);
+  const recipientsLoaded = useCareRecipientsStore((state) => state.loaded);
+  const storeRecipients = useCareRecipientsStore((state) => state.items);
+  const recipients =
+    hydrated && storeRecipients.length ? storeRecipients : mockRecipients;
+
   const titleId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState<"form" | "success">("form");
@@ -184,8 +193,13 @@ export function BookCaregiverModal({
 
   useEffect(() => {
     if (!open) return;
+    if (!recipientsLoaded) void loadRecipients();
+  }, [open, recipientsLoaded, loadRecipients]);
+
+  useEffect(() => {
+    if (!open) return;
     setStep("form");
-    setRecipientId(mockRecipients[0]?.id ?? "");
+    setRecipientId(recipients[0]?.id ?? "");
     setCareType(
       caregiver.services.find((service) =>
         CARE_TYPE_META.some((option) => option.id === service),
@@ -202,7 +216,7 @@ export function BookCaregiverModal({
     );
     setOpenMenu(null);
     setCalendarMonth({ year: 2026, month: 9 });
-  }, [open, caregiver]);
+  }, [open, caregiver, recipients]);
 
   useEffect(() => {
     if (!openMenu) return;
@@ -215,7 +229,7 @@ export function BookCaregiverModal({
     return () => document.removeEventListener("mousedown", onPointerDown);
   }, [openMenu]);
 
-  const recipient = mockRecipients.find((item) => item.id === recipientId);
+  const recipient = recipients.find((item) => item.id === recipientId);
   const pricing = useMemo(
     () => rateForFrequency(caregiver, frequency),
     [caregiver, frequency],
@@ -289,7 +303,7 @@ export function BookCaregiverModal({
                 Who needs care?
               </p>
               <div className="flex flex-wrap gap-2">
-                {mockRecipients.map((item) => (
+                {recipients.map((item) => (
                   <Pill
                     key={item.id}
                     label={item.fullName}

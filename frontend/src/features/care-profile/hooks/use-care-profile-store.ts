@@ -13,6 +13,7 @@ type CareProfileState = {
   isReviewing: boolean;
   isComplete: boolean;
   draft: CareProfileDraft;
+  hydrated: boolean;
   setStepIndex: (index: number) => void;
   nextStep: () => void;
   prevStep: () => void;
@@ -20,6 +21,7 @@ type CareProfileState = {
   exitReview: () => void;
   completeSetup: () => void;
   patchDraft: (patch: Partial<CareProfileDraft>) => void;
+  hydrateDraft: (draft: CareProfileDraft, options?: { complete?: boolean }) => void;
   reset: () => void;
   currentStepId: () => CareProfileStepId;
 };
@@ -29,6 +31,7 @@ export const useCareProfileStore = create<CareProfileState>((set, get) => ({
   isReviewing: false,
   isComplete: false,
   draft: { ...initialCareProfileDraft },
+  hydrated: false,
   setStepIndex: (index) =>
     set({
       stepIndex: Math.max(0, Math.min(index, CARE_PROFILE_STEPS.length - 1)),
@@ -53,11 +56,18 @@ export const useCareProfileStore = create<CareProfileState>((set, get) => ({
     set((state) => ({
       draft: { ...state.draft, ...patch },
     })),
+  hydrateDraft: (draft, options) =>
+    set({
+      draft: { ...draft },
+      hydrated: true,
+      ...(options?.complete ? { isComplete: true, isReviewing: false } : {}),
+    }),
   reset: () =>
     set({
       stepIndex: 0,
       isReviewing: false,
       isComplete: false,
+      hydrated: false,
       draft: { ...initialCareProfileDraft },
     }),
   currentStepId: () => CARE_PROFILE_STEPS[get().stepIndex].id,

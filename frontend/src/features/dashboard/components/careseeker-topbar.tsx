@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from "react";
 import { LogoutConfirmModal } from "@/features/dashboard/components/logout-confirm-modal";
 import { NotificationsDropdown } from "@/features/dashboard/components/notifications-dropdown";
 import { mockRecipients, mockUser } from "@/features/dashboard/data/mock";
+import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
 import { useNotificationsStore } from "@/features/dashboard/hooks/use-notifications-store";
 import type { CareRecipient } from "@/features/dashboard/types";
 import { useHydrated } from "@/hooks/use-hydrated";
@@ -44,6 +45,15 @@ export function CareseekerTopbar({
 }) {
   const hydrated = useHydrated();
   const { data: session } = useSession();
+  const loadRecipients = useCareRecipientsStore((state) => state.load);
+  const recipientItems = useCareRecipientsStore((state) => state.items);
+  const recipients =
+    hydrated && recipientItems.length ? recipientItems : mockRecipients;
+
+  useEffect(() => {
+    if (!hydrated) return;
+    void loadRecipients();
+  }, [hydrated, loadRecipients]);
   // Keep SSR + first client paint on mock data to avoid hydration mismatches.
   const displayFullName =
     (hydrated && session?.user?.name?.trim()) || mockUser.fullName;
@@ -54,7 +64,7 @@ export function CareseekerTopbar({
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [localRecipientId, setLocalRecipientId] = useState(
-    recipientId ?? mockRecipients[0]?.id ?? null,
+    recipientId ?? recipients[0]?.id ?? null,
   );
   const [localQuery, setLocalQuery] = useState(searchQuery ?? "");
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -62,8 +72,7 @@ export function CareseekerTopbar({
 
   const activeRecipientId = recipientId ?? localRecipientId;
   const selectedRecipient: CareRecipient | undefined =
-    mockRecipients.find((item) => item.id === activeRecipientId) ??
-    mockRecipients[0];
+    recipients.find((item) => item.id === activeRecipientId) ?? recipients[0];
   const query = searchQuery ?? localQuery;
   const unreadNotifications = useNotificationsStore((state) =>
     state.items.filter((item) => item.unread).length,
@@ -143,7 +152,7 @@ export function CareseekerTopbar({
                       Caring for
                     </p>
                     <ul className="px-2 pb-2">
-                      {mockRecipients.map((recipient) => {
+                      {recipients.map((recipient) => {
                         const selected = recipient.id === activeRecipientId;
                         return (
                           <li key={recipient.id}>

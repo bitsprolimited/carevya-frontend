@@ -1,39 +1,21 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { LovedOneProfileView } from "@/features/dashboard/components/loved-one-profile-view";
-import {
-  getLovedOneProfile,
-  getLovedOneProfileIds,
-} from "@/features/dashboard/data/loved-one-profiles";
+import { LovedOneProfileLoader } from "@/features/dashboard/components/loved-one-profile-loader";
 
 type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-export async function generateStaticParams() {
-  return getLovedOneProfileIds().map((id) => ({ id }));
-}
-
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const profile = getLovedOneProfile(id);
-  if (!profile) {
-    return { title: "Loved one not found" };
-  }
   return {
-    title: profile.fullName,
-    description: `Care profile for ${profile.fullName}`,
+    title: "Care profile",
+    description: `Care profile ${id}`,
   };
 }
 
 export default async function LovedOneProfilePage({ params }: PageProps) {
   const { id } = await params;
-  const profile = getLovedOneProfile(id);
-  if (!profile) {
-    notFound();
-  }
-
-  return <LovedOneProfileView profile={profile} />;
+  return <LovedOneProfileLoader id={id} />;
 }
