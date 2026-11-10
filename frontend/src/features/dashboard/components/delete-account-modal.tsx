@@ -4,44 +4,86 @@ import { AlertTriangle, Lock, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
-import { deleteUserAccount } from "@/features/auth/services/auth-service";
+import {
+  deleteAccount,
+  getDeletionEligibility,
+} from "@/features/account/services/account-service";
+import { ApiError } from "@/lib/api";
 
 export function DeleteAccountModal({
   open,
   onClose,
-  activeBookings = 2,
   onDeleted,
 }: {
   open: boolean;
   onClose: () => void;
-  activeBookings?: number;
-  onDeleted?: () => void;
+  onDeleted?: () => void | Promise<void>;
 }) {
   const [confirmText, setConfirmText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [loadingEligibility, setLoadingEligibility] = useState(false);
+  const [activeBookings, setActiveBookings] = useState(0);
+  const [canDeleteApi, setCanDeleteApi] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const canDelete =
-    confirmText.trim().toUpperCase() === "DELETE" && activeBookings === 0;
+    confirmText.trim().toUpperCase() === "DELETE" &&
+    canDeleteApi &&
+    activeBookings === 0;
 
   useEffect(() => {
     if (!open) {
       setConfirmText("");
       setError(null);
+      setSubmitting(false);
+      return;
     }
+
+    let cancelled = false;
+    setLoadingEligibility(true);
+    setError(null);
+    void (async () => {
+      try {
+        const eligibility = await getDeletionEligibility();
+        if (cancelled) return;
+        setCanDeleteApi(Boolean(eligibility.canDelete));
+        setActiveBookings(eligibility.activeBookings ?? 0);
+      } catch (err) {
+        if (cancelled) return;
+        setCanDeleteApi(false);
+        setActiveBookings(0);
+        setError(
+          err instanceof ApiError
+            ? err.message
+            : "Could not check whether your account can be deleted.",
+        );
+      } finally {
+        if (!cancelled) setLoadingEligibility(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [open]);
 
   async function handleDelete() {
     if (!canDelete) return;
     setSubmitting(true);
     setError(null);
-    const result = await deleteUserAccount();
-    setSubmitting(false);
-    if (!result.success) {
-      setError(result.message);
-      return;
+    try {
+      await deleteAccount();
+      await onDeleted?.();
+      onClose();
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : "We couldn't delete your account. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
     }
-    onDeleted?.();
-    onClose();
   }
 
   return (
@@ -58,14 +100,19 @@ export function DeleteAccountModal({
           messages. This can&apos;t be undone.
         </p>
 
-        {activeBookings > 0 ? (
+        {loadingEligibility ? (
+          <p className="mt-4 text-sm text-navy/55">Checking eligibility…</p>
+        ) : null}
+
+        {!loadingEligibility && activeBookings > 0 ? (
           <p className="mt-4 flex items-start gap-2 rounded-xl bg-[#FFF6E5] px-3.5 py-3 text-sm leading-relaxed text-amber-800">
             <AlertTriangle
               className="mt-0.5 size-4 shrink-0 text-amber-600"
               aria-hidden
             />
-            You have {activeBookings} active bookings. Complete or cancel them
-            before deleting your account.
+            You have {activeBookings} active booking
+            {activeBookings === 1 ? "" : "s"}. Complete or cancel them before
+            deleting your account.
           </p>
         ) : null}
 
@@ -103,7 +150,7 @@ export function DeleteAccountModal({
           <Button
             type="button"
             onClick={() => void handleDelete()}
-            disabled={!canDelete || submitting}
+            disabled={!canDelete || submitting || loadingEligibility}
             className="h-11 flex-1 rounded-full bg-[#FEECEC] text-danger shadow-none hover:bg-[#FDD8D8] disabled:bg-[#FEECEC]/60 disabled:text-danger/40"
           >
             {submitting ? "Deleting..." : "Delete account"}

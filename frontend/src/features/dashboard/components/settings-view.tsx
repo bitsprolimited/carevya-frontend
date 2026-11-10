@@ -3,7 +3,7 @@
 import { Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { signOut } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
@@ -11,7 +11,6 @@ import { AccountSecuritySection } from "@/features/dashboard/components/account-
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { DeleteAccountModal } from "@/features/dashboard/components/delete-account-modal";
-import { useBookingsStore } from "@/features/dashboard/hooks/use-bookings-store";
 import { cn } from "@/lib/utils";
 
 type Channel = "inApp" | "email" | "sms";
@@ -57,18 +56,6 @@ const INITIAL_ROWS: NotificationRow[] = [
 
 export function SettingsView() {
   const router = useRouter();
-  const bookings = useBookingsStore((state) => state.bookings);
-  const activeBookings = useMemo(
-    () =>
-      bookings.filter(
-        (item) =>
-          item.status === "accepted" ||
-          item.status === "confirmed" ||
-          item.status === "pending",
-      ).length,
-    [bookings],
-  );
-
   const [rows, setRows] = useState(INITIAL_ROWS);
   const [shareHealth, setShareHealth] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
@@ -275,7 +262,6 @@ export function SettingsView() {
       <DeleteAccountModal
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
-        activeBookings={activeBookings}
         onDeleted={async () => {
           await signOut();
           router.push("/");

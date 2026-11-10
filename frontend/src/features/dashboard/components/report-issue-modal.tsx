@@ -5,19 +5,45 @@ import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
-import { useBookingsStore } from "@/features/dashboard/hooks/use-bookings-store";
+import {
+  createIssueReport,
+  getIssueBookingOptions,
+  type IssueBookingOption,
+  type IssueReportCategory,
+} from "@/features/issue-reports/services/issue-reports-service";
+import { uploadFile } from "@/features/uploads/services/upload-service";
+import { ApiError } from "@/lib/api";
+import { assets } from "@/lib/assets";
 import { cn } from "@/lib/utils";
 
-const ISSUE_OPTIONS = [
-  "Caregiver arrived late",
-  "Caregiver didn't show up",
-  "Safety or wellbeing concern",
-  "Disagreement about the agreed price",
-  "Unprofessional behaviour",
-  "Something else",
-] as const;
+const ISSUE_OPTIONS: {
+  label: string;
+  category: IssueReportCategory;
+}[] = [
+  { label: "Caregiver arrived late", category: "caregiver_late" },
+  { label: "Caregiver didn't show up", category: "caregiver_no_show" },
+  { label: "Safety or wellbeing concern", category: "safety_concern" },
+  {
+    label: "Disagreement about the agreed price",
+    category: "price_disagreement",
+  },
+  { label: "Unprofessional behaviour", category: "unprofessional_behaviour" },
+  { label: "Something else", category: "other" },
+];
 
 type OpenMenu = "issue" | "booking" | null;
+
+function formatBookingWhen(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 
 export function ReportIssueModal({
   open,
@@ -31,30 +57,53 @@ export function ReportIssueModal({
   const titleId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const bookings = useBookingsStore((state) => state.bookings);
 
-  const [issue, setIssue] = useState<(typeof ISSUE_OPTIONS)[number]>(
-    ISSUE_OPTIONS[0],
+  const [issueIndex, setIssueIndex] = useState(0);
+  const [bookingOptions, setBookingOptions] = useState<IssueBookingOption[]>(
+    [],
   );
-  const [bookingId, setBookingId] = useState<string | null>(
-    bookings[0]?.id ?? null,
-  );
+  const [bookingId, setBookingId] = useState<string | null>(null);
   const [details, setDetails] = useState("");
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [safetyConcern, setSafetyConcern] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [loadingOptions, setLoadingOptions] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [openMenu, setOpenMenu] = useState<OpenMenu>(null);
 
   useEffect(() => {
     if (!open) return;
-    setIssue(ISSUE_OPTIONS[0]);
-    setBookingId(bookings[0]?.id ?? null);
+    setIssueIndex(0);
+    setBookingId(null);
     setDetails("");
+    setAttachmentFile(null);
     setFileName(null);
     setSafetyConcern(false);
     setSubmitting(false);
     setOpenMenu(null);
-  }, [open, bookings]);
+    setError(null);
+
+    let cancelled = false;
+    setLoadingOptions(true);
+    void (async () => {
+      try {
+        const options = await getIssueBookingOptions();
+        if (cancelled) return;
+        setBookingOptions(Array.isArray(options) ? options : []);
+      } catch {
+        if (cancelled) return;
+        // Spec: empty until bookings ship — keep "Not about a booking".
+        setBookingOptions([]);
+      } finally {
+        if (!cancelled) setLoadingOptions(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!openMenu) return;
@@ -67,22 +116,46 @@ export function ReportIssueModal({
     return () => document.removeEventListener("mousedown", onPointerDown);
   }, [openMenu]);
 
+  const selectedIssue = ISSUE_OPTIONS[issueIndex] ?? ISSUE_OPTIONS[0];
   const selectedBooking =
     bookingId == null
       ? null
-      : (bookings.find((item) => item.id === bookingId) ?? null);
+      : (bookingOptions.find((item) => item.id === bookingId) ?? null);
 
   const bookingLabel = selectedBooking
-    ? `${selectedBooking.caregiverFirstName} · ${selectedBooking.careStartsLabel.split("·")[0]?.trim() || selectedBooking.dateTimeLabel}`
+    ? `${selectedBooking.caregiverName} · ${formatBookingWhen(selectedBooking.scheduledFor)}`
     : "Not about a booking";
 
   async function handleSubmit() {
     if (!details.trim()) return;
     setSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    setSubmitting(false);
-    onSubmitted?.();
-    onClose();
+    setError(null);
+    try {
+      const attachmentUrls: string[] = [];
+      if (attachmentFile) {
+        const uploaded = await uploadFile("issue_attachment", attachmentFile);
+        if (uploaded.url) attachmentUrls.push(uploaded.url);
+      }
+
+      await createIssueReport({
+        category: selectedIssue.category,
+        bookingId,
+        details: details.trim(),
+        isSafetyConcern: safetyConcern,
+        ...(attachmentUrls.length ? { attachmentUrls } : {}),
+      });
+
+      onSubmitted?.();
+      onClose();
+    } catch (err) {
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : "We couldn't submit your report. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -137,20 +210,20 @@ export function ReportIssueModal({
                   : "border-[#D7E0EA]",
               )}
             >
-              <span className="truncate">{issue}</span>
+              <span className="truncate">{selectedIssue.label}</span>
               <ChevronDown className="size-4 shrink-0 text-navy/40" aria-hidden />
             </button>
             {openMenu === "issue" ? (
               <div className="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-[#E8EEF5] bg-white py-1 shadow-xl">
-                {ISSUE_OPTIONS.map((option) => {
-                  const selected = issue === option;
+                {ISSUE_OPTIONS.map((option, index) => {
+                  const selected = issueIndex === index;
                   return (
                     <button
-                      key={option}
+                      key={option.category}
                       type="button"
                       onClick={() => {
-                        setIssue(option);
-                        if (option === "Safety or wellbeing concern") {
+                        setIssueIndex(index);
+                        if (option.category === "safety_concern") {
                           setSafetyConcern(true);
                         }
                         setOpenMenu(null);
@@ -162,7 +235,7 @@ export function ReportIssueModal({
                           : "text-navy hover:bg-surface-soft",
                       )}
                     >
-                      {option}
+                      {option.label}
                       {selected ? (
                         <Check className="size-4 shrink-0" aria-hidden />
                       ) : null}
@@ -191,15 +264,15 @@ export function ReportIssueModal({
                   : "border-[#D7E0EA]",
               )}
             >
-              <span className="truncate">{bookingLabel}</span>
+              <span className="truncate">
+                {loadingOptions ? "Loading bookings…" : bookingLabel}
+              </span>
               <ChevronDown className="size-4 shrink-0 text-navy/40" aria-hidden />
             </button>
             {openMenu === "booking" ? (
               <div className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border border-[#E8EEF5] bg-white py-1 shadow-xl">
-                {bookings.slice(0, 6).map((booking) => {
+                {bookingOptions.map((booking) => {
                   const selected = bookingId === booking.id;
-                  const careLabel =
-                    booking.careType.split("·")[0]?.trim() || booking.careType;
                   return (
                     <button
                       key={booking.id}
@@ -215,7 +288,10 @@ export function ReportIssueModal({
                     >
                       <span className="relative size-9 shrink-0 overflow-hidden rounded-full bg-surface-soft">
                         <Image
-                          src={booking.avatarUrl}
+                          src={
+                            booking.caregiverPhotoUrl ||
+                            assets.aboutMemberDevG
+                          }
                           alt=""
                           fill
                           sizes="36px"
@@ -224,10 +300,10 @@ export function ReportIssueModal({
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-semibold text-navy">
-                          {booking.caregiverName} · {careLabel}
+                          {booking.caregiverName} · {booking.serviceLabel}
                         </span>
                         <span className="mt-0.5 block truncate text-xs text-navy/50">
-                          {booking.careStartsLabel} · Booking{" "}
+                          {formatBookingWhen(booking.scheduledFor)} · Booking{" "}
                           {booking.reference}
                         </span>
                       </span>
@@ -270,6 +346,7 @@ export function ReportIssueModal({
               value={details}
               onChange={(event) => setDetails(event.target.value)}
               rows={4}
+              maxLength={2000}
               placeholder="Include what happened, when, and how we can help."
               className="w-full resize-none rounded-xl border border-[#D7E0EA] bg-white px-3.5 py-3 text-sm text-navy outline-none placeholder:text-navy/35 focus-visible:ring-2 focus-visible:ring-ring"
             />
@@ -282,7 +359,8 @@ export function ReportIssueModal({
               accept="image/*,.pdf,.doc,.docx"
               className="sr-only"
               onChange={(event) => {
-                const file = event.target.files?.[0];
+                const file = event.target.files?.[0] ?? null;
+                setAttachmentFile(file);
                 setFileName(file?.name ?? null);
               }}
             />
@@ -308,6 +386,12 @@ export function ReportIssueModal({
             </span>
           </label>
         </div>
+
+        {error ? (
+          <p className="mt-4 text-sm text-red-600" role="alert">
+            {error}
+          </p>
+        ) : null}
 
         <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
           <Button

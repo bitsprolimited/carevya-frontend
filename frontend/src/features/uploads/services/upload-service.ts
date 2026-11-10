@@ -1,6 +1,6 @@
 import { backendFetch } from "@/lib/backend-api";
 
-export type UploadKind = "photo" | "nin";
+export type UploadKind = "photo" | "nin" | "issue_attachment";
 
 export type UploadResult = {
   url: string;
@@ -9,7 +9,7 @@ export type UploadResult = {
   isPrivate: boolean;
 };
 
-/** POST /uploads — multipart photo (public) or NIN document (private). */
+/** POST /uploads — photo, NIN, or issue attachment. */
 export async function uploadFile(
   kind: UploadKind,
   file: File,
