@@ -235,17 +235,7 @@ export function BookCaregiverModal({
     [caregiver, frequency],
   );
 
-  const startDateLabel = useMemo(() => {
-    const date = new Date(`${startDate}T12:00:00`);
-    return date.toLocaleDateString("en-GB", {
-      weekday: "short",
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  }, [startDate]);
-
-  const startLabel = `${startDateLabel} · ${startTime}`;
+  const startLabel = `${startDate} · ${startTime}`;
 
   const calendarCells = useMemo(() => {
     const { year, month } = calendarMonth;
@@ -404,7 +394,7 @@ export function BookCaregiverModal({
                       : "border-[#D7E0EA]",
                   )}
                 >
-                  <span className="truncate">{startDateLabel}</span>
+                  <span className="truncate">{startDate}</span>
                   <ChevronDown className="size-4 shrink-0 text-navy/40" aria-hidden />
                 </button>
                 {openMenu === "date" ? (

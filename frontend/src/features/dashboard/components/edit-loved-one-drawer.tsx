@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { LovedOneTab, LovedOneProfile } from "@/features/dashboard/types/loved-one";
+import { toDateOnly, toIso8601Date } from "@/lib/date";
 import { cn } from "@/lib/utils";
 
 const RELATIONSHIPS = [
@@ -140,20 +141,6 @@ function arrangementValueFromLabel(label: string): string {
   return found?.value ?? "";
 }
 
-function parseDobToIso(display: string): string | undefined {
-  // Accept "12 / 03 / 1952" or ISO
-  const iso = display.trim();
-  if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso;
-  const parts = iso.split("/").map((p) => p.trim());
-  if (parts.length === 3) {
-    const [d, m, y] = parts;
-    if (d && m && y) {
-      return `${y}-${m.padStart(2, "0")}-${d.padStart(2, "0")}`;
-    }
-  }
-  return undefined;
-}
-
 export function EditLovedOneDrawer({
   open,
   onClose,
@@ -171,7 +158,7 @@ export function EditLovedOneDrawer({
   const [fullName, setFullName] = useState(profile.fullName);
   const [relationship, setRelationship] = useState(profile.relationship);
   const [gender, setGender] = useState(profile.gender);
-  const [dob, setDob] = useState(profile.dateOfBirth);
+  const [dob, setDob] = useState(toDateOnly(profile.dateOfBirth));
   const [address, setAddress] = useState(
     profile.address.split(",")[0] ?? profile.address,
   );
@@ -243,7 +230,7 @@ export function EditLovedOneDrawer({
     setFullName(profile.fullName);
     setRelationship(profile.relationship);
     setGender(profile.gender);
-    setDob(profile.dateOfBirth);
+    setDob(toDateOnly(profile.dateOfBirth));
     setAddress(profile.address.split(",")[0]?.trim() ?? profile.address);
     setState(profile.city);
     setLga(profile.lga);
@@ -474,7 +461,7 @@ export function EditLovedOneDrawer({
             fullName,
             relationship,
             gender: gender.toLowerCase() === "male" ? "male" : "female",
-            dateOfBirth: parseDobToIso(dob),
+            dateOfBirth: toIso8601Date(dob),
             addressState: state,
             addressLga: lga,
             addressStreet: address,
@@ -485,6 +472,7 @@ export function EditLovedOneDrawer({
             firstName: fullName.trim().split(/\s+/)[0] || fullName,
             relationship,
             gender,
+            dateOfBirth: toDateOnly(dob),
             address: `${address}, ${lga}, ${state}`,
             city: state,
             lga,
@@ -494,6 +482,7 @@ export function EditLovedOneDrawer({
               fullName,
               relationship,
               gender,
+              dateOfBirth: toDateOnly(dob),
               homeAddress: `${address}, ${lga}, ${state}`,
               languages: languages.join(", "),
             },
@@ -609,9 +598,9 @@ export function EditLovedOneDrawer({
                 <span className="flex h-11 items-center gap-2 rounded-xl border border-[#D7E0EA] bg-white px-3">
                   <Calendar className="size-4 text-navy/40" aria-hidden />
                   <input
+                    type="date"
                     value={dob}
                     onChange={(event) => setDob(event.target.value)}
-                    placeholder="DD / MM / YYYY"
                     className="min-w-0 flex-1 border-0 bg-transparent text-sm text-navy outline-none"
                   />
                 </span>

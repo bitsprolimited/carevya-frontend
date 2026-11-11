@@ -10,6 +10,7 @@ import type {
   Relationship,
 } from "@/features/care-profile/types";
 import { initialCareProfileDraft } from "@/features/care-profile/types";
+import { toDisplayDob, toIso8601Date } from "@/lib/date";
 
 const CARE_TYPE_TO_API: Record<CareType, string> = {
   companionship: "companion",
@@ -85,15 +86,18 @@ function startTimingToApi(draft: CareProfileDraft): {
   specificStartDate?: string;
   careStartDate?: string;
 } {
-  if (draft.startTiming === "specific_date" && draft.startDate) {
+  const startIso = draft.startDate
+    ? toIso8601Date(draft.startDate)
+    : undefined;
+  if (draft.startTiming === "specific_date" && startIso) {
     return {
       startDateFlexType: "specific",
-      specificStartDate: draft.startDate,
+      specificStartDate: startIso,
     };
   }
   return {
     startDateFlexType: "flexible",
-    ...(draft.startDate ? { careStartDate: draft.startDate } : {}),
+    ...(startIso ? { careStartDate: startIso } : {}),
   };
 }
 
@@ -104,12 +108,12 @@ function startTimingFromApi(profile: OnboardingProfile): {
   if (profile.startDateFlexType === "specific") {
     return {
       startTiming: "specific_date",
-      startDate: profile.specificStartDate ?? "",
+      startDate: toDisplayDob(profile.specificStartDate),
     };
   }
   return {
     startTiming: "asap",
-    startDate: profile.careStartDate ?? "",
+    startDate: toDisplayDob(profile.careStartDate),
   };
 }
 
@@ -139,9 +143,13 @@ export function draftToStep2(draft: CareProfileDraft) {
       ? draft.gender
       : undefined;
   if (!gender) throw new Error("Select a gender.");
+  const recipientDateOfBirth = toIso8601Date(draft.dateOfBirth);
+  if (!recipientDateOfBirth) {
+    throw new Error("Enter a valid date of birth.");
+  }
   return {
     recipientFullName: draft.fullName.trim(),
-    recipientDateOfBirth: draft.dateOfBirth,
+    recipientDateOfBirth,
     recipientGender: gender,
     recipientState: draft.state,
     recipientLga: draft.lga,
@@ -251,7 +259,7 @@ export function profileToDraft(profile: OnboardingProfile): CareProfileDraft {
     relationshipOther:
       relationship === "Other" ? relationshipRaw : "",
     fullName: profile.recipientFullName ?? "",
-    dateOfBirth: profile.recipientDateOfBirth ?? "",
+    dateOfBirth: toDisplayDob(profile.recipientDateOfBirth),
     gender: profile.recipientGender ?? "",
     state: profile.recipientState ?? "",
     lga: profile.recipientLga ?? "",

@@ -7,6 +7,7 @@ import {
 } from "@/features/care-recipients/services/care-recipients-service";
 import type { LovedOneProfile } from "@/features/dashboard/types/loved-one";
 import { assets } from "@/lib/assets";
+import { toDateOnly } from "@/lib/date";
 
 function str(value: unknown, fallback = ""): string {
   return typeof value === "string" && value.trim() ? value : fallback;
@@ -27,16 +28,6 @@ function ageFromDob(dob?: string | null): number {
   return Math.max(0, age);
 }
 
-function formatDobLabel(dob?: string | null): string {
-  if (!dob) return "";
-  const d = new Date(dob);
-  if (Number.isNaN(d.getTime())) return dob;
-  return d.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 function asStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
@@ -373,13 +364,13 @@ export async function fetchLovedOneProfile(
     fullName,
     relationship,
     gender,
-    dateOfBirth: formatDobLabel(dob),
+    dateOfBirth: toDateOnly(dob),
     age: ageFromDob(dob),
     avatarUrl: photoUrl,
     profileComplete,
     updatedLabel: str(
       recipient.updatedAt
-        ? `Updated ${formatDobLabel(String(recipient.updatedAt))}`
+        ? `Updated ${toDateOnly(String(recipient.updatedAt))}`
         : "",
       profileComplete ? "Profile loaded" : "Incomplete profile",
     ),
@@ -394,7 +385,7 @@ export async function fetchLovedOneProfile(
     about: {
       fullName,
       relationship,
-      dateOfBirth: formatDobLabel(dob),
+      dateOfBirth: toDateOnly(dob),
       gender,
       homeAddress: addressLine,
       languages: languages.join(", "),
@@ -411,7 +402,9 @@ export async function fetchLovedOneProfile(
     careNeeds: {
       typeOfCare: careTypes,
       arrangement: arrangementLabel,
-      careStarted: str(carePlan.startDate ?? careNeedsBlock.careStarted, ""),
+      careStarted: toDateOnly(
+        str(carePlan.startDate ?? careNeedsBlock.careStarted, ""),
+      ),
       caregiverPreference: prefs.join(", "),
     },
     nextCare: null,
@@ -465,7 +458,7 @@ export async function fetchLovedOneProfile(
       typeOfCare: careTypes,
       arrangement: arrangementLabel,
       schedule: str(carePlan.scheduleNote, ""),
-      startDate: str(carePlan.startDate, ""),
+      startDate: toDateOnly(str(carePlan.startDate, "")),
       duration: "",
       routine: routineRaw.map((row) => ({
         time: str(row.hour ?? row.time, ""),

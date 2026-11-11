@@ -30,6 +30,14 @@ const FREQUENCY_LABELS: Record<CareFrequency, string> = {
 function parseDobParts(
   value: string,
 ): { day: number; month: number; year: number } | null {
+  const match = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    return {
+      year: Number(match[1]),
+      month: Number(match[2]),
+      day: Number(match[3]),
+    };
+  }
   const digits = value.replace(/\D/g, "");
   if (digits.length !== 8) return null;
   const day = Number(digits.slice(0, 2));

@@ -7,11 +7,11 @@ const folake: LovedOneProfile = {
   fullName: "Folake Adebayo",
   relationship: "Mother",
   gender: "Female",
-  dateOfBirth: "12 Mar 1952",
+  dateOfBirth: "1952-03-12",
   age: 74,
   avatarUrl: assets.homeTestimonialAvatarC,
   profileComplete: true,
-  updatedLabel: "Updated 14 Oct 2026",
+  updatedLabel: "Updated 2026-10-14",
   area: "Yaba",
   city: "Lagos",
   lga: "Lagos Mainland",
@@ -23,7 +23,7 @@ const folake: LovedOneProfile = {
   about: {
     fullName: "Folake Adebayo",
     relationship: "Mother",
-    dateOfBirth: "12 Mar 1952",
+    dateOfBirth: "1952-03-12",
     gender: "Female",
     homeAddress: "14 Herbert Macaulay Way, Yaba, Lagos",
     languages: "English, Yoruba (prefers Yoruba at home)",
@@ -37,7 +37,7 @@ const folake: LovedOneProfile = {
   careNeeds: {
     typeOfCare: "Non-clinical · Personal care",
     arrangement: "Live-in",
-    careStarted: "15 Oct 2026",
+    careStarted: "2026-10-15",
     caregiverPreference: "Yoruba-speaking, elderly care experience",
   },
   nextCare: {
@@ -168,7 +168,7 @@ const folake: LovedOneProfile = {
     typeOfCare: "Companionship, Personal care",
     arrangement: "Live-in",
     schedule: "Monday to Saturday",
-    startDate: "15 October 2026",
+    startDate: "2026-10-15",
     duration: "1 month",
     routine: [
       {
@@ -276,11 +276,11 @@ const musa: LovedOneProfile = {
   fullName: "Musa Adebayo",
   relationship: "Father",
   gender: "Male",
-  dateOfBirth: "4 Jan 1946",
+  dateOfBirth: "1946-01-04",
   age: 80,
   avatarUrl: assets.homeTestimonialAvatarD,
   profileComplete: false,
-  updatedLabel: "Updated 2 Oct 2026",
+  updatedLabel: "Updated 2026-10-02",
   area: "Surulere",
   city: "Lagos",
   lga: "Surulere",
@@ -291,7 +291,7 @@ const musa: LovedOneProfile = {
   about: {
     fullName: "Musa Adebayo",
     relationship: "Father",
-    dateOfBirth: "4 Jan 1946",
+    dateOfBirth: "1946-01-04",
     gender: "Male",
     homeAddress: "22 Bode Thomas Street, Surulere, Lagos",
     languages: "English, Yoruba",
@@ -374,7 +374,7 @@ const musa: LovedOneProfile = {
     typeOfCare: "Companionship",
     arrangement: "Part-time",
     schedule: "Weekday afternoons",
-    startDate: "Not set",
+    startDate: "",
     duration: "—",
     enjoys: ["Radio news", "Chess", "Pepper soup"],
     home: {

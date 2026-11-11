@@ -7,6 +7,15 @@ import {
   type CareProfileDraft,
   type CareProfileStepId,
 } from "@/features/care-profile/types";
+import { toDateOnly } from "@/lib/date";
+
+function normalizeDraftDates(draft: CareProfileDraft): CareProfileDraft {
+  return {
+    ...draft,
+    dateOfBirth: toDateOnly(draft.dateOfBirth),
+    startDate: toDateOnly(draft.startDate),
+  };
+}
 
 type CareProfileState = {
   stepIndex: number;
@@ -54,11 +63,11 @@ export const useCareProfileStore = create<CareProfileState>((set, get) => ({
   completeSetup: () => set({ isComplete: true, isReviewing: false }),
   patchDraft: (patch) =>
     set((state) => ({
-      draft: { ...state.draft, ...patch },
+      draft: normalizeDraftDates({ ...state.draft, ...patch }),
     })),
   hydrateDraft: (draft, options) =>
     set({
-      draft: { ...draft },
+      draft: normalizeDraftDates({ ...draft }),
       hydrated: true,
       ...(options?.complete ? { isComplete: true, isReviewing: false } : {}),
     }),
