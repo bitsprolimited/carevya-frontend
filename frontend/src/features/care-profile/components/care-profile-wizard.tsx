@@ -1665,8 +1665,9 @@ export function CareProfileWizard() {
         ]);
         if (cancelled) return;
         const complete =
-          summary?.status === "completed" || profile.status === "completed";
-        hydrateDraft(profileToDraft(profile), { complete });
+          summary?.status === "completed" ||
+          profile?.status === "completed";
+        hydrateDraft(profileToDraft(profile ?? {}), { complete: Boolean(complete) });
       } catch (err) {
         if (cancelled) return;
         if (err instanceof ApiError && err.status === 403) {
