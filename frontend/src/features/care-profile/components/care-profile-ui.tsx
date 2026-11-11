@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useRef, type ReactNode } from "react";
+import { toDateOnly } from "@/lib/date";
 import { cn } from "@/lib/utils";
 
 export function FieldError({ children }: { children: ReactNode }) {
@@ -31,24 +32,6 @@ export function ErrorBanner({ children }: { children: ReactNode }) {
       <p>{children}</p>
     </div>
   );
-}
-
-/** Convert `DD / MM / YYYY` (or close variants) to `YYYY-MM-DD` for native date inputs. */
-function toIsoDate(value: string): string {
-  const digits = value.replace(/\D/g, "");
-  if (digits.length !== 8) return "";
-  const day = digits.slice(0, 2);
-  const month = digits.slice(2, 4);
-  const year = digits.slice(4, 8);
-  return `${year}-${month}-${day}`;
-}
-
-/** Format a native `YYYY-MM-DD` value as `DD / MM / YYYY`. */
-function fromIsoDate(iso: string): string {
-  if (!iso) return "";
-  const [year, month, day] = iso.split("-");
-  if (!year || !month || !day) return "";
-  return `${day} / ${month} / ${year}`;
 }
 
 export function OptionCard({
@@ -210,7 +193,6 @@ export function DateField({
   id,
   value,
   onChange,
-  placeholder = "DD / MM / YYYY",
   max,
   min,
   invalid = false,
@@ -218,17 +200,16 @@ export function DateField({
   id: string;
   value: string;
   onChange: (value: string) => void;
-  placeholder?: string;
   /** ISO `YYYY-MM-DD`. Prefer a stable string from the parent, not `new Date()` in render. */
   max?: string;
   min?: string;
   invalid?: boolean;
 }) {
-  const pickerRef = useRef<HTMLInputElement>(null);
-  const isoValue = toIsoDate(value);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const isoValue = toDateOnly(value);
 
   function openPicker() {
-    const input = pickerRef.current;
+    const input = inputRef.current;
     if (!input) return;
     if (typeof input.showPicker === "function") {
       try {
@@ -242,45 +223,33 @@ export function DateField({
   }
 
   return (
-    <div className="relative">
-      <div
-        className={cn(
-          "flex h-12 items-center gap-3 rounded-full border bg-white px-4 focus-within:ring-2",
-          invalid
-            ? "border-red-400 focus-within:border-red-500 focus-within:ring-red-200/70"
-            : "border-[#D7DEE8] focus-within:border-brand-blue focus-within:ring-brand-blue/20",
-        )}
+    <div
+      className={cn(
+        "flex h-12 items-center gap-3 rounded-full border bg-white px-4 focus-within:ring-2",
+        invalid
+          ? "border-red-400 focus-within:border-red-500 focus-within:ring-red-200/70"
+          : "border-[#D7DEE8] focus-within:border-brand-blue focus-within:ring-brand-blue/20",
+      )}
+    >
+      <button
+        type="button"
+        onClick={openPicker}
+        className="inline-flex shrink-0 text-navy/40 transition-colors hover:text-brand-blue"
+        aria-label="Open date picker"
       >
-        <button
-          type="button"
-          onClick={openPicker}
-          className="inline-flex shrink-0 text-navy/40 transition-colors hover:text-brand-blue"
-          aria-label="Open date picker"
-        >
-          <Calendar className="size-4" aria-hidden />
-        </button>
-        <input
-          id={id}
-          type="text"
-          inputMode="numeric"
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          placeholder={placeholder}
-          aria-invalid={invalid}
-          className="min-w-0 flex-1 bg-transparent text-sm text-navy outline-none placeholder:text-navy/35"
-          autoComplete="bday"
-        />
-      </div>
+        <Calendar className="size-4" aria-hidden />
+      </button>
       <input
-        ref={pickerRef}
+        ref={inputRef}
+        id={id}
         type="date"
         value={isoValue}
         max={max}
         min={min}
-        tabIndex={-1}
-        aria-hidden
-        className="pointer-events-none absolute left-4 top-full h-0 w-0 opacity-0"
-        onChange={(event) => onChange(fromIsoDate(event.target.value))}
+        onChange={(event) => onChange(event.target.value)}
+        aria-invalid={invalid}
+        className="min-w-0 flex-1 bg-transparent text-sm text-navy outline-none"
+        autoComplete="bday"
       />
     </div>
   );

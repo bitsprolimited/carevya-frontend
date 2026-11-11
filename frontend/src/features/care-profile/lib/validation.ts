@@ -1,6 +1,7 @@
 import type { CareProfileDraft } from "@/features/care-profile/types";
 import { getCarePronouns } from "@/features/care-profile/lib/pronouns";
 import { validateNigerianMobile as validatePhoneNumber } from "@/lib/phone";
+import { toDateOnly } from "@/lib/date";
 
 export { validatePhoneNumber };
 
@@ -23,12 +24,13 @@ export function validateDateOfBirth(value: string): string | null {
   const trimmed = value.trim();
   if (!trimmed) return "required";
 
-  const digits = trimmed.replace(/\D/g, "");
-  if (digits.length !== 8) return "Enter a valid date.";
+  const dateOnly = toDateOnly(trimmed);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateOnly)) return "Enter a valid date.";
 
-  const day = Number(digits.slice(0, 2));
-  const month = Number(digits.slice(2, 4));
-  const year = Number(digits.slice(4, 8));
+  const [yearStr, monthStr, dayStr] = dateOnly.split("-");
+  const day = Number(dayStr);
+  const month = Number(monthStr);
+  const year = Number(yearStr);
 
   if (month < 1 || month > 12 || year < 1900) return "Enter a valid date.";
 
