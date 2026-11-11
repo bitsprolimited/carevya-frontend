@@ -56,8 +56,21 @@ export type OnboardingReviewResult = {
 };
 
 /** GET /onboarding/careseeker */
-export function getOnboardingProfile() {
-  return backendFetch<OnboardingGetResponse>("/onboarding/careseeker");
+export async function getOnboardingProfile(): Promise<OnboardingGetResponse> {
+  const data = await backendFetch<OnboardingGetResponse | OnboardingProfile>(
+    "/onboarding/careseeker",
+  );
+  // Nest may return `{ profile }` or the profile object directly in `data`.
+  if (
+    data &&
+    typeof data === "object" &&
+    "profile" in data &&
+    data.profile &&
+    typeof data.profile === "object"
+  ) {
+    return { profile: data.profile as OnboardingProfile };
+  }
+  return { profile: (data ?? {}) as OnboardingProfile };
 }
 
 /** PUT /onboarding/careseeker/steps/{step} */
