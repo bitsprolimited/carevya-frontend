@@ -1,7 +1,6 @@
 "use client";
 
 import { create } from "zustand";
-import { mockBookings } from "@/features/dashboard/data/mock-bookings";
 import {
   confirmedTimeline,
   type Booking,
@@ -16,7 +15,7 @@ type BookingsState = {
 };
 
 export const useBookingsStore = create<BookingsState>((set, get) => ({
-  bookings: mockBookings,
+  bookings: [],
   getById: (id) => get().bookings.find((item) => item.id === id),
   updateBooking: (id, patch) =>
     set((state) => ({
@@ -35,7 +34,7 @@ export const useBookingsStore = create<BookingsState>((set, get) => ({
       ...booking,
       status: "confirmed",
       timeProposal: undefined,
-      paymentNote: `Pay ${booking.caregiverFirstName} directly, as agreed. Agreed in chat · Mon 12 Oct.`,
+      paymentNote: `Pay ${booking.caregiverFirstName} directly, as agreed.`,
       timeline: confirmedTimeline(booking),
     };
     set((state) => ({

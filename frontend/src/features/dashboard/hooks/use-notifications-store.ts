@@ -1,10 +1,7 @@
 "use client";
 
 import { create } from "zustand";
-import {
-  mockNotifications,
-  type AppNotification,
-} from "@/features/dashboard/data/mock-notifications";
+import type { AppNotification } from "@/features/dashboard/data/mock-notifications";
 
 type NotificationsState = {
   items: AppNotification[];
@@ -14,7 +11,7 @@ type NotificationsState = {
 };
 
 export const useNotificationsStore = create<NotificationsState>((set, get) => ({
-  items: mockNotifications,
+  items: [],
   unreadCount: () => get().items.filter((item) => item.unread).length,
   markAllRead: () =>
     set((state) => ({

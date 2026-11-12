@@ -74,11 +74,39 @@ function Card({
 }
 
 export function CaregiverProfileView({ caregiverId }: { caregiverId: string }) {
-  const loaded = getCaregiverProfile(caregiverId) as CaregiverProfile;
-  const [saved, setSaved] = useState(Boolean(loaded.saved));
+  const loaded = getCaregiverProfile(caregiverId);
+  const [saved, setSaved] = useState(Boolean(loaded?.saved));
   const [messageOpen, setMessageOpen] = useState(false);
   const [bookOpen, setBookOpen] = useState(false);
   const profile = loaded;
+
+  if (!profile) {
+    return (
+      <CareseekerShell>
+        <div className="min-w-0 flex-1 px-4 py-5 sm:px-6 lg:px-8">
+          <CareseekerTopbar
+            title="Find Care"
+            subtitle="Meet your next trusted caregiver."
+          />
+          <div className="mt-10 rounded-2xl border border-[#E8EEF5] bg-white px-5 py-10 text-center shadow-sm">
+            <p className="text-base font-semibold text-navy">
+              Caregiver profile unavailable
+            </p>
+            <p className="mt-2 text-sm text-navy/55">
+              Detailed caregiver profiles will appear here once the caregivers
+              API is available. ({caregiverId})
+            </p>
+            <Link
+              href="/careseeker/caregivers"
+              className="mt-5 inline-flex text-sm font-semibold text-brand-blue hover:text-brand-blue-hover"
+            >
+              Back to Find Care
+            </Link>
+          </div>
+        </div>
+      </CareseekerShell>
+    );
+  }
 
   return (
     <CareseekerShell>

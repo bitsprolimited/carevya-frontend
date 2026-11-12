@@ -7,7 +7,6 @@ import type {
   CareRecipient,
   DashboardAppointment,
 } from "@/features/dashboard/types";
-import { mockWeekDays } from "@/features/dashboard/data/mock";
 import { cn } from "@/lib/utils";
 
 type WeekDay = { label: string; day: number };
@@ -17,7 +16,7 @@ export function DashboardRightPanel({
   appointments,
   selectedDay,
   onSelectDay,
-  weekDays = mockWeekDays,
+  weekDays = [],
 }: {
   recipients: CareRecipient[];
   appointments: DashboardAppointment[];
@@ -29,6 +28,11 @@ export function DashboardRightPanel({
     <aside className="flex w-full shrink-0 flex-col gap-4">
       <section className="rounded-2xl border border-[#E8EEF5] bg-white p-3.5 shadow-sm sm:p-4">
         <h2 className="text-sm font-bold text-navy">Caring for</h2>
+        {recipients.length === 0 ? (
+          <p className="mt-3 text-sm text-navy/55">
+            No care recipients yet. Finish onboarding to add someone.
+          </p>
+        ) : null}
         <ul className="mt-3 space-y-2">
           {recipients.map((recipient) => (
             <li key={recipient.id}>

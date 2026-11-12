@@ -17,11 +17,11 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { LogoutConfirmModal } from "@/features/dashboard/components/logout-confirm-modal";
 import { NotificationsDropdown } from "@/features/dashboard/components/notifications-dropdown";
-import { mockRecipients, mockUser } from "@/features/dashboard/data/mock";
 import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
 import { useNotificationsStore } from "@/features/dashboard/hooks/use-notifications-store";
 import type { CareRecipient } from "@/features/dashboard/types";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { assets } from "@/lib/assets";
 import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
@@ -46,19 +46,17 @@ export function CareseekerTopbar({
   const hydrated = useHydrated();
   const { data: session } = useSession();
   const loadRecipients = useCareRecipientsStore((state) => state.load);
-  const recipientItems = useCareRecipientsStore((state) => state.items);
-  const recipients =
-    hydrated && recipientItems.length ? recipientItems : mockRecipients;
+  const recipients = useCareRecipientsStore((state) => state.items);
 
   useEffect(() => {
     if (!hydrated) return;
     void loadRecipients();
   }, [hydrated, loadRecipients]);
-  // Keep SSR + first client paint on mock data to avoid hydration mismatches.
   const displayFullName =
-    (hydrated && session?.user?.name?.trim()) || mockUser.fullName;
-  const displayEmail =
-    (hydrated && session?.user?.email) || mockUser.email;
+    (hydrated && session?.user?.name?.trim()) || "Your account";
+  const displayEmail = (hydrated && session?.user?.email) || "";
+  const avatarUrl =
+    (hydrated && session?.user?.image) || assets.homeTestimonialAvatarA;
   const [menuOpen, setMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -287,7 +285,7 @@ export function CareseekerTopbar({
               >
                 <span className="relative size-8 overflow-hidden rounded-full bg-surface-soft">
                   <Image
-                    src={mockUser.avatarUrl}
+                    src={avatarUrl}
                     alt=""
                     fill
                     sizes="32px"
@@ -299,7 +297,7 @@ export function CareseekerTopbar({
                     {displayFullName}
                   </span>
                   <span className="block text-[0.6875rem] text-navy/45">
-                    {mockUser.roleLabel}
+                    Careseeker
                   </span>
                 </span>
                 <ChevronDown className="size-3.5 text-navy/45" aria-hidden />
@@ -310,7 +308,7 @@ export function CareseekerTopbar({
                   <div className="flex items-center gap-3 border-b border-[#E8EEF5] px-3.5 py-3">
                     <span className="relative size-11 shrink-0 overflow-hidden rounded-full bg-surface-soft">
                       <Image
-                        src={mockUser.avatarUrl}
+                        src={avatarUrl}
                         alt=""
                         fill
                         sizes="44px"

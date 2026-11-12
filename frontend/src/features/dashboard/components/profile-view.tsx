@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
-import { mockRecipients, mockUser } from "@/features/dashboard/data/mock";
 import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
 import {
   changePassword,
@@ -20,6 +19,7 @@ import {
   verifyPhoneOtp,
 } from "@/features/auth/services/auth-service";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { assets } from "@/lib/assets";
 import { useSession } from "@/lib/auth-client";
 
 function Field({
@@ -61,24 +61,20 @@ export function ProfileView() {
   const hydrated = useHydrated();
   const { data: session } = useSession();
   const loadRecipients = useCareRecipientsStore((state) => state.load);
-  const storeRecipients = useCareRecipientsStore((state) => state.items);
-  const recipients =
-    hydrated && storeRecipients.length ? storeRecipients : mockRecipients;
-  const fallbackParts = mockUser.fullName.split(/\s+/);
+  const recipients = useCareRecipientsStore((state) => state.items);
   const [editing, setEditing] = useState(false);
-  const [firstName, setFirstName] = useState(fallbackParts[0] || "Grace");
-  const [lastName, setLastName] = useState(
-    fallbackParts.slice(1).join(" ") || "Bills",
-  );
-  const [email, setEmail] = useState(mockUser.email);
-  const [phone, setPhone] = useState("+234 809 221 3340");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [draft, setDraft] = useState({
-    firstName: fallbackParts[0] || "Grace",
-    lastName: fallbackParts.slice(1).join(" ") || "Bills",
-    email: mockUser.email,
-    phone: "+234 809 221 3340",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
   });
-  const [sessionEmail, setSessionEmail] = useState(mockUser.email);
+  const [sessionEmail, setSessionEmail] = useState("");
+  const avatarUrl = session?.user?.image || assets.homeTestimonialAvatarA;
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -105,15 +101,15 @@ export function ProfileView() {
 
   useEffect(() => {
     if (!hydrated || !session?.user) return;
-    const name = session.user.name?.trim() || mockUser.fullName;
-    const parts = name.split(/\s+/);
-    const nextFirst = parts[0] || "Grace";
-    const nextLast = parts.slice(1).join(" ") || "Bills";
-    const nextEmail = session.user.email || mockUser.email;
+    const name = session.user.name?.trim() || "";
+    const parts = name.split(/\s+/).filter(Boolean);
+    const nextFirst = parts[0] || "";
+    const nextLast = parts.slice(1).join(" ");
+    const nextEmail = session.user.email || "";
     const nextPhone =
       (session.user as { phoneNumber?: string; phone?: string }).phoneNumber ||
       (session.user as { phone?: string }).phone ||
-      "+234 809 221 3340";
+      "";
     setFirstName(nextFirst);
     setLastName(nextLast);
     setEmail(nextEmail);
@@ -251,7 +247,7 @@ export function ProfileView() {
               <div className="flex items-center gap-3">
                 <span className="relative size-16 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
                   <Image
-                    src={mockUser.avatarUrl}
+                    src={avatarUrl}
                     alt=""
                     fill
                     sizes="64px"
@@ -260,7 +256,7 @@ export function ProfileView() {
                 </span>
                 <div>
                   <p className="text-lg font-bold text-navy">{fullName}</p>
-                  <p className="text-sm text-navy/55">{mockUser.roleLabel}</p>
+                  <p className="text-sm text-navy/55">Careseeker</p>
                 </div>
               </div>
               {!editing ? (

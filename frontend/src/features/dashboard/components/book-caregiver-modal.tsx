@@ -15,7 +15,6 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
-import { mockRecipients } from "@/features/dashboard/data/mock";
 import { useHydrated } from "@/hooks/use-hydrated";
 import type { CaregiverProfile } from "@/features/dashboard/types/caregiver-profile";
 import { assets } from "@/lib/assets";
@@ -167,14 +166,12 @@ export function BookCaregiverModal({
   const hydrated = useHydrated();
   const loadRecipients = useCareRecipientsStore((state) => state.load);
   const recipientsLoaded = useCareRecipientsStore((state) => state.loaded);
-  const storeRecipients = useCareRecipientsStore((state) => state.items);
-  const recipients =
-    hydrated && storeRecipients.length ? storeRecipients : mockRecipients;
+  const recipients = useCareRecipientsStore((state) => state.items);
 
   const titleId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState<"form" | "success">("form");
-  const [recipientId, setRecipientId] = useState(mockRecipients[0]?.id ?? "");
+  const [recipientId, setRecipientId] = useState("");
   const initialCareType =
     caregiver.services.find((service) =>
       CARE_TYPE_META.some((option) => option.id === service),
