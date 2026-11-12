@@ -931,6 +931,7 @@ function EmergencyConsentStep({
   const [errors, setErrors] = useState<{
     emergencyName?: string;
     relationshipToYou?: string;
+    relationshipToCareRecipient?: string;
     emergencyPhone?: string;
     reachChannels?: string;
     consentMatch?: string;
@@ -961,6 +962,10 @@ function EmergencyConsentStep({
     }
     if (!draft.relationshipToYou) {
       next.relationshipToYou = "Select their relationship to you.";
+    }
+    if (!draft.relationshipToCareRecipient) {
+      next.relationshipToCareRecipient =
+        "Select their relationship to who needs care.";
     }
     const phoneError = validatePhoneNumber(draft.emergencyPhone);
     if (phoneError === "required") {
@@ -1050,6 +1055,26 @@ function EmergencyConsentStep({
           />
           {errors.relationshipToYou ? (
             <FieldError>{errors.relationshipToYou}</FieldError>
+          ) : null}
+        </div>
+
+        <div>
+          <FieldLabel htmlFor="rel-recipient">
+            Relationship to who needs care
+          </FieldLabel>
+          <SelectField
+            id="rel-recipient"
+            value={draft.relationshipToCareRecipient}
+            onChange={(value) => {
+              clearError("relationshipToCareRecipient");
+              patchDraft({ relationshipToCareRecipient: value });
+            }}
+            placeholder="Select relationship"
+            invalid={Boolean(errors.relationshipToCareRecipient)}
+            options={[...EMERGENCY_RELATIONSHIP_OPTIONS]}
+          />
+          {errors.relationshipToCareRecipient ? (
+            <FieldError>{errors.relationshipToCareRecipient}</FieldError>
           ) : null}
         </div>
 
@@ -1182,6 +1207,7 @@ function EmergencyConsentStep({
       {continueLabel === "Finish setup" &&
       (errors.consentTerms ||
         errors.relationshipToYou ||
+        errors.relationshipToCareRecipient ||
         errors.emergencyPhone) ? (
         <p className="mt-4 text-center text-xs text-navy/55">
           Finish setup will be available once the required details and agreement
@@ -1520,6 +1546,11 @@ function ReviewSummaryStep({
           label="Relationship to you"
           value={labelEmergencyRelationship(draft.relationshipToYou)}
           missing={!draft.relationshipToYou}
+        />
+        <ReviewRow
+          label="Relationship to who needs care"
+          value={labelEmergencyRelationship(draft.relationshipToCareRecipient)}
+          missing={!draft.relationshipToCareRecipient}
         />
         <ReviewRow
           label="Phone number"

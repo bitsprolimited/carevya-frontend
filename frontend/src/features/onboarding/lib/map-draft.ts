@@ -191,10 +191,15 @@ export function draftToStep5(draft: CareProfileDraft) {
     draft.reachChannels[0] != null
       ? REACH_TO_API[draft.reachChannels[0]]
       : "phone_call";
+  const emergencyRelationshipToRecipient =
+    draft.relationshipToCareRecipient.trim();
+  if (emergencyRelationshipToRecipient.length < 2) {
+    throw new Error("Select their relationship to who needs care.");
+  }
   return {
     emergencyContactName: draft.emergencyName.trim(),
     emergencyRelationshipToYou: draft.relationshipToYou,
-    emergencyRelationshipToRecipient: draft.relationshipToCareRecipient,
+    emergencyRelationshipToRecipient,
     emergencyPhone: draft.emergencyPhone.trim(),
     preferredContactMethod: preferred,
     consentDataSharing: draft.consentMatch,

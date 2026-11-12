@@ -93,6 +93,11 @@ export function getFinishSetupIssues(draft: CareProfileDraft): FinishSetupIssues
   if (!draft.relationshipToYou) {
     emergencyMissing.push("emergency contact's relationship to you");
   }
+  if (!draft.relationshipToCareRecipient) {
+    emergencyMissing.push(
+      "emergency contact's relationship to who needs care",
+    );
+  }
   if (validatePhoneNumber(draft.emergencyPhone)) {
     emergencyMissing.push("a valid emergency phone number");
   }
