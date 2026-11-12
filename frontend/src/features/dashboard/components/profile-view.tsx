@@ -210,10 +210,9 @@ export function ProfileView() {
       );
     }
 
-    const profileResult = await updateUserProfile({
-      name,
-      phoneNumber: phone,
-    });
+    // Better Auth rejects phoneNumber on /update-user
+    // (PHONE_NUMBER_CANNOT_BE_UPDATED). Phone changes use the OTP flow below.
+    const profileResult = await updateUserProfile({ name });
     setSavingProfile(false);
 
     if (!profileResult.success) {
