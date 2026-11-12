@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
 import { Toggle } from "@/components/ui/toggle";
 import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
-import { mockRecipients, mockUser } from "@/features/dashboard/data/mock";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { buildCaregiverMessageDraft } from "@/features/dashboard/lib/message-draft";
 import type { CaregiverProfile } from "@/features/dashboard/types/caregiver-profile";
@@ -27,13 +26,12 @@ export function MessageCaregiverModal({
   onSent?: () => void;
 }) {
   const hydrated = useHydrated();
-  const storeRecipients = useCareRecipientsStore((state) => state.items);
-  const recipients =
-    hydrated && storeRecipients.length ? storeRecipients : mockRecipients;
+  const recipients = useCareRecipientsStore((state) => state.items);
+  void hydrated;
 
   const titleId = useId();
   const { data: session } = useSession();
-  const seekerName = session?.user?.name?.trim() || mockUser.fullName;
+  const seekerName = session?.user?.name?.trim() || "there";
   const recipientId = recipientIdProp ?? recipients[0]?.id;
   const recipient =
     recipients.find((item) => item.id === recipientId) ?? recipients[0];

@@ -13,7 +13,6 @@ import { CareseekerShell } from "@/features/dashboard/components/careseeker-shel
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { MessageCaregiverModal } from "@/features/dashboard/components/message-caregiver-modal";
 import { getCaregiverProfile } from "@/features/dashboard/data/caregiver-profiles";
-import { mockRecipients } from "@/features/dashboard/data/mock";
 import { useBookingsStore } from "@/features/dashboard/hooks/use-bookings-store";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/lib/utils";
@@ -31,9 +30,7 @@ const TIMEFRAMES = [
 export function BookingsView() {
   const hydrated = useHydrated();
   const loadRecipients = useCareRecipientsStore((state) => state.load);
-  const storeRecipients = useCareRecipientsStore((state) => state.items);
-  const recipients =
-    hydrated && storeRecipients.length ? storeRecipients : mockRecipients;
+  const recipients = useCareRecipientsStore((state) => state.items);
 
   const router = useRouter();
   const bookings = useBookingsStore((state) => state.bookings);
@@ -44,7 +41,7 @@ export function BookingsView() {
   const [timeframe, setTimeframe] =
     useState<(typeof TIMEFRAMES)[number]>("This month");
   const [timeframeOpen, setTimeframeOpen] = useState(false);
-  const [recipientId, setRecipientId] = useState(mockRecipients[0]?.id ?? null);
+  const [recipientId, setRecipientId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messageOpen, setMessageOpen] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);

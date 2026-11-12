@@ -5,7 +5,6 @@ import {
   listCareRecipients,
   type CareRecipientListItem,
 } from "@/features/care-recipients/services/care-recipients-service";
-import { mockRecipients } from "@/features/dashboard/data/mock";
 import type { CareRecipient } from "@/features/dashboard/types";
 import { assets } from "@/lib/assets";
 
@@ -66,12 +65,12 @@ type CareRecipientsState = {
 };
 
 export const useCareRecipientsStore = create<CareRecipientsState>((set, get) => ({
-  items: mockRecipients,
+  items: [],
   raw: [],
   loading: false,
   error: null,
   loaded: false,
-  selectedId: mockRecipients[0]?.id ?? null,
+  selectedId: null,
   setSelectedId: (id) => set({ selectedId: id }),
   load: async () => {
     if (get().loading) return;
@@ -86,8 +85,8 @@ export const useCareRecipientsStore = create<CareRecipientsState>((set, get) => 
           : (items[0]?.id ?? null);
       set({
         raw,
-        items: items.length ? items : mockRecipients,
-        selectedId: items.length ? selectedId : mockRecipients[0]?.id ?? null,
+        items,
+        selectedId,
         loading: false,
         loaded: true,
         error: null,
@@ -97,8 +96,9 @@ export const useCareRecipientsStore = create<CareRecipientsState>((set, get) => 
         loading: false,
         loaded: true,
         error: err instanceof Error ? err.message : "Failed to load recipients",
-        // Keep mock fallback so UI remains usable offline / unauthenticated.
-        items: get().items.length ? get().items : mockRecipients,
+        items: [],
+        raw: [],
+        selectedId: null,
       });
     }
   },

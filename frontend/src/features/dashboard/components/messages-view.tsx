@@ -19,21 +19,17 @@ import { ChatThreadMenu } from "@/features/dashboard/components/chat-thread-menu
 import { MessageCaregiverModal } from "@/features/dashboard/components/message-caregiver-modal";
 import { MessagesEmptyState } from "@/features/dashboard/components/messages-empty-state";
 import { getCaregiverProfile } from "@/features/dashboard/data/caregiver-profiles";
-import { mockMessageThreads } from "@/features/dashboard/data/mock-messages";
 import type { MessageThread } from "@/features/dashboard/types/messages";
 import { cn } from "@/lib/utils";
 
 export function MessagesView({
-  initialEmpty = false,
+  initialEmpty = true,
 }: {
   initialEmpty?: boolean;
 }) {
-  const [threads, setThreads] = useState<MessageThread[]>(
-    initialEmpty ? [] : mockMessageThreads,
-  );
-  const [activeId, setActiveId] = useState<string | null>(
-    initialEmpty ? null : (mockMessageThreads[0]?.id ?? null),
-  );
+  const [threads, setThreads] = useState<MessageThread[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  void initialEmpty;
   const [listFilter, setListFilter] = useState<"all" | "unread">("all");
   const [listQuery, setListQuery] = useState("");
   const [draft, setDraft] = useState("");

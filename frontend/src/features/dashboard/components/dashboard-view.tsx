@@ -15,6 +15,7 @@ import {
   getDashboardRecommended,
 } from "@/features/dashboard/services/dashboard-service";
 import {
+  EMPTY_DASHBOARD_STATS,
   mapAppointments,
   mapHomeStats,
   mapRecommendedCaregivers,
@@ -27,13 +28,6 @@ import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-top
 import { DashboardEmptyState } from "@/features/dashboard/components/dashboard-empty-state";
 import { DashboardRightPanel } from "@/features/dashboard/components/dashboard-right-panel";
 import { FiltersDrawer } from "@/features/dashboard/components/filters-drawer";
-import {
-  mockAppointments,
-  mockCaregivers,
-  mockRecipients,
-  mockStats,
-  mockWeekDays,
-} from "@/features/dashboard/data/mock";
 import { filterCaregivers } from "@/features/dashboard/lib/filter-caregivers";
 import {
   CARE_CATEGORY_OPTIONS,
@@ -47,7 +41,7 @@ import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 function firstNameFrom(name: string | undefined | null): string {
-  return name?.trim().split(/\s+/)[0] || "Grace";
+  return name?.trim().split(/\s+/)[0] || "there";
 }
 
 const QUICK_CHIPS: { value: CareCategory | "live_in"; label: string }[] = [
@@ -62,30 +56,30 @@ export function DashboardView() {
   const hydrated = useHydrated();
   const { data: session } = useSession();
   const loadRecipients = useCareRecipientsStore((state) => state.load);
-  const storeRecipients = useCareRecipientsStore((state) => state.items);
-  const recipients =
-    hydrated && storeRecipients.length ? storeRecipients : mockRecipients;
+  const recipients = useCareRecipientsStore((state) => state.items);
 
   const displayFirstName = firstNameFrom(
     hydrated ? session?.user?.name : null,
   );
 
-  const [selectedRecipientId, setSelectedRecipientId] = useState(
-    mockRecipients[0]?.id ?? null,
+  const [selectedRecipientId, setSelectedRecipientId] = useState<string | null>(
+    null,
   );
   const [filters, setFilters] = useState<DashboardFilters>(() =>
-    defaultDashboardFilters(mockRecipients[0]?.id ?? null),
+    defaultDashboardFilters(null),
   );
   const [liveInChip, setLiveInChip] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedDay, setSelectedDay] = useState(15);
-  const [caregivers, setCaregivers] = useState<Caregiver[]>(mockCaregivers);
-  const [stats, setStats] = useState(mockStats);
-  const [appointments, setAppointments] = useState(mockAppointments);
+  const [selectedDay, setSelectedDay] = useState(0);
+  const [caregivers, setCaregivers] = useState<Caregiver[]>([]);
+  const [stats, setStats] = useState(EMPTY_DASHBOARD_STATS);
+  const [appointments, setAppointments] = useState<
+    ReturnType<typeof mapAppointments>
+  >([]);
   const [weekDays, setWeekDays] = useState<
     ReadonlyArray<{ label: string; day: number }>
-  >(mockWeekDays);
+  >([]);
   useEffect(() => {
     if (!hydrated) return;
     void loadRecipients();
@@ -111,21 +105,24 @@ export function DashboardView() {
             : Promise.resolve(null),
         ]);
         if (cancelled) return;
-        const mappedStats = home ? mapHomeStats(home) : null;
-        if (mappedStats) setStats(mappedStats);
+        setStats(home ? mapHomeStats(home) ?? EMPTY_DASHBOARD_STATS : EMPTY_DASHBOARD_STATS);
         if (appts) {
-          const mapped = mapAppointments(appts);
-          if (mapped.length) setAppointments(mapped);
-          const week = mapWeekDays(appts);
-          if (week?.length) setWeekDays(week);
+          setAppointments(mapAppointments(appts));
+          setWeekDays(mapWeekDays(appts) ?? []);
+        } else {
+          setAppointments([]);
+          setWeekDays([]);
         }
-        if (recommended) {
-          setCaregivers(
-            mapRecommendedCaregivers(recommended, recipientId ?? ""),
-          );
-        }
+        setCaregivers(
+          recommended
+            ? mapRecommendedCaregivers(recommended, recipientId ?? "")
+            : [],
+        );
       } catch {
-        // Keep mock fallbacks when dashboard APIs are unavailable.
+        setStats(EMPTY_DASHBOARD_STATS);
+        setAppointments([]);
+        setWeekDays([]);
+        setCaregivers([]);
       }
     })();
     return () => {

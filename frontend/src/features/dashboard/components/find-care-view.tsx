@@ -9,14 +9,11 @@ import { CareseekerShell } from "@/features/dashboard/components/careseeker-shel
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { FiltersDrawer } from "@/features/dashboard/components/filters-drawer";
 import { MessageCaregiverModal } from "@/features/dashboard/components/message-caregiver-modal";
-import {
-  buildFindCareCatalog,
-  FIND_CARE_PAGE_SIZE,
-} from "@/features/dashboard/data/find-care-catalog";
 import { getCaregiverProfile } from "@/features/dashboard/data/caregiver-profiles";
-import { mockRecipients } from "@/features/dashboard/data/mock";
 import { useBookingsStore } from "@/features/dashboard/hooks/use-bookings-store";
+import { mapRecommendedCaregivers } from "@/features/dashboard/lib/map-dashboard-api";
 import { filterCaregivers } from "@/features/dashboard/lib/filter-caregivers";
+import { getDashboardRecommended } from "@/features/dashboard/services/dashboard-service";
 import {
   defaultDashboardFilters,
   type Caregiver,
@@ -28,24 +25,20 @@ import { cn } from "@/lib/utils";
 
 type FindCareTab = "all" | "saved" | "booked" | "contacted";
 
-const INITIAL_CATALOG = buildFindCareCatalog();
+const FIND_CARE_PAGE_SIZE = 12;
 
 export function FindCareView() {
   const hydrated = useHydrated();
   const loadRecipients = useCareRecipientsStore((state) => state.load);
-  const storeRecipients = useCareRecipientsStore((state) => state.items);
-  const recipients =
-    hydrated && storeRecipients.length ? storeRecipients : mockRecipients;
+  const recipients = useCareRecipientsStore((state) => state.items);
 
   const bookings = useBookingsStore((state) => state.bookings);
-  const [catalog, setCatalog] = useState<Caregiver[]>(INITIAL_CATALOG);
+  const [catalog, setCatalog] = useState<Caregiver[]>([]);
   const [tab, setTab] = useState<FindCareTab>("all");
   const [page, setPage] = useState(1);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [recipientId, setRecipientId] = useState(
-    mockRecipients[0]?.id ?? null,
-  );
+  const [recipientId, setRecipientId] = useState<string | null>(null);
   const [filters, setFilters] = useState<DashboardFilters>(() => ({
     ...defaultDashboardFilters(null),
     categories: [],
@@ -65,6 +58,27 @@ export function FindCareView() {
     }
     if (recipients[0]?.id) setRecipientId(recipients[0].id);
   }, [hydrated, recipients, recipientId]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    let cancelled = false;
+    void (async () => {
+      if (!recipientId) {
+        setCatalog([]);
+        return;
+      }
+      try {
+        const recommended = await getDashboardRecommended({ recipientId });
+        if (cancelled) return;
+        setCatalog(mapRecommendedCaregivers(recommended, recipientId));
+      } catch {
+        if (!cancelled) setCatalog([]);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, recipientId]);
 
   const selectedRecipient =
     recipients.find((item) => item.id === recipientId) ?? recipients[0];

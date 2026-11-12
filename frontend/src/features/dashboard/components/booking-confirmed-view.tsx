@@ -99,6 +99,7 @@ export function BookingConfirmedView({ bookingId }: { bookingId: string }) {
               type="button"
               variant="secondary"
               className="h-11 flex-1 rounded-full"
+              disabled={!profile}
               onClick={() => setMessageOpen(true)}
             >
               Message {booking.caregiverFirstName}

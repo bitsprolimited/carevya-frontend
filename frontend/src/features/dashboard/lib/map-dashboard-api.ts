@@ -10,6 +10,12 @@ import type {
 } from "@/features/dashboard/services/dashboard-service";
 import { assets } from "@/lib/assets";
 
+export const EMPTY_DASHBOARD_STATS: DashboardStats = {
+  appointments: { count: 0, detail: "No upcoming visits" },
+  pendingRequests: { count: 0, detail: "" },
+  unreadMessages: { count: 0, detail: "" },
+};
+
 function str(value: unknown, fallback = ""): string {
   return typeof value === "string" && value.trim() ? value : fallback;
 }

@@ -56,71 +56,78 @@ export function CareProfileShell({
       </header>
 
       <main className="mx-auto w-full max-w-3xl px-4 pt-24 pb-8 sm:px-6 sm:pb-10">
-        {!hideProgress ? (
-          isReviewing ? (
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">
-                {reviewTitle ?? "Review your care profile"}
-              </h1>
-              <p className="mt-2 text-sm text-navy/60">
-                Check the details below to make changes before you finish setup.
-              </p>
-            </div>
-          ) : (
-            <div className="mb-4 flex items-center justify-between gap-3 text-xs sm:text-sm">
-              <p className="font-semibold text-brand-blue">
-                Step {stepNumber} of {CARE_PROFILE_STEPS.length}
-              </p>
-              <p className="text-navy/55">Takes about 3 minutes</p>
-            </div>
-          )
+        {!hideProgress && isReviewing ? (
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">
+              {reviewTitle ?? "Review your care profile"}
+            </h1>
+            <p className="mt-2 text-sm text-navy/60">
+              Check the details below to make changes before you finish setup.
+            </p>
+          </div>
         ) : null}
 
         {!hideProgress ? (
-          <nav
-            aria-label="Care profile steps"
-            className="mb-6 overflow-x-auto border-b border-[#E2E8F0]"
+          <div
+            className={cn(
+              "mb-6",
+              "lg:sticky lg:top-16 lg:z-40 lg:bg-[#F5F7FB] lg:pt-1",
+            )}
           >
-            <ol className="flex min-w-max gap-5 sm:gap-6">
-              {CARE_PROFILE_STEPS.map((step, index) => {
-                const active = index === stepIndex;
-                const done = !isReviewing && index < stepIndex;
-                const clickable = Boolean(isReviewing && onSelectStep);
+            {!isReviewing ? (
+              <div className="mb-4 flex items-center justify-between gap-3 text-xs sm:text-sm">
+                <p className="font-semibold text-brand-blue">
+                  Step {stepNumber} of {CARE_PROFILE_STEPS.length}
+                </p>
+                <p className="text-navy/55">Takes about 3 minutes</p>
+              </div>
+            ) : null}
 
-                return (
-                  <li key={step.id}>
-                    {clickable ? (
-                      <button
-                        type="button"
-                        onClick={() => onSelectStep?.(index)}
-                        className={cn(
-                          "inline-flex whitespace-nowrap border-b-2 pb-3 text-xs font-medium sm:text-sm",
-                          active
-                            ? "border-brand-blue text-brand-blue"
-                            : "border-transparent text-navy/45 hover:text-navy/70",
-                        )}
-                      >
-                        {step.label}
-                      </button>
-                    ) : (
-                      <span
-                        className={cn(
-                          "inline-block whitespace-nowrap border-b-2 pb-3 text-xs font-medium sm:text-sm",
-                          active
-                            ? "border-brand-blue text-navy"
-                            : done
-                              ? "border-transparent text-navy/70"
-                              : "border-transparent text-navy/40",
-                        )}
-                      >
-                        {step.label}
-                      </span>
-                    )}
-                  </li>
-                );
-              })}
-            </ol>
-          </nav>
+            <nav
+              aria-label="Care profile steps"
+              className="overflow-x-auto border-b border-[#E2E8F0] bg-[#F5F7FB]"
+            >
+              <ol className="flex min-w-max gap-5 sm:gap-6">
+                {CARE_PROFILE_STEPS.map((step, index) => {
+                  const active = index === stepIndex;
+                  const done = !isReviewing && index < stepIndex;
+                  const clickable = Boolean(isReviewing && onSelectStep);
+
+                  return (
+                    <li key={step.id}>
+                      {clickable ? (
+                        <button
+                          type="button"
+                          onClick={() => onSelectStep?.(index)}
+                          className={cn(
+                            "inline-flex whitespace-nowrap border-b-2 pb-3 text-xs font-medium sm:text-sm",
+                            active
+                              ? "border-brand-blue text-brand-blue"
+                              : "border-transparent text-navy/45 hover:text-navy/70",
+                          )}
+                        >
+                          {step.label}
+                        </button>
+                      ) : (
+                        <span
+                          className={cn(
+                            "inline-block whitespace-nowrap border-b-2 pb-3 text-xs font-medium sm:text-sm",
+                            active
+                              ? "border-brand-blue text-navy"
+                              : done
+                                ? "border-transparent text-navy/70"
+                                : "border-transparent text-navy/40",
+                          )}
+                        >
+                          {step.label}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </nav>
+          </div>
         ) : null}
 
         <div className="rounded-2xl border border-[#E2E8F0] bg-white p-5 shadow-sm sm:p-8">
