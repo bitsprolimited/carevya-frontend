@@ -1,9 +1,9 @@
 "use client";
 
-import { Eye, EyeOff, Pencil } from "lucide-react";
+import { Camera, Eye, EyeOff, Pencil } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
@@ -18,9 +18,10 @@ import {
   updateUserProfile,
   verifyPhoneOtp,
 } from "@/features/auth/services/auth-service";
+import { uploadFile } from "@/features/uploads/services/upload-service";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { assets } from "@/lib/assets";
-import { useSession } from "@/lib/auth-client";
+import { authClient, useSession } from "@/lib/auth-client";
 
 function Field({
   label,
@@ -59,9 +60,10 @@ function Field({
 
 export function ProfileView() {
   const hydrated = useHydrated();
-  const { data: session } = useSession();
+  const { data: session, refetch: refetchSession } = useSession();
   const loadRecipients = useCareRecipientsStore((state) => state.load);
   const recipients = useCareRecipientsStore((state) => state.items);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -74,7 +76,11 @@ export function ProfileView() {
     phone: "",
   });
   const [sessionEmail, setSessionEmail] = useState("");
-  const avatarUrl = session?.user?.image || assets.homeTestimonialAvatarA;
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const avatarUrl =
+    avatarPreview || session?.user?.image || assets.homeTestimonialAvatarA;
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -134,6 +140,7 @@ export function ProfileView() {
 
   function startEdit() {
     setDraft({ firstName, lastName, email, phone });
+    setAvatarError(null);
     setEditing(true);
   }
 
@@ -142,7 +149,43 @@ export function ProfileView() {
     setLastName(draft.lastName);
     setEmail(draft.email);
     setPhone(draft.phone);
+    setAvatarError(null);
     setEditing(false);
+  }
+
+  async function handleAvatarSelected(file: File | undefined) {
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp)$/i.test(file.type)) {
+      setAvatarError("Use a JPG, PNG, or WebP image.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError("Image must be under 5 MB.");
+      return;
+    }
+
+    setAvatarError(null);
+    setAvatarUploading(true);
+    try {
+      const uploaded = await uploadFile("photo", file);
+      const result = await updateUserProfile({ image: uploaded.url });
+      if (!result.success) {
+        setAvatarError(result.message);
+        return;
+      }
+      setAvatarPreview(uploaded.url);
+      await authClient.getSession();
+      await refetchSession?.();
+      setProfileSaved(true);
+      window.setTimeout(() => setProfileSaved(false), 2500);
+    } catch (err) {
+      setAvatarError(
+        err instanceof Error ? err.message : "Photo upload failed.",
+      );
+    } finally {
+      setAvatarUploading(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
+    }
   }
 
   async function saveProfile() {
@@ -245,18 +288,50 @@ export function ProfileView() {
 
             <div className="relative mt-4 overflow-hidden rounded-2xl bg-[#EAF2FF] px-4 py-5">
               <div className="flex items-center gap-3">
-                <span className="relative size-16 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
-                  <Image
-                    src={avatarUrl}
-                    alt=""
-                    fill
-                    sizes="64px"
-                    className="object-cover"
+                <div className="relative shrink-0">
+                  <span className="relative block size-16 overflow-hidden rounded-full border-2 border-white bg-white shadow-sm">
+                    <Image
+                      src={avatarUrl}
+                      alt=""
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                    />
+                  </span>
+                  <button
+                    type="button"
+                    aria-label="Change profile photo"
+                    disabled={avatarUploading}
+                    onClick={() => avatarInputRef.current?.click()}
+                    className="absolute -right-0.5 -bottom-0.5 inline-flex size-7 items-center justify-center rounded-full border-2 border-white bg-brand-blue text-white shadow-sm transition-colors hover:bg-brand-blue-hover disabled:opacity-60"
+                  >
+                    <Camera className="size-3.5" aria-hidden />
+                  </button>
+                  <input
+                    ref={avatarInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="sr-only"
+                    onChange={(event) => {
+                      void handleAvatarSelected(event.target.files?.[0]);
+                    }}
                   />
-                </span>
-                <div>
+                </div>
+                <div className="min-w-0">
                   <p className="text-lg font-bold text-navy">{fullName}</p>
                   <p className="text-sm text-navy/55">Careseeker</p>
+                  {avatarUploading ? (
+                    <p className="mt-1 text-xs text-navy/55">Uploading photo…</p>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={avatarUploading}
+                      onClick={() => avatarInputRef.current?.click()}
+                      className="mt-1 text-xs font-semibold text-brand-blue hover:text-brand-blue-hover"
+                    >
+                      Change photo
+                    </button>
+                  )}
                 </div>
               </div>
               {!editing ? (
@@ -270,6 +345,11 @@ export function ProfileView() {
                 </button>
               ) : null}
             </div>
+            {avatarError ? (
+              <p role="alert" className="mt-2 text-xs text-red-600">
+                {avatarError}
+              </p>
+            ) : null}
 
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <Field

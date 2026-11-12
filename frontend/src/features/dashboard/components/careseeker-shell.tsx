@@ -2,6 +2,7 @@
 
 import { Menu, X } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { CareseekerAccountControls } from "@/features/dashboard/components/careseeker-account-controls";
 import { CareseekerSidebar } from "@/features/dashboard/components/careseeker-sidebar";
 import { cn } from "@/lib/utils";
 
@@ -29,18 +30,19 @@ export function CareseekerShell({ children }: { children: ReactNode }) {
       ) : null}
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-[#E8EEF5] bg-white px-4 lg:hidden">
+        <div className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-[#E8EEF5] bg-white px-3 sm:gap-3 sm:px-4 lg:hidden">
           <button
             type="button"
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            className="inline-flex size-9 items-center justify-center rounded-lg text-navy hover:bg-surface-soft"
+            className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-navy hover:bg-surface-soft"
             onClick={() => setMobileOpen((open) => !open)}
           >
             {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
-          <span className="text-sm font-bold text-navy">
+          <span className="min-w-0 flex-1 truncate text-sm font-bold text-navy">
             <span className="text-brand-blue">Care</span>VYA
           </span>
+          <CareseekerAccountControls showName />
         </div>
 
         <div className={cn("flex min-h-0 flex-1 flex-col")}>{children}</div>
