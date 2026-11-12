@@ -170,7 +170,7 @@ export function CareProfileComplete() {
           </span>
         </p>
         <Link
-          href="/family/verify"
+          href="/careseeker/settings"
           className="shrink-0 text-sm font-semibold text-brand-blue hover:text-brand-blue-hover"
         >
           Verify now
@@ -179,7 +179,7 @@ export function CareProfileComplete() {
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Link
-          href="/family"
+          href="/careseeker"
           className={cn(
             actionLinkClass,
             "border border-border bg-white text-navy hover:bg-surface-soft",
@@ -188,7 +188,7 @@ export function CareProfileComplete() {
           Go to dashboard
         </Link>
         <Link
-          href="/family/caregivers"
+          href="/careseeker/caregivers"
           className={cn(
             actionLinkClass,
             "bg-brand-blue text-white shadow-sm hover:bg-brand-blue-hover",
