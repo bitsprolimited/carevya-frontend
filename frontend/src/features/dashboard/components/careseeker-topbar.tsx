@@ -10,6 +10,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { AddCareRecipientModal } from "@/features/dashboard/components/add-care-recipient-modal";
 import { CareseekerAccountControls } from "@/features/dashboard/components/careseeker-account-controls";
 import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
 import type { CareRecipient } from "@/features/dashboard/types";
@@ -44,6 +45,7 @@ export function CareseekerTopbar({
   }, [hydrated, loadRecipients]);
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(false);
   const [localRecipientId, setLocalRecipientId] = useState(
     recipientId ?? recipients[0]?.id ?? null,
   );
@@ -173,10 +175,13 @@ export function CareseekerTopbar({
                   </ul>
 
                   <div className="border-t border-[#E8EEF5] px-2 py-2">
-                    <Link
-                      href="/careseeker/care-profile"
-                      onClick={() => setMenuOpen(false)}
-                      className="flex items-start gap-3 rounded-xl px-2.5 py-2.5 hover:bg-surface-soft"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setAddOpen(true);
+                      }}
+                      className="flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left hover:bg-surface-soft"
                     >
                       <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-full bg-[#EAF2FF] text-brand-blue">
                         <Plus className="size-4" aria-hidden />
@@ -189,7 +194,7 @@ export function CareseekerTopbar({
                           Set up a care profile in 3 minutes.
                         </span>
                       </span>
-                    </Link>
+                    </button>
                     <Link
                       href="/careseeker/profile"
                       onClick={() => setMenuOpen(false)}
@@ -221,6 +226,11 @@ export function CareseekerTopbar({
           <CareseekerAccountControls showName />
         </div>
       </div>
+
+      <AddCareRecipientModal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+      />
     </header>
   );
 }
