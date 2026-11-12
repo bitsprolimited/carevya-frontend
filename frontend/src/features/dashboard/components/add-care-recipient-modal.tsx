@@ -141,11 +141,20 @@ export function AddCareRecipientModal({
     setSaving(true);
     try {
       const created = await createCareRecipient(body);
+      const id =
+        created && typeof created === "object" && typeof created.id === "string"
+          ? created.id
+          : null;
+      if (!id) {
+        throw new Error(
+          "Care recipient was created but the server response was incomplete. Please refresh and try again.",
+        );
+      }
       await refresh();
-      setSelectedId(created.id);
+      setSelectedId(id);
       resetForm();
       onClose();
-      router.push(`/careseeker/recipients/${created.id}`);
+      router.push(`/careseeker/recipients/${id}`);
     } catch (err) {
       setError(
         err instanceof Error

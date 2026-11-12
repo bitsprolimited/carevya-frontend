@@ -17,6 +17,12 @@ export function LovedOneProfileLoader({ id }: { id: string }) {
     setLoading(true);
     setError(null);
 
+    if (!id || id === "undefined" || id === "null") {
+      setError("Profile not found");
+      setLoading(false);
+      return;
+    }
+
     void (async () => {
       try {
         const result = await fetchLovedOneProfile(id);

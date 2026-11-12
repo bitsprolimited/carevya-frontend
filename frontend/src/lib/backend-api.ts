@@ -36,11 +36,20 @@ async function parseBody(response: Response): Promise<unknown> {
   const contentType = response.headers.get("content-type");
   const text = await response.text();
   if (!text) return null;
-  if (contentType?.includes("application/json")) {
+  const looksJson =
+    contentType?.includes("application/json") ||
+    /^[\[{]/.test(text.trim());
+  if (looksJson) {
     try {
       return JSON.parse(text) as unknown;
     } catch {
-      return text;
+      // Truncated proxy bodies used to parse as plain text and then
+      // silently yield `undefined` ids on create. Fail loudly instead.
+      throw new ApiError(
+        "The server returned an incomplete response. Please try again.",
+        response.status,
+        text,
+      );
     }
   }
   return text;
