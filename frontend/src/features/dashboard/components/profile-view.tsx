@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AddCareRecipientModal } from "@/features/dashboard/components/add-care-recipient-modal";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
@@ -104,6 +105,7 @@ export function ProfileView() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
+  const [addRecipientOpen, setAddRecipientOpen] = useState(false);
 
   useEffect(() => {
     if (!hydrated || !session?.user) return;
@@ -642,12 +644,13 @@ export function ProfileView() {
         <section className="mt-5 rounded-2xl border border-[#E8EEF5] bg-white p-5 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-base font-bold text-navy">Care Recipients</h2>
-            <Link
-              href="/careseeker/care-profile"
+            <button
+              type="button"
+              onClick={() => setAddRecipientOpen(true)}
               className="text-sm font-semibold text-brand-blue hover:text-brand-blue-hover"
             >
               + Add another person
-            </Link>
+            </button>
           </div>
 
           <ul className="mt-4 space-y-3">
@@ -699,6 +702,11 @@ export function ProfileView() {
           </p>
         </section>
       </div>
+
+      <AddCareRecipientModal
+        open={addRecipientOpen}
+        onClose={() => setAddRecipientOpen(false)}
+      />
     </CareseekerShell>
   );
 }

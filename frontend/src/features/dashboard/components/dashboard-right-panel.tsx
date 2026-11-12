@@ -3,6 +3,8 @@
 import { BadgeCheck, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { AddCareRecipientModal } from "@/features/dashboard/components/add-care-recipient-modal";
 import type {
   CareRecipient,
   DashboardAppointment,
@@ -24,13 +26,15 @@ export function DashboardRightPanel({
   onSelectDay: (day: number) => void;
   weekDays?: readonly WeekDay[];
 }) {
+  const [addOpen, setAddOpen] = useState(false);
+
   return (
     <aside className="flex w-full shrink-0 flex-col gap-4">
       <section className="rounded-2xl border border-[#E8EEF5] bg-white p-3.5 shadow-sm sm:p-4">
         <h2 className="text-sm font-bold text-navy">Caring for</h2>
         {recipients.length === 0 ? (
           <p className="mt-3 text-sm text-navy/55">
-            No care recipients yet. Finish onboarding to add someone.
+            No care recipients yet. Add someone to get started.
           </p>
         ) : null}
         <ul className="mt-3 space-y-2">
@@ -65,12 +69,13 @@ export function DashboardRightPanel({
             </li>
           ))}
         </ul>
-        <Link
-          href="/careseeker/care-profile"
+        <button
+          type="button"
+          onClick={() => setAddOpen(true)}
           className="mt-3 inline-flex text-sm font-semibold text-brand-blue hover:text-brand-blue-hover"
         >
           + Add a Care Recipient
-        </Link>
+        </button>
       </section>
 
       <section className="rounded-2xl border border-[#E8EEF5] bg-white p-3.5 shadow-sm sm:p-4">
@@ -147,6 +152,8 @@ export function DashboardRightPanel({
           View all bookings
         </Link>
       </section>
+
+      <AddCareRecipientModal open={addOpen} onClose={() => setAddOpen(false)} />
     </aside>
   );
 }
