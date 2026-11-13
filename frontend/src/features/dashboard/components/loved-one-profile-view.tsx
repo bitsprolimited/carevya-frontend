@@ -3,6 +3,7 @@
 import {
   BadgeCheck,
   CalendarDays,
+  Camera,
   ChevronRight,
   FileText,
   Home,
@@ -16,9 +17,16 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
+import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
+import {
+  replaceEmergencyContacts,
+  saveCareRecipientCarePlan,
+  saveCareRecipientHealth,
+  updateCareRecipient,
+} from "@/features/care-recipients/services/care-recipients-service";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import {
@@ -30,12 +38,7 @@ import type {
   LovedOneProfile,
   LovedOneTab,
 } from "@/features/dashboard/types/loved-one";
-import {
-  replaceEmergencyContacts,
-  saveCareRecipientCarePlan,
-  saveCareRecipientHealth,
-  updateCareRecipient,
-} from "@/features/care-recipients/services/care-recipients-service";
+import { uploadFile } from "@/features/uploads/services/upload-service";
 import { cn } from "@/lib/utils";
 
 const TABS: { id: LovedOneTab; label: string }[] = [
@@ -232,9 +235,13 @@ function OverviewTab({
 function HealthTab({
   profile,
   onEdit,
+  onEditAllergiesDiet,
+  onAddMedication,
 }: {
   profile: LovedOneProfile;
   onEdit: () => void;
+  onEditAllergiesDiet: () => void;
+  onAddMedication: () => void;
 }) {
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,0.9fr)]">
@@ -260,6 +267,7 @@ function HealthTab({
           action={
             <button
               type="button"
+              onClick={onAddMedication}
               className="text-sm font-semibold text-brand-blue hover:text-brand-blue-hover"
             >
               + Add medication
@@ -285,7 +293,10 @@ function HealthTab({
           </ul>
         </Card>
 
-        <Card title="Allergies & diet" action={<EditLink onClick={onEdit} />}>
+        <Card
+          title="Allergies & diet"
+          action={<EditLink onClick={onEditAllergiesDiet} />}
+        >
           <dl>
             <div className="border-b border-[#E8EEF5] py-3">
               <dt className="text-xs font-medium text-navy/50">
@@ -860,12 +871,16 @@ export function LovedOneProfileView({
   recipientId?: string;
 }) {
   const router = useRouter();
+  const refreshRecipients = useCareRecipientsStore((state) => state.refresh);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState(initial);
   const [tab, setTab] = useState<LovedOneTab>("overview");
   const [editOpen, setEditOpen] = useState(false);
   const [editSection, setEditSection] =
     useState<LovedOneEditSection>("overview");
   const [toast, setToast] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
 
   function openEditor(section: LovedOneEditSection) {
     setEditSection(section);
@@ -875,6 +890,7 @@ export function LovedOneProfileView({
   useEffect(() => {
     setProfile(initial);
     setTab("overview");
+    setAvatarError(null);
   }, [initial]);
 
   const findCareHref = useMemo(
@@ -885,6 +901,36 @@ export function LovedOneProfileView({
   function showToast(message: string) {
     setToast(message);
     window.setTimeout(() => setToast(null), 2200);
+  }
+
+  async function handleAvatarSelected(file: File | undefined) {
+    if (!file) return;
+    if (!/^image\/(jpeg|png|webp)$/i.test(file.type)) {
+      setAvatarError("Use a JPG, PNG, or WebP image.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setAvatarError("Image must be under 5 MB.");
+      return;
+    }
+
+    const id = recipientId ?? profile.id;
+    setAvatarError(null);
+    setAvatarUploading(true);
+    try {
+      const uploaded = await uploadFile("photo", file);
+      await updateCareRecipient(id, { photoUrl: uploaded.url });
+      setProfile((current) => ({ ...current, avatarUrl: uploaded.url }));
+      void refreshRecipients();
+      showToast("Photo updated");
+    } catch (err) {
+      setAvatarError(
+        err instanceof Error ? err.message : "Photo upload failed.",
+      );
+    } finally {
+      setAvatarUploading(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = "";
+    }
   }
 
   return (
@@ -915,15 +961,35 @@ export function LovedOneProfileView({
         <div className="mt-4 rounded-2xl border border-[#E8EEF5] bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex min-w-0 items-center gap-4">
-              <span className="relative size-20 shrink-0 overflow-hidden rounded-full border-2 border-white bg-surface-soft shadow-sm sm:size-24">
-                <Image
-                  src={profile.avatarUrl}
-                  alt=""
-                  fill
-                  sizes="96px"
-                  className="object-cover"
+              <div className="relative shrink-0">
+                <span className="relative block size-20 overflow-hidden rounded-full border-2 border-white bg-surface-soft shadow-sm sm:size-24">
+                  <Image
+                    src={profile.avatarUrl}
+                    alt=""
+                    fill
+                    sizes="96px"
+                    className="object-cover"
+                  />
+                </span>
+                <button
+                  type="button"
+                  aria-label={`Change ${profile.firstName}'s photo`}
+                  disabled={avatarUploading}
+                  onClick={() => avatarInputRef.current?.click()}
+                  className="absolute -right-0.5 -bottom-0.5 inline-flex size-8 items-center justify-center rounded-full border-2 border-white bg-brand-blue text-white shadow-sm transition-colors hover:bg-brand-blue-hover disabled:opacity-60"
+                >
+                  <Camera className="size-3.5" aria-hidden />
+                </button>
+                <input
+                  ref={avatarInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="sr-only"
+                  onChange={(event) => {
+                    void handleAvatarSelected(event.target.files?.[0]);
+                  }}
                 />
-              </span>
+              </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h2 className="text-xl font-bold tracking-tight text-navy sm:text-2xl">
@@ -946,6 +1012,23 @@ export function LovedOneProfileView({
                     Shared only with caregivers you book
                   </span>
                 </p>
+                {avatarUploading ? (
+                  <p className="mt-1 text-xs text-navy/55">Uploading photo…</p>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={avatarUploading}
+                    onClick={() => avatarInputRef.current?.click()}
+                    className="mt-1 text-xs font-semibold text-brand-blue hover:text-brand-blue-hover"
+                  >
+                    Change photo
+                  </button>
+                )}
+                {avatarError ? (
+                  <p role="alert" className="mt-1 text-xs text-red-600">
+                    {avatarError}
+                  </p>
+                ) : null}
               </div>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row">
@@ -1008,6 +1091,8 @@ export function LovedOneProfileView({
               <HealthTab
                 profile={profile}
                 onEdit={() => openEditor("health")}
+                onEditAllergiesDiet={() => openEditor("allergies-diet")}
+                onAddMedication={() => openEditor("health")}
               />
             ) : null}
             {tab === "care-plan" ? (
@@ -1044,10 +1129,16 @@ export function LovedOneProfileView({
         onClose={() => setEditOpen(false)}
         profile={profile}
         section={editSection}
+        photoUploading={avatarUploading}
+        onChangePhoto={() => avatarInputRef.current?.click()}
         onSave={async (payload: LovedOneEditPayload) => {
           const id = recipientId ?? profile.id;
           try {
-            if (payload.section === "health" && payload.health) {
+            if (
+              (payload.section === "health" ||
+                payload.section === "allergies-diet") &&
+              payload.health
+            ) {
               await saveCareRecipientHealth(id, payload.health);
             } else if (
               (payload.section === "care-plan" ||

@@ -67,6 +67,69 @@ function mobilityTone(
   return "blue";
 }
 
+const FOOD_ALLERGY_PREFIX = "Food: ";
+const FLUIDS_MARKER = "\n\nFluids: ";
+
+/** Encode UI allergies/diet/fluids into SaveHealthDto `allergies` + `diet`. */
+export function encodeHealthAllergiesDiet(input: {
+  medicineAllergies: string[];
+  foodAllergies: string[];
+  diet: string;
+  fluids: string;
+}): { allergies: string[]; diet: string } {
+  const allergies = [
+    ...input.medicineAllergies.map((item) => item.trim()).filter(Boolean),
+    ...input.foodAllergies
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .map((item) =>
+        /^food:\s*/i.test(item) ? item : `${FOOD_ALLERGY_PREFIX}${item}`,
+      ),
+  ];
+  const dietBase = input.diet.replace(/\n\nFluids:\s*[\s\S]*$/i, "").trimEnd();
+  const fluids = input.fluids.trim();
+  return {
+    allergies,
+    diet: fluids ? `${dietBase}${FLUIDS_MARKER}${fluids}` : dietBase,
+  };
+}
+
+/** Decode SaveHealthDto `allergies` + `diet` into UI allergies/diet/fluids. */
+function decodeHealthAllergiesDiet(
+  allergiesRaw: string[],
+  dietRaw: string,
+): {
+  medicineAllergies: string;
+  foodAllergies: string;
+  diet: string;
+  fluids: string;
+} {
+  const medicine: string[] = [];
+  const food: string[] = [];
+  for (const item of allergiesRaw) {
+    const trimmed = item.trim();
+    if (!trimmed) continue;
+    const match = trimmed.match(/^food:\s*(.+)$/i);
+    if (match?.[1]) food.push(match[1].trim());
+    else medicine.push(trimmed);
+  }
+
+  const marker = dietRaw.search(/\n\nFluids:\s*/i);
+  let diet = dietRaw;
+  let fluids = "";
+  if (marker >= 0) {
+    diet = dietRaw.slice(0, marker).trimEnd();
+    fluids = dietRaw.slice(marker).replace(/^\n\nFluids:\s*/i, "").trim();
+  }
+
+  return {
+    medicineAllergies: medicine.join("; "),
+    foodAllergies: food.join("; "),
+    diet,
+    fluids,
+  };
+}
+
 function emptyProfile(id: string): LovedOneProfile {
   return {
     id,
@@ -268,6 +331,10 @@ export async function fetchLovedOneProfile(
   );
   const medications = asStringArray(health.medications);
   const allergies = asStringArray(health.allergies);
+  const allergiesDietDecoded = decodeHealthAllergiesDiet(
+    allergies,
+    str(health.diet, ""),
+  );
   const mobilityKey = str(
     health.mobility ?? healthAtAGlance.mobility,
     "",
@@ -393,7 +460,7 @@ export async function fetchLovedOneProfile(
     healthGlance: {
       conditions,
       mobility: mobilityLabel,
-      allergies: allergies.join("; "),
+      allergies: allergiesDietDecoded.medicineAllergies,
       medicines:
         medications.length > 0
           ? `${medications.length} medicine${medications.length === 1 ? "" : "s"}`
@@ -436,12 +503,7 @@ export async function fetchLovedOneProfile(
       schedule: "",
       instruction: "",
     })),
-    allergiesDiet: {
-      medicineAllergies: allergies.join("; "),
-      foodAllergies: "",
-      diet: str(health.diet, ""),
-      fluids: "",
-    },
+    allergiesDiet: allergiesDietDecoded,
     mobility: mobilityRows,
     doctor: {
       name: str(health.doctorName, ""),
