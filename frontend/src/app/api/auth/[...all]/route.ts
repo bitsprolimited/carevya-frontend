@@ -56,7 +56,15 @@ function rewriteUpstreamHeaders(
   const headers = new Headers();
   upstream.forEach((value, key) => {
     const lower = key.toLowerCase();
-    if (lower === "transfer-encoding" || lower === "content-encoding") return;
+    // Node fetch decompresses bodies but may leave the compressed
+    // Content-Length; forwarding it truncates JSON for browsers/curl.
+    if (
+      lower === "transfer-encoding" ||
+      lower === "content-encoding" ||
+      lower === "content-length"
+    ) {
+      return;
+    }
     if (lower === "set-cookie") return;
     headers.set(key, value);
   });
