@@ -136,10 +136,6 @@ export function DashboardView() {
     };
   }, [hydrated, selectedRecipientId, recipients]);
 
-  if (!hydrated || initialLoading) {
-    return <DashboardHomeSkeleton />;
-  }
-
   const selectedRecipient =
     recipients.find((item) => item.id === selectedRecipientId) ?? recipients[0];
 
@@ -180,6 +176,10 @@ export function DashboardView() {
   }, [filtered, recipients, selectedRecipient, selectedRecipientId]);
 
   const isEmpty = filtered.length === 0;
+
+  if (!hydrated || initialLoading) {
+    return <DashboardHomeSkeleton />;
+  }
 
   function toggleCategoryChip(value: CareCategory) {
     setFilters((current) => {
