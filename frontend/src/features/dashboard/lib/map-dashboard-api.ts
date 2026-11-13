@@ -59,7 +59,7 @@ export function mapAppointments(
         caregiverName: str(apt.caregiverName ?? apt.caregiver, "Caregiver"),
         caregiverAvatarUrl: str(
           apt.caregiverAvatarUrl ?? apt.avatarUrl,
-          assets.aboutMemberDevG,
+          assets.defaultAvatar,
         ),
         dayOfMonth: Number(apt.dayOfMonth) || dayOfMonth,
       });
@@ -120,7 +120,7 @@ export function mapRecommendedCaregivers(
         languages: Array.isArray(rec.languages)
           ? (rec.languages as string[])
           : ["English"],
-        imageUrl: str(rec.imageUrl ?? rec.photoUrl, assets.aboutMemberDevG),
+        imageUrl: str(rec.imageUrl ?? rec.photoUrl, assets.defaultAvatar),
         saved: Boolean(rec.saved),
         recipientIds: [recipientId],
       };

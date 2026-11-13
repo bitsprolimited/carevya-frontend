@@ -26,6 +26,7 @@ import { CaregiverCard } from "@/features/dashboard/components/caregiver-card";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { DashboardEmptyState } from "@/features/dashboard/components/dashboard-empty-state";
+import { DashboardHomeSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
 import { DashboardRightPanel } from "@/features/dashboard/components/dashboard-right-panel";
 import { FiltersDrawer } from "@/features/dashboard/components/filters-drawer";
 import { filterCaregivers } from "@/features/dashboard/lib/filter-caregivers";
@@ -80,6 +81,8 @@ export function DashboardView() {
   const [weekDays, setWeekDays] = useState<
     ReadonlyArray<{ label: string; day: number }>
   >([]);
+  const [initialLoading, setInitialLoading] = useState(true);
+
   useEffect(() => {
     if (!hydrated) return;
     void loadRecipients();
@@ -119,16 +122,23 @@ export function DashboardView() {
             : [],
         );
       } catch {
+        if (cancelled) return;
         setStats(EMPTY_DASHBOARD_STATS);
         setAppointments([]);
         setWeekDays([]);
         setCaregivers([]);
+      } finally {
+        if (!cancelled) setInitialLoading(false);
       }
     })();
     return () => {
       cancelled = true;
     };
   }, [hydrated, selectedRecipientId, recipients]);
+
+  if (!hydrated || initialLoading) {
+    return <DashboardHomeSkeleton />;
+  }
 
   const selectedRecipient =
     recipients.find((item) => item.id === selectedRecipientId) ?? recipients[0];

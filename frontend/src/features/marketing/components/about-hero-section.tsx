@@ -5,35 +5,35 @@ import { cn } from "@/lib/utils";
 
 const fanPhotos = [
   {
-    src: assets.aboutHeroFan1,
-    alt: "Caregiver supporting an elderly woman using a walker at home",
+    src: assets.defaultAvatar,
+    alt: "Care avatar",
     className:
       "z-10 -rotate-[14deg] translate-y-4 sm:translate-y-6 lg:translate-y-8",
     size: "h-40 w-[7.25rem] sm:h-56 sm:w-40 md:h-72 md:w-[13rem] lg:h-[19.5rem] lg:w-[13.5rem]",
   },
   {
-    src: assets.aboutHeroFan2,
-    alt: "Caregiver sitting with an elderly man on a garden bench",
+    src: assets.defaultAvatar,
+    alt: "Care avatar",
     className:
       "z-20 -rotate-[7deg] -translate-y-1 sm:-translate-y-2",
     size: "h-44 w-32 sm:h-60 sm:w-44 md:h-80 md:w-[14.5rem] lg:h-[21rem] lg:w-[14.5rem]",
   },
   {
-    src: assets.aboutHeroFan3,
-    alt: "Caregiver with an elderly couple, one seated in a wheelchair",
+    src: assets.defaultAvatar,
+    alt: "Care avatar",
     className: "z-30 rotate-0 -translate-y-3 sm:-translate-y-5 lg:-translate-y-6",
     size: "h-48 w-36 sm:h-64 sm:w-48 md:h-[22rem] md:w-64 lg:h-[24rem] lg:w-[16.5rem]",
   },
   {
-    src: assets.aboutHeroFan4,
-    alt: "Caregiver and elderly woman gardening together outdoors",
+    src: assets.defaultAvatar,
+    alt: "Care avatar",
     className:
       "z-20 rotate-[7deg] -translate-y-1 sm:-translate-y-2",
     size: "h-44 w-32 sm:h-60 sm:w-44 md:h-80 md:w-[14.5rem] lg:h-[21rem] lg:w-[14.5rem]",
   },
   {
-    src: assets.aboutHeroFan5,
-    alt: "Two caregivers coordinating care notes at a table",
+    src: assets.defaultAvatar,
+    alt: "Care avatar",
     className:
       "z-10 rotate-[14deg] translate-y-4 sm:translate-y-6 lg:translate-y-8",
     size: "h-40 w-[7.25rem] sm:h-56 sm:w-40 md:h-72 md:w-[13rem] lg:h-[19.5rem] lg:w-[13.5rem]",

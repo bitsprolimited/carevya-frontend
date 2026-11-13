@@ -19,8 +19,8 @@ export function HomeCommitmentSection() {
             <div className="mt-5 grid grid-cols-2 gap-3 sm:gap-4">
               <div className="relative aspect-square overflow-hidden rounded-3xl">
                 <Image
-                  src={assets.homeCommitmentPortraitA}
-                  alt="Caregiver in blue scrubs smiling with an elderly woman at home"
+                  src={assets.defaultAvatar}
+                  alt="Caregiver avatar"
                   fill
                   sizes="(max-width: 1024px) 45vw, 22vw"
                   className="object-cover"
@@ -28,8 +28,8 @@ export function HomeCommitmentSection() {
               </div>
               <div className="relative aspect-square overflow-hidden rounded-3xl">
                 <Image
-                  src={assets.homeCommitmentPortraitB}
-                  alt="Caregiver sitting bedside and holding an elderly patient's hand"
+                  src={assets.defaultAvatar}
+                  alt="Care recipient avatar"
                   fill
                   sizes="(max-width: 1024px) 45vw, 22vw"
                   className="object-cover"

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { AddCareRecipientModal } from "@/features/dashboard/components/add-care-recipient-modal";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
+import { ProfileContentSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
 import { useCareRecipientsStore } from "@/features/care-recipients/hooks/use-care-recipients-store";
 import {
   changePassword,
@@ -81,7 +82,7 @@ export function ProfileView() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
   const avatarUrl =
-    avatarPreview || session?.user?.image || assets.homeTestimonialAvatarA;
+    avatarPreview || session?.user?.image || assets.defaultAvatar;
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -272,6 +273,14 @@ export function ProfileView() {
     setNewPassword("");
     setConfirmPassword("");
     window.setTimeout(() => setPasswordSaved(false), 2500);
+  }
+
+  if (!hydrated) {
+    return (
+      <CareseekerShell>
+        <ProfileContentSkeleton />
+      </CareseekerShell>
+    );
   }
 
   return (

@@ -32,7 +32,7 @@ export function CareseekerAccountControls({
     (hydrated && session?.user?.name?.trim()) || "Your account";
   const displayEmail = (hydrated && session?.user?.email) || "";
   const avatarUrl =
-    (hydrated && session?.user?.image) || assets.homeTestimonialAvatarA;
+    (hydrated && session?.user?.image) || assets.defaultAvatar;
 
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);

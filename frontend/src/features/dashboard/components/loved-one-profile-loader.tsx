@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
+import { LovedOneProfileSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
 import { LovedOneProfileView } from "@/features/dashboard/components/loved-one-profile-view";
 import { fetchLovedOneProfile } from "@/features/dashboard/lib/map-loved-one-from-api";
 import type { LovedOneProfile } from "@/features/dashboard/types/loved-one";
@@ -51,13 +52,7 @@ export function LovedOneProfileLoader({ id }: { id: string }) {
   }, [id]);
 
   if (loading) {
-    return (
-      <CareseekerShell>
-        <div className="flex flex-1 items-center justify-center px-4 py-16 text-sm text-navy/55">
-          Loading care profile…
-        </div>
-      </CareseekerShell>
-    );
+    return <LovedOneProfileSkeleton />;
   }
 
   if (error || !profile) {

@@ -71,8 +71,8 @@ const communities: readonly CommunityBlock[] = [
     ],
     waitlist: "50+ Care Seekers joined CareVYA's waitlist",
     waitlistMobile: "50+ Families joined CareVYA's waitlist",
-    imageSrc: assets.communityFamily,
-    imageAlt: "A multi-generational family laughing together outdoors",
+    imageSrc: assets.defaultAvatar,
+    imageAlt: "Family care avatar",
   },
   {
     id: "caregivers",
@@ -97,9 +97,8 @@ const communities: readonly CommunityBlock[] = [
     ],
     waitlist: "30+ Caregivers joined CareVYA's waitlist",
     waitlistMobile: "30+ Caregivers joined CareVYA's waitlist",
-    imageSrc: assets.communityCaregiver,
-    imageAlt:
-      "A smiling caregiver in scrubs brushing an elderly woman's hair",
+    imageSrc: assets.defaultAvatar,
+    imageAlt: "Caregiver avatar",
   },
 ] as const;
 

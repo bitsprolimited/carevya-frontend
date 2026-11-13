@@ -134,7 +134,7 @@ export function ConfirmBookingView({ bookingId }: { bookingId: string }) {
               <div className="flex gap-4">
                 <div className="relative hidden size-20 shrink-0 overflow-hidden rounded-2xl bg-[#EAF2FF] sm:block">
                   <Image
-                    src={assets.communityCaregiver}
+                    src={assets.defaultAvatar}
                     alt=""
                     fill
                     sizes="80px"

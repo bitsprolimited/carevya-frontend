@@ -580,7 +580,7 @@ export function BookCaregiverModal({
                 <span className="absolute inset-0 rounded-full bg-[#EAF2FF]" />
                 <span className="relative size-16 overflow-hidden rounded-full border-2 border-white shadow-md">
                   <Image
-                    src={assets.careProfileRecipient}
+                    src={assets.defaultAvatar}
                     alt=""
                     fill
                     sizes="64px"

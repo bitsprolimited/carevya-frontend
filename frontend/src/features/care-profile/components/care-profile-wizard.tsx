@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { CareProfileComplete } from "@/features/care-profile/components/care-profile-complete";
 import { CareProfileShell } from "@/features/care-profile/components/care-profile-shell";
+import { CareProfileWizardSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
 import {
   Chip,
   DateField,
@@ -193,7 +194,7 @@ function WhoNeedsCareStep({
               relationshipOther: "",
             });
           }}
-          imageSrc={assets.careProfileRecipient}
+          imageSrc={assets.defaultAvatar}
         />
         <OptionCard
           title="A family member"
@@ -207,7 +208,7 @@ function WhoNeedsCareStep({
               relationshipOther: "",
             });
           }}
-          imageSrc={assets.careProfileRecipient}
+          imageSrc={assets.defaultAvatar}
         />
         <OptionCard
           title="Someone in my care"
@@ -221,7 +222,7 @@ function WhoNeedsCareStep({
               relationshipOther: "",
             });
           }}
-          imageSrc={assets.careProfileRecipient}
+          imageSrc={assets.defaultAvatar}
         />
       </div>
       {errors.recipient ? <FieldError>{errors.recipient}</FieldError> : null}
@@ -645,7 +646,7 @@ function CareNeedsStep({
               description={option.description}
               selected={draft.careTypes.includes(option.value)}
               onSelect={() => toggleCareType(option.value)}
-              imageSrc={assets.careProfileRecipient}
+              imageSrc={assets.defaultAvatar}
             />
           ))}
         </div>
@@ -1815,11 +1816,7 @@ export function CareProfileWizard() {
   }
 
   if (loadPending) {
-    return (
-      <div className="flex min-h-[40vh] items-center justify-center text-sm text-navy/55">
-        Loading your care profile…
-      </div>
-    );
+    return <CareProfileWizardSkeleton />;
   }
 
   const sharedNav: StepNavProps = {

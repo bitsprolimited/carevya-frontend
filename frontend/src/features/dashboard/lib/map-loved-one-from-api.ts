@@ -76,7 +76,7 @@ function emptyProfile(id: string): LovedOneProfile {
     gender: "",
     dateOfBirth: "",
     age: 0,
-    avatarUrl: assets.homeTestimonialAvatarC,
+    avatarUrl: assets.defaultAvatar,
     profileComplete: false,
     updatedLabel: "Not updated yet",
     area: "",
@@ -229,7 +229,7 @@ export async function fetchLovedOneProfile(
   );
   const photoUrl = str(
     recipient.photoUrl ?? recipient.avatarUrl,
-    assets.homeTestimonialAvatarC,
+    assets.defaultAvatar,
   );
   const dob = str(
     recipient.dateOfBirth ?? aboutBlock.dateOfBirth,
@@ -413,7 +413,7 @@ export async function fetchLovedOneProfile(
       name: str(member.name, "Caregiver"),
       role: str(member.role, "Caregiver"),
       verified: Boolean(member.verified),
-      avatarUrl: str(member.avatarUrl ?? member.photoUrl, assets.aboutMemberDevG),
+      avatarUrl: str(member.avatarUrl ?? member.photoUrl, assets.defaultAvatar),
       phone: str(member.phone, ""),
     })),
     emergencyContacts: finalContacts,
