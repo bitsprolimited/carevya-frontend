@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { encodeHealthAllergiesDiet } from "@/features/dashboard/lib/map-loved-one-from-api";
 import type { LovedOneTab, LovedOneProfile } from "@/features/dashboard/types/loved-one";
 import { toDateOnly, toIso8601Date } from "@/lib/date";
 import { cn } from "@/lib/utils";
@@ -70,6 +71,7 @@ const CHANNEL_OPTIONS = [
 
 export type LovedOneEditSection =
   | Extract<LovedOneTab, "overview" | "health" | "care-plan" | "contacts">
+  | "allergies-diet"
   | "home"
   | "preferences"
   | "routine";
@@ -155,12 +157,16 @@ export function EditLovedOneDrawer({
   profile,
   section = "overview",
   onSave,
+  onChangePhoto,
+  photoUploading = false,
 }: {
   open: boolean;
   onClose: () => void;
   profile: LovedOneProfile;
   section?: LovedOneEditSection;
   onSave?: (payload: LovedOneEditPayload) => void | Promise<void>;
+  onChangePhoto?: () => void;
+  photoUploading?: boolean;
 }) {
   const [saving, setSaving] = useState(false);
   const [fullName, setFullName] = useState(profile.fullName);
@@ -181,9 +187,13 @@ export function EditLovedOneDrawer({
     profile.medications.map((m) => m.name).join(", "),
   );
   const [allergiesText, setAllergiesText] = useState(
-    profile.allergiesDiet.medicineAllergies,
+    profile.allergiesDiet.medicineAllergies.replace(/;\s*/g, ", "),
+  );
+  const [foodAllergiesText, setFoodAllergiesText] = useState(
+    profile.allergiesDiet.foodAllergies.replace(/;\s*/g, ", "),
   );
   const [diet, setDiet] = useState(profile.allergiesDiet.diet);
+  const [fluids, setFluids] = useState(profile.allergiesDiet.fluids);
   const [mobility, setMobility] = useState(
     mobilityValueFromLabel(profile.healthGlance.mobility),
   );
@@ -270,8 +280,14 @@ export function EditLovedOneDrawer({
     setLanguages(profile.languages);
     setConditionsText(profile.healthGlance.conditions.join(", "));
     setMedicationsText(profile.medications.map((m) => m.name).join(", "));
-    setAllergiesText(profile.allergiesDiet.medicineAllergies);
+    setAllergiesText(
+      profile.allergiesDiet.medicineAllergies.replace(/;\s*/g, ", "),
+    );
+    setFoodAllergiesText(
+      profile.allergiesDiet.foodAllergies.replace(/;\s*/g, ", "),
+    );
     setDiet(profile.allergiesDiet.diet);
+    setFluids(profile.allergiesDiet.fluids);
     setMobility(mobilityValueFromLabel(profile.healthGlance.mobility));
     setDoctorName(profile.doctor.name);
     setDoctorPhone(profile.doctor.phone);
@@ -347,17 +363,19 @@ export function EditLovedOneDrawer({
   const title =
     section === "health"
       ? `Edit ${profile.firstName}'s health`
-      : section === "care-plan"
-        ? `Edit ${profile.firstName}'s care plan`
-        : section === "home"
-          ? `Edit ${profile.firstName}'s home`
-          : section === "preferences"
-            ? `Edit caregiver preferences`
-            : section === "routine"
-              ? `Edit ${profile.firstName}'s daily routine`
-              : section === "contacts"
-                ? `Edit emergency contacts`
-                : `Edit ${profile.firstName}'s details`;
+      : section === "allergies-diet"
+        ? `Edit allergies & diet`
+        : section === "care-plan"
+          ? `Edit ${profile.firstName}'s care plan`
+          : section === "home"
+            ? `Edit ${profile.firstName}'s home`
+            : section === "preferences"
+              ? `Edit caregiver preferences`
+              : section === "routine"
+                ? `Edit ${profile.firstName}'s daily routine`
+                : section === "contacts"
+                  ? `Edit emergency contacts`
+                  : `Edit ${profile.firstName}'s details`;
 
   function currentDailyRoutine() {
     const rows =
@@ -425,32 +443,60 @@ export function EditLovedOneDrawer({
   async function handleSave() {
     setSaving(true);
     try {
-      if (section === "health") {
-        const conditions = splitCsv(conditionsText);
-        const medications = splitCsv(medicationsText);
-        const allergies = splitCsv(allergiesText);
+      if (section === "health" || section === "allergies-diet") {
+        const conditions =
+          section === "health"
+            ? splitCsv(conditionsText)
+            : profile.healthGlance.conditions;
+        const medications =
+          section === "health"
+            ? splitCsv(medicationsText)
+            : profile.medications.map((item) => item.name);
+        const medicineAllergies = splitCsv(allergiesText);
+        const foodAllergies = splitCsv(foodAllergiesText);
+        const encoded = encodeHealthAllergiesDiet({
+          medicineAllergies,
+          foodAllergies,
+          diet,
+          fluids,
+        });
+        const mobilityValue =
+          section === "health"
+            ? mobility
+            : mobilityValueFromLabel(profile.healthGlance.mobility);
+        const nextDoctorName =
+          section === "health" ? doctorName : profile.doctor.name;
+        const nextDoctorPhone =
+          section === "health" ? doctorPhone : profile.doctor.phone;
+        const nextClinicName =
+          section === "health" ? clinicName : profile.doctor.clinic;
+        const nextNotes =
+          section === "health" ? notes : profile.caregiverNotes.body;
+
         await onSave?.({
           section,
           health: {
             conditions,
             medications,
-            allergies,
-            diet,
-            mobility: mobility
-              ? (mobility as NonNullable<LovedOneEditPayload["health"]>["mobility"])
+            allergies: encoded.allergies,
+            diet: encoded.diet,
+            mobility: mobilityValue
+              ? (mobilityValue as NonNullable<
+                  LovedOneEditPayload["health"]
+                >["mobility"])
               : undefined,
-            doctorName,
-            doctorPhone,
-            clinicName,
-            notesForCaregivers: notes,
+            doctorName: nextDoctorName,
+            doctorPhone: nextDoctorPhone,
+            clinicName: nextClinicName,
+            notesForCaregivers: nextNotes,
           },
           profilePatch: {
             healthGlance: {
               conditions,
               mobility:
-                MOBILITY_OPTIONS.find((o) => o.value === mobility)?.label ??
-                profile.healthGlance.mobility,
-              allergies: allergies.join("; "),
+                MOBILITY_OPTIONS.find((o) => o.value === mobilityValue)
+                  ?.label ?? profile.healthGlance.mobility,
+              allergies: medicineAllergies.join("; "),
               medicines:
                 medications.length > 0
                   ? `${medications.length} medicine${medications.length === 1 ? "" : "s"}`
@@ -462,25 +508,26 @@ export function EditLovedOneDrawer({
               note: "",
             })),
             medications: medications.map((name, index) => ({
-              id: `med-${index}`,
+              id: profile.medications[index]?.id ?? `med-${index}`,
               name,
-              form: "",
-              purpose: "",
-              schedule: "",
-              instruction: "",
+              form: profile.medications[index]?.form ?? "",
+              purpose: profile.medications[index]?.purpose ?? "",
+              schedule: profile.medications[index]?.schedule ?? "",
+              instruction: profile.medications[index]?.instruction ?? "",
             })),
             allergiesDiet: {
-              ...profile.allergiesDiet,
-              medicineAllergies: allergies.join("; "),
+              medicineAllergies: medicineAllergies.join("; "),
+              foodAllergies: foodAllergies.join("; "),
               diet,
+              fluids,
             },
             doctor: {
               ...profile.doctor,
-              name: doctorName,
-              phone: doctorPhone,
-              clinic: clinicName,
+              name: nextDoctorName,
+              phone: nextDoctorPhone,
+              clinic: nextClinicName,
             },
-            caregiverNotes: { body: notes, meta: "" },
+            caregiverNotes: { body: nextNotes, meta: "" },
           },
         });
       } else if (
@@ -681,9 +728,21 @@ export function EditLovedOneDrawer({
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-navy">Profile photo</p>
-                  <p className="text-xs text-navy/50">
-                    Change via care profile upload
-                  </p>
+                  {photoUploading ? (
+                    <p className="text-xs text-navy/50">Uploading photo…</p>
+                  ) : onChangePhoto ? (
+                    <button
+                      type="button"
+                      onClick={onChangePhoto}
+                      className="text-xs font-semibold text-brand-blue hover:text-brand-blue-hover"
+                    >
+                      Change photo
+                    </button>
+                  ) : (
+                    <p className="text-xs text-navy/50">
+                      JPG, PNG, or WebP up to 5 MB
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -823,6 +882,23 @@ export function EditLovedOneDrawer({
             </>
           ) : null}
 
+          {section === "allergies-diet" ? (
+            <div className="space-y-4">
+              <Field
+                label="Medicine allergies (comma-separated)"
+                value={allergiesText}
+                onChange={setAllergiesText}
+              />
+              <Field
+                label="Food allergies (comma-separated)"
+                value={foodAllergiesText}
+                onChange={setFoodAllergiesText}
+              />
+              <Field label="Diet" value={diet} onChange={setDiet} />
+              <Field label="Fluids" value={fluids} onChange={setFluids} />
+            </div>
+          ) : null}
+
           {section === "health" ? (
             <div className="space-y-4">
               <Field
@@ -836,11 +912,17 @@ export function EditLovedOneDrawer({
                 onChange={setMedicationsText}
               />
               <Field
-                label="Allergies (comma-separated)"
+                label="Medicine allergies (comma-separated)"
                 value={allergiesText}
                 onChange={setAllergiesText}
               />
-              <Field label="Diet notes" value={diet} onChange={setDiet} />
+              <Field
+                label="Food allergies (comma-separated)"
+                value={foodAllergiesText}
+                onChange={setFoodAllergiesText}
+              />
+              <Field label="Diet" value={diet} onChange={setDiet} />
+              <Field label="Fluids" value={fluids} onChange={setFluids} />
               <label className="block">
                 <span className="mb-1.5 block text-xs font-medium text-navy/55">
                   Mobility
