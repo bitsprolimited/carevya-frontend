@@ -1,5 +1,7 @@
 /** Cloudinary delivery URLs used across the CareVYA marketing site. */
 export const assets = {
+  /** Generic silhouette used when a user/recipient has no photo. */
+  defaultAvatar: "/default-avatar.svg",
   heroBackground:
     "https://res.cloudinary.com/dycukxm7r/image/upload/v1790163942/grandMaHero_vba2hs.png",
   homeHeroBackground:

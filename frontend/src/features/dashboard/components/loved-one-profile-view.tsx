@@ -385,9 +385,15 @@ function HealthTab({
 function CarePlanTab({
   profile,
   onEdit,
+  onEditHome,
+  onEditPreferences,
+  onEditRoutine,
 }: {
   profile: LovedOneProfile;
   onEdit: () => void;
+  onEditHome: () => void;
+  onEditPreferences: () => void;
+  onEditRoutine: () => void;
 }) {
   const plan = profile.carePlan;
   return (
@@ -403,7 +409,7 @@ function CarePlanTab({
           </dl>
         </Card>
 
-        <Card title="Daily routine" action={<EditLink onClick={onEdit} />}>
+        <Card title="Daily routine" action={<EditLink onClick={onEditRoutine} />}>
           <p className="mb-4 text-sm text-navy/55">
             A typical day for {profile.firstName}. Caregivers follow this as a
             guide.
@@ -438,7 +444,7 @@ function CarePlanTab({
       <div className="space-y-5">
         <Card
           title="Caregiver preferences"
-          action={<EditLink onClick={onEdit} />}
+          action={<EditLink onClick={onEditPreferences} />}
         >
           <dl>
             <DetailRow label="Gender" value={plan.preferences.gender} />
@@ -467,7 +473,7 @@ function CarePlanTab({
           </div>
         </Card>
 
-        <Card title="Home" action={<EditLink onClick={onEdit} />}>
+        <Card title="Home" action={<EditLink onClick={onEditHome} />}>
           <dl>
             <DetailRow label="Lives with" value={plan.home.livesWith} />
             <DetailRow label="Home" value={plan.home.home} />
@@ -1008,6 +1014,9 @@ export function LovedOneProfileView({
               <CarePlanTab
                 profile={profile}
                 onEdit={() => openEditor("care-plan")}
+                onEditHome={() => openEditor("home")}
+                onEditPreferences={() => openEditor("preferences")}
+                onEditRoutine={() => openEditor("routine")}
               />
             ) : null}
             {tab === "history" ? <HistoryTab profile={profile} /> : null}
@@ -1040,7 +1049,13 @@ export function LovedOneProfileView({
           try {
             if (payload.section === "health" && payload.health) {
               await saveCareRecipientHealth(id, payload.health);
-            } else if (payload.section === "care-plan" && payload.carePlan) {
+            } else if (
+              (payload.section === "care-plan" ||
+                payload.section === "home" ||
+                payload.section === "preferences" ||
+                payload.section === "routine") &&
+              payload.carePlan
+            ) {
               await saveCareRecipientCarePlan(id, payload.carePlan);
             } else if (payload.section === "contacts" && payload.contacts) {
               await replaceEmergencyContacts(id, payload.contacts);
@@ -1099,7 +1114,18 @@ export function LovedOneProfileView({
                 ? { ...current.careNeeds, ...payload.profilePatch.careNeeds }
                 : current.careNeeds,
               carePlan: payload.profilePatch.carePlan
-                ? { ...current.carePlan, ...payload.profilePatch.carePlan }
+                ? {
+                    ...current.carePlan,
+                    ...payload.profilePatch.carePlan,
+                    preferences: {
+                      ...current.carePlan.preferences,
+                      ...payload.profilePatch.carePlan.preferences,
+                    },
+                    home: {
+                      ...current.carePlan.home,
+                      ...payload.profilePatch.carePlan.home,
+                    },
+                  }
                 : current.carePlan,
               allergiesDiet: payload.profilePatch.allergiesDiet
                 ? {

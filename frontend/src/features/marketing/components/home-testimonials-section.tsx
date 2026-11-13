@@ -6,8 +6,8 @@ const featured = {
   quote:
     "When Mom was discharged from Riverside Methodist, we were terrified. CareVYA gave us direct access to Sarah’s complete background checks, within 30 minutes.",
   family: "The Henderson Family",
-  avatar: assets.homeTestimonialAvatarHenderson,
-  photo: assets.homeTestimonialFeatured,
+  avatar: assets.defaultAvatar,
+  photo: assets.defaultAvatar,
 } as const;
 
 const testimonials = [
@@ -16,28 +16,28 @@ const testimonials = [
       "CareVYA made finding the right caregiver for my mum feel simple, reassuring, and stress-free.",
     family: "The Adekunle Family",
     meta: "Ikeja, Nigeria • 11 months care",
-    avatar: assets.homeTestimonialAvatarA,
+    avatar: assets.defaultAvatar,
   },
   {
     quote:
       "Even from far away, CareVYA helps us stay connected to my grandmother's care every day.",
     family: "The Shina Family",
     meta: "Ikoyi, Nigeria • 8 months care",
-    avatar: assets.homeTestimonialAvatarB,
+    avatar: assets.defaultAvatar,
   },
   {
     quote:
       "We found a caregiver who truly understood my dad’s needs, routine, and personality.",
     family: "The Henderson Family",
     meta: "Mushin, Nigeria • 6 months care",
-    avatar: assets.homeTestimonialAvatarC,
+    avatar: assets.defaultAvatar,
   },
   {
     quote:
       "Everything felt clear, transparent, and genuinely human from the very beginning.",
     family: "The Babajide Family",
     meta: "Surulere, Nigeria • 5 months care",
-    avatar: assets.homeTestimonialAvatarD,
+    avatar: assets.defaultAvatar,
   },
 ] as const;
 

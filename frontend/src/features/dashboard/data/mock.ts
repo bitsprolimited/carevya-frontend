@@ -11,7 +11,7 @@ export const mockUser = {
   fullName: "Grace Bills",
   email: "grace.bills@family.ng",
   roleLabel: "Family",
-  avatarUrl: assets.homeTestimonialAvatarA,
+  avatarUrl: assets.defaultAvatar,
   notificationCount: 1,
 };
 
@@ -24,7 +24,7 @@ export const mockRecipients: CareRecipient[] = [
     age: 74,
     area: "Yaba",
     city: "Lagos",
-    avatarUrl: assets.homeTestimonialAvatarC,
+    avatarUrl: assets.defaultAvatar,
   },
   {
     id: "musa",
@@ -34,7 +34,7 @@ export const mockRecipients: CareRecipient[] = [
     age: 80,
     area: "Surulere",
     city: "Lagos",
-    avatarUrl: assets.homeTestimonialAvatarD,
+    avatarUrl: assets.defaultAvatar,
     profileProgress: { completed: 2, total: 5 },
   },
 ];
@@ -52,7 +52,7 @@ export const mockAppointments: DashboardAppointment[] = [
     dateLabel: "Thu 15 Oct",
     timeLabel: "Starts 8:00 AM",
     caregiverName: "Emeka Okonkwo",
-    caregiverAvatarUrl: assets.aboutMemberDevG,
+    caregiverAvatarUrl: assets.defaultAvatar,
     dayOfMonth: 15,
   },
   {
@@ -61,7 +61,7 @@ export const mockAppointments: DashboardAppointment[] = [
     dateLabel: "Sat 17 Oct",
     timeLabel: "10:30 AM",
     caregiverName: "Chinedu Obi",
-    caregiverAvatarUrl: assets.aboutMemberDevE,
+    caregiverAvatarUrl: assets.defaultAvatar,
     dayOfMonth: 17,
   },
 ];
@@ -92,7 +92,7 @@ export const mockCaregivers: Caregiver[] = [
     arrangement: "live_in",
     gender: "male",
     languages: ["English", "Igbo", "Yoruba"],
-    imageUrl: assets.aboutMemberDevG,
+    imageUrl: assets.defaultAvatar,
     saved: true,
     booked: true,
     recipientIds: ["folake"],
@@ -111,7 +111,7 @@ export const mockCaregivers: Caregiver[] = [
     arrangement: "full_day",
     gender: "female",
     languages: ["English", "Hausa", "Yoruba"],
-    imageUrl: assets.aboutMemberDesD,
+    imageUrl: assets.defaultAvatar,
     contacted: true,
     recipientIds: ["folake"],
   },
@@ -129,7 +129,7 @@ export const mockCaregivers: Caregiver[] = [
     arrangement: "part_time",
     gender: "female",
     languages: ["English", "Igbo"],
-    imageUrl: assets.aboutMemberDevO,
+    imageUrl: assets.defaultAvatar,
     recipientIds: ["folake"],
   },
   {
@@ -146,7 +146,7 @@ export const mockCaregivers: Caregiver[] = [
     arrangement: "full_day",
     gender: "female",
     languages: ["English", "Igbo"],
-    imageUrl: assets.homeCommitmentPortraitA,
+    imageUrl: assets.defaultAvatar,
     saved: true,
     booked: true,
     recipientIds: ["musa", "folake"],
@@ -165,7 +165,7 @@ export const mockCaregivers: Caregiver[] = [
     arrangement: "overnight",
     gender: "female",
     languages: ["English", "Yoruba"],
-    imageUrl: assets.homeCommitmentPortraitB,
+    imageUrl: assets.defaultAvatar,
     recipientIds: ["musa"],
   },
   {
@@ -182,7 +182,7 @@ export const mockCaregivers: Caregiver[] = [
     arrangement: "live_in",
     gender: "female",
     languages: ["English", "Hausa"],
-    imageUrl: assets.aboutCoreValuesPhotoA,
+    imageUrl: assets.defaultAvatar,
     recipientIds: ["musa"],
   },
   {
@@ -198,7 +198,7 @@ export const mockCaregivers: Caregiver[] = [
     priceAmount: 8_000,
     gender: "male",
     languages: ["English", "Igbo"],
-    imageUrl: assets.aboutMemberDevE,
+    imageUrl: assets.defaultAvatar,
     contacted: true,
     recipientIds: ["musa", "folake"],
   },
@@ -216,7 +216,7 @@ export const mockCaregivers: Caregiver[] = [
     arrangement: "part_time",
     gender: "female",
     languages: ["English", "Yoruba"],
-    imageUrl: assets.aboutCoreValuesPhotoB,
+    imageUrl: assets.defaultAvatar,
     recipientIds: ["musa"],
   },
 ];

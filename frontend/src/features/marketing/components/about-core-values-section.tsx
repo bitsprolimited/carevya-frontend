@@ -83,8 +83,8 @@ export function AboutCoreValuesSection() {
 
           <div className="relative min-h-[14rem] overflow-hidden rounded-3xl sm:min-h-[16rem] lg:col-span-2 lg:col-start-3 lg:row-start-1 lg:min-h-0 lg:h-full">
             <Image
-              src={assets.aboutCoreValuesPhotoA}
-              alt="Younger woman hugging an older woman from behind, both smiling"
+              src={assets.defaultAvatar}
+              alt="Care family avatar"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover object-center"
@@ -93,8 +93,8 @@ export function AboutCoreValuesSection() {
 
           <div className="relative min-h-[14rem] overflow-hidden rounded-3xl sm:min-h-[16rem] lg:col-span-2 lg:col-start-1 lg:row-start-2 lg:min-h-0 lg:h-full">
             <Image
-              src={assets.aboutCoreValuesPhotoB}
-              alt="Caregiver in blue scrubs showing a pill organizer to an elderly man in a wheelchair"
+              src={assets.defaultAvatar}
+              alt="Caregiver avatar"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover object-center"

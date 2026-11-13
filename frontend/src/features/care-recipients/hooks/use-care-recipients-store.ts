@@ -37,7 +37,7 @@ export function mapListItemToRecipient(
     age: ageFromDob(item.dateOfBirth),
     area: item.addressLga ?? "",
     city: item.addressState ?? "",
-    avatarUrl: item.photoUrl || assets.homeTestimonialAvatarC,
+    avatarUrl: item.photoUrl || assets.defaultAvatar,
     ...(completeness &&
     typeof completeness.completed === "number" &&
     typeof completeness.total === "number" &&

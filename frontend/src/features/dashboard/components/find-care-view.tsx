@@ -7,6 +7,7 @@ import { BookedCaregiverCard } from "@/features/dashboard/components/booked-care
 import { CaregiverCard } from "@/features/dashboard/components/caregiver-card";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
+import { FindCareContentSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
 import { FiltersDrawer } from "@/features/dashboard/components/filters-drawer";
 import { MessageCaregiverModal } from "@/features/dashboard/components/message-caregiver-modal";
 import { getCaregiverProfile } from "@/features/dashboard/data/caregiver-profiles";
@@ -45,6 +46,7 @@ export function FindCareView() {
     recipientId: null,
   }));
   const [messageBooking, setMessageBooking] = useState<Booking | null>(null);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -65,6 +67,7 @@ export function FindCareView() {
     void (async () => {
       if (!recipientId) {
         setCatalog([]);
+        if (!cancelled) setInitialLoading(false);
         return;
       }
       try {
@@ -73,6 +76,8 @@ export function FindCareView() {
         setCatalog(mapRecommendedCaregivers(recommended, recipientId));
       } catch {
         if (!cancelled) setCatalog([]);
+      } finally {
+        if (!cancelled) setInitialLoading(false);
       }
     })();
     return () => {
@@ -176,6 +181,14 @@ export function FindCareView() {
   const isEmpty = showBookedList
     ? bookedBookings.length === 0
     : pageItems.length === 0;
+
+  if (!hydrated || initialLoading) {
+    return (
+      <CareseekerShell>
+        <FindCareContentSkeleton />
+      </CareseekerShell>
+    );
+  }
 
   return (
     <CareseekerShell>

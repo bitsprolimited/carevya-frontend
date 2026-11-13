@@ -60,18 +60,7 @@ const AREAS = [
   "Akoka",
 ];
 
-const IMAGES = [
-  assets.aboutMemberDevG,
-  assets.aboutMemberDesD,
-  assets.aboutMemberDevO,
-  assets.homeCommitmentPortraitA,
-  assets.homeCommitmentPortraitB,
-  assets.aboutCoreValuesPhotoA,
-  assets.aboutMemberDevE,
-  assets.aboutCoreValuesPhotoB,
-  assets.homeTestimonialAvatarB,
-  assets.homeTestimonialAvatarD,
-];
+const IMAGES = [assets.defaultAvatar];
 
 const CATEGORIES: Caregiver["category"][] = [
   "non_clinical",

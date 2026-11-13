@@ -10,6 +10,7 @@ import {
   revokeSession,
   unlinkAccount,
 } from "@/features/auth/services/auth-service";
+import { InlineListSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
 import { useHydrated } from "@/hooks/use-hydrated";
 
 type SessionRow = {
@@ -106,10 +107,10 @@ export function AccountSecuritySection({
 
       <div className="mt-5">
         <h3 className="text-sm font-semibold text-navy">Active sessions</h3>
-        {sessions.length === 0 ? (
-          <p className="mt-2 text-sm text-navy/50">
-            {loading ? "Loading sessions…" : "No other sessions listed."}
-          </p>
+        {loading && sessions.length === 0 ? (
+          <InlineListSkeleton rows={2} />
+        ) : sessions.length === 0 ? (
+          <p className="mt-2 text-sm text-navy/50">No other sessions listed.</p>
         ) : (
           <ul className="mt-3 space-y-2">
             {sessions.map((session) => (
@@ -176,10 +177,10 @@ export function AccountSecuritySection({
 
       <div className="mt-6">
         <h3 className="text-sm font-semibold text-navy">Linked accounts</h3>
-        {accounts.length === 0 ? (
-          <p className="mt-2 text-sm text-navy/50">
-            {loading ? "Loading accounts…" : "No linked social accounts."}
-          </p>
+        {loading && accounts.length === 0 ? (
+          <InlineListSkeleton rows={2} />
+        ) : accounts.length === 0 ? (
+          <p className="mt-2 text-sm text-navy/50">No linked social accounts.</p>
         ) : (
           <ul className="mt-3 space-y-2">
             {accounts.map((account) => (

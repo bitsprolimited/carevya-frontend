@@ -11,6 +11,7 @@ import { BookingStatusBadge } from "@/features/dashboard/components/booking-stat
 import { CareReviewModal } from "@/features/dashboard/components/care-review-modal";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
+import { BookingsContentSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
 import { MessageCaregiverModal } from "@/features/dashboard/components/message-caregiver-modal";
 import { getCaregiverProfile } from "@/features/dashboard/data/caregiver-profiles";
 import { useBookingsStore } from "@/features/dashboard/hooks/use-bookings-store";
@@ -105,6 +106,14 @@ export function BookingsView() {
     { id: "accepted", label: "Accepted", count: counts.accepted },
     { id: "declined", label: "Declined", count: counts.declined },
   ];
+
+  if (!hydrated) {
+    return (
+      <CareseekerShell>
+        <BookingsContentSkeleton />
+      </CareseekerShell>
+    );
+  }
 
   return (
     <CareseekerShell>

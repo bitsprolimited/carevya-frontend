@@ -290,7 +290,7 @@ export function ReportIssueModal({
                         <Image
                           src={
                             booking.caregiverPhotoUrl ||
-                            assets.aboutMemberDevG
+                            assets.defaultAvatar
                           }
                           alt=""
                           fill

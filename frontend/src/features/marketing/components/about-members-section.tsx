@@ -5,26 +5,26 @@ const members = [
   {
     name: "Des. D",
     role: "Chief Design Officer",
-    photo: assets.aboutMemberDesD,
-    alt: "Des. D at a desk with dual monitors",
+    photo: assets.defaultAvatar,
+    alt: "Des. D profile avatar",
   },
   {
     name: "Dev. G",
     role: "Chief Technical Officer",
-    photo: assets.aboutMemberDevG,
-    alt: "Dev. G at a desk with a laptop and monitor",
+    photo: assets.defaultAvatar,
+    alt: "Dev. G profile avatar",
   },
   {
     name: "Dev. E",
     role: "Chief Product Officer",
-    photo: assets.aboutMemberDevE,
-    alt: "Dev. E at a desk with a laptop",
+    photo: assets.defaultAvatar,
+    alt: "Dev. E profile avatar",
   },
   {
     name: "Dev. O",
     role: "Chief Marketing Officer",
-    photo: assets.aboutMemberDevO,
-    alt: "Dev. O at a desk with a laptop",
+    photo: assets.defaultAvatar,
+    alt: "Dev. O profile avatar",
   },
 ] as const;
 

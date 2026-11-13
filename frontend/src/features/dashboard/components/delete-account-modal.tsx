@@ -4,6 +4,7 @@ import { AlertTriangle, Lock, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Modal } from "@/components/ui/modal";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   deleteAccount,
   getDeletionEligibility,
@@ -101,7 +102,17 @@ export function DeleteAccountModal({
         </p>
 
         {loadingEligibility ? (
-          <p className="mt-4 text-sm text-navy/55">Checking eligibility…</p>
+          <div
+            className="mt-4 space-y-2"
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+            aria-label="Checking eligibility"
+          >
+            <span className="sr-only">Checking eligibility…</span>
+            <Skeleton className="h-3.5 w-full" />
+            <Skeleton className="h-3.5 w-[80%]" />
+          </div>
         ) : null}
 
         {!loadingEligibility && activeBookings > 0 ? (

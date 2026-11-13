@@ -68,10 +68,11 @@ const CHANNEL_OPTIONS = [
   { value: "email", label: "Email" },
 ] as const;
 
-export type LovedOneEditSection = Extract<
-  LovedOneTab,
-  "overview" | "health" | "care-plan" | "contacts"
->;
+export type LovedOneEditSection =
+  | Extract<LovedOneTab, "overview" | "health" | "care-plan" | "contacts">
+  | "home"
+  | "preferences"
+  | "routine";
 
 export type LovedOneEditPayload = {
   section: LovedOneEditSection;
@@ -112,6 +113,13 @@ export type LovedOneEditPayload = {
     scheduleNote: string;
     caregiverPreferences: string[];
     enjoys: string[];
+    dailyRoutine?: Array<{ hour: string; note: string }>;
+    home?: {
+      livesWith: string;
+      home: string;
+      caregiverRoom: string;
+      power: string;
+    };
   };
   contacts?: Array<{
     name: string;
@@ -200,8 +208,33 @@ export function EditLovedOneDrawer({
         .filter(Boolean)
         .join(", "),
   );
+  const [prefGender, setPrefGender] = useState(
+    profile.carePlan.preferences.gender,
+  );
+  const [prefLanguages, setPrefLanguages] = useState(
+    profile.carePlan.preferences.languages,
+  );
+  const [prefExperience, setPrefExperience] = useState(
+    profile.carePlan.preferences.experience,
+  );
+  const [prefOther, setPrefOther] = useState(
+    profile.carePlan.preferences.other,
+  );
   const [enjoysText, setEnjoysText] = useState(
     profile.carePlan.enjoys.join(", "),
+  );
+  const [livesWith, setLivesWith] = useState(profile.carePlan.home.livesWith);
+  const [homeType, setHomeType] = useState(profile.carePlan.home.home);
+  const [caregiverRoom, setCaregiverRoom] = useState(
+    profile.carePlan.home.caregiverRoom,
+  );
+  const [power, setPower] = useState(profile.carePlan.home.power);
+  const [routineRows, setRoutineRows] = useState(
+    profile.carePlan.routine.map((item) => ({
+      time: item.time,
+      title: item.title,
+      note: item.note ?? "",
+    })),
   );
 
   const [contact1Name, setContact1Name] = useState(
@@ -256,7 +289,22 @@ export function EditLovedOneDrawer({
           .filter(Boolean)
           .join(", "),
     );
+    setPrefGender(profile.carePlan.preferences.gender);
+    setPrefLanguages(profile.carePlan.preferences.languages);
+    setPrefExperience(profile.carePlan.preferences.experience);
+    setPrefOther(profile.carePlan.preferences.other);
     setEnjoysText(profile.carePlan.enjoys.join(", "));
+    setLivesWith(profile.carePlan.home.livesWith);
+    setHomeType(profile.carePlan.home.home);
+    setCaregiverRoom(profile.carePlan.home.caregiverRoom);
+    setPower(profile.carePlan.home.power);
+    setRoutineRows(
+      profile.carePlan.routine.map((item) => ({
+        time: item.time,
+        title: item.title,
+        note: item.note ?? "",
+      })),
+    );
     setContact1Name(profile.emergencyContacts[0]?.name ?? "");
     setContact1Rel(profile.emergencyContacts[0]?.relationship ?? "");
     setContact1Phone(profile.emergencyContacts[0]?.phone ?? "");
@@ -301,9 +349,78 @@ export function EditLovedOneDrawer({
       ? `Edit ${profile.firstName}'s health`
       : section === "care-plan"
         ? `Edit ${profile.firstName}'s care plan`
-        : section === "contacts"
-          ? `Edit emergency contacts`
-          : `Edit ${profile.firstName}'s details`;
+        : section === "home"
+          ? `Edit ${profile.firstName}'s home`
+          : section === "preferences"
+            ? `Edit caregiver preferences`
+            : section === "routine"
+              ? `Edit ${profile.firstName}'s daily routine`
+              : section === "contacts"
+                ? `Edit emergency contacts`
+                : `Edit ${profile.firstName}'s details`;
+
+  function currentDailyRoutine() {
+    const rows =
+      section === "routine"
+        ? routineRows
+        : profile.carePlan.routine.map((item) => ({
+            time: item.time,
+            title: item.title,
+            note: item.note ?? "",
+          }));
+    return rows
+      .filter((item) => item.time.trim() || item.title.trim())
+      .map((item) => ({
+        hour: item.time.trim(),
+        note: item.note.trim()
+          ? `${item.title.trim()} — ${item.note.trim()}`
+          : item.title.trim(),
+      }));
+  }
+
+  function updateRoutineRow(
+    index: number,
+    key: "time" | "title" | "note",
+    value: string,
+  ) {
+    setRoutineRows((current) =>
+      current.map((row, rowIndex) =>
+        rowIndex === index ? { ...row, [key]: value } : row,
+      ),
+    );
+  }
+
+  function currentHome() {
+    return {
+      livesWith,
+      home: homeType,
+      caregiverRoom,
+      power,
+    };
+  }
+
+  function currentPreferences() {
+    return {
+      gender: prefGender.trim(),
+      languages: prefLanguages.trim(),
+      experience: prefExperience.trim(),
+      other: prefOther.trim(),
+    };
+  }
+
+  function preferencesToChips(prefs: {
+    gender: string;
+    languages: string;
+    experience: string;
+    other: string;
+  }): string[] {
+    return [
+      prefs.gender,
+      ...splitCsv(prefs.languages),
+      prefs.experience,
+      prefs.other,
+    ].filter(Boolean);
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -366,13 +483,34 @@ export function EditLovedOneDrawer({
             caregiverNotes: { body: notes, meta: "" },
           },
         });
-      } else if (section === "care-plan") {
+      } else if (
+        section === "care-plan" ||
+        section === "home" ||
+        section === "preferences" ||
+        section === "routine"
+      ) {
         const careTypes = splitCsv(careTypesText);
-        const caregiverPreferences = splitCsv(prefsText);
+        const preferences = currentPreferences();
+        const caregiverPreferences =
+          section === "preferences"
+            ? preferencesToChips(preferences)
+            : splitCsv(prefsText);
         const enjoys = splitCsv(enjoysText);
         const arrangementLabel =
           ARRANGEMENT_OPTIONS.find((o) => o.value === arrangement)?.label ??
           arrangement;
+        const home = currentHome();
+        const dailyRoutine = currentDailyRoutine();
+        const routineForUi =
+          section === "routine"
+            ? routineRows
+                .filter((item) => item.time.trim() || item.title.trim())
+                .map((item) => ({
+                  time: item.time.trim(),
+                  title: item.title.trim() || item.time.trim(),
+                  note: item.note.trim() || undefined,
+                }))
+            : profile.carePlan.routine;
         await onSave?.({
           section,
           carePlan: {
@@ -385,6 +523,8 @@ export function EditLovedOneDrawer({
             scheduleNote,
             caregiverPreferences,
             enjoys,
+            dailyRoutine,
+            home,
           },
           profilePatch: {
             careNeeds: {
@@ -398,11 +538,16 @@ export function EditLovedOneDrawer({
               typeOfCare: careTypes.join(", "),
               arrangement: arrangementLabel,
               schedule: scheduleNote,
-              preferences: {
-                ...profile.carePlan.preferences,
-                other: caregiverPreferences.join(", "),
-              },
+              preferences:
+                section === "preferences"
+                  ? preferences
+                  : {
+                      ...profile.carePlan.preferences,
+                      other: caregiverPreferences.join(", "),
+                    },
               enjoys,
+              home,
+              routine: routineForUi,
             },
             careTypeDetail: careTypes.join(", "),
             careTypeSummary: arrangementLabel,
@@ -781,6 +926,125 @@ export function EditLovedOneDrawer({
                 value={enjoysText}
                 onChange={setEnjoysText}
               />
+            </div>
+          ) : null}
+
+          {section === "home" ? (
+            <div className="space-y-4">
+              <Field
+                label="Lives with"
+                value={livesWith}
+                onChange={setLivesWith}
+              />
+              <Field
+                label="Home"
+                value={homeType}
+                onChange={setHomeType}
+              />
+              <Field
+                label="Caregiver's room"
+                value={caregiverRoom}
+                onChange={setCaregiverRoom}
+              />
+              <Field label="Power" value={power} onChange={setPower} />
+            </div>
+          ) : null}
+
+          {section === "preferences" ? (
+            <div className="space-y-4">
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-medium text-navy/55">
+                  Gender
+                </span>
+                <select
+                  value={prefGender}
+                  onChange={(event) => setPrefGender(event.target.value)}
+                  className="h-11 w-full appearance-none rounded-xl border border-[#D7E0EA] bg-white px-3 text-sm text-navy outline-none"
+                >
+                  <option value="">No preference</option>
+                  <option value="Female">Female</option>
+                  <option value="Male">Male</option>
+                </select>
+              </label>
+              <Field
+                label="Languages"
+                value={prefLanguages}
+                onChange={setPrefLanguages}
+              />
+              <Field
+                label="Experience"
+                value={prefExperience}
+                onChange={setPrefExperience}
+              />
+              <Field label="Other" value={prefOther} onChange={setPrefOther} />
+            </div>
+          ) : null}
+
+          {section === "routine" ? (
+            <div className="space-y-4">
+              <p className="text-sm text-navy/55">
+                Add the times and activities caregivers should follow for{" "}
+                {profile.firstName}.
+              </p>
+              {routineRows.map((row, index) => (
+                <div
+                  key={`routine-${index}`}
+                  className="rounded-xl border border-[#E8EEF5] bg-[#F8FAFC] p-3"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs font-semibold text-navy/55">
+                      Step {index + 1}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setRoutineRows((current) =>
+                          current.filter((_, rowIndex) => rowIndex !== index),
+                        )
+                      }
+                      className="text-xs font-semibold text-danger hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                  <div className="mt-2 space-y-2.5">
+                    <Field
+                      label="Time"
+                      value={row.time}
+                      onChange={(value) =>
+                        updateRoutineRow(index, "time", value)
+                      }
+                    />
+                    <Field
+                      label="Activity"
+                      value={row.title}
+                      onChange={(value) =>
+                        updateRoutineRow(index, "title", value)
+                      }
+                    />
+                    <Field
+                      label="Note (optional)"
+                      value={row.note}
+                      onChange={(value) =>
+                        updateRoutineRow(index, "note", value)
+                      }
+                    />
+                  </div>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() =>
+                  setRoutineRows((current) => [
+                    ...current,
+                    { time: "", title: "", note: "" },
+                  ])
+                }
+                className="h-10 w-full rounded-full"
+              >
+                Add routine step
+              </Button>
             </div>
           ) : null}
 
