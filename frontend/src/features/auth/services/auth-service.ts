@@ -112,11 +112,14 @@ export function getPasswordChecks(password: string) {
   ];
 }
 
-export async function signUpfamily(input: {
+export type SignupRole = "care_seeker" | "caregiver";
+
+export async function signUpWithRole(input: {
   fullName: string;
   email: string;
   phone: string;
   password: string;
+  role: SignupRole;
 }): Promise<AuthResult> {
   const { error } = await authClient.signUp.email({
     name: input.fullName,
@@ -125,7 +128,7 @@ export async function signUpfamily(input: {
     // Backend field is `phoneNumber` (Better Auth phone-number plugin).
     phoneNumber: toE164Ng(input.phone),
     // Always send the role explicitly; the backend only defaults to care_seeker.
-    role: "care_seeker",
+    role: input.role,
   });
 
   if (error) {
@@ -134,6 +137,24 @@ export async function signUpfamily(input: {
 
   // Signup does not mean the email is verified; an OTP has been sent.
   return { success: true };
+}
+
+export async function signUpfamily(input: {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+}): Promise<AuthResult> {
+  return signUpWithRole({ ...input, role: "care_seeker" });
+}
+
+export async function signUpCaregiver(input: {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+}): Promise<AuthResult> {
+  return signUpWithRole({ ...input, role: "caregiver" });
 }
 
 export async function signInWithEmail(input: {

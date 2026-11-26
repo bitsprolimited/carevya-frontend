@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MotionConfig } from "motion/react";
 import { useEffect, useState, type ReactNode } from "react";
+import { AppToaster } from "@/components/ui/app-toaster";
 
 type AppProvidersProps = {
   children: ReactNode;
@@ -29,7 +30,10 @@ export function AppProviders({ children }: AppProvidersProps) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MotionConfig reducedMotion={reducedMotion}>{children}</MotionConfig>
+      <MotionConfig reducedMotion={reducedMotion}>
+        {children}
+        <AppToaster />
+      </MotionConfig>
     </QueryClientProvider>
   );
 }

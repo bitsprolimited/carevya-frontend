@@ -39,6 +39,7 @@ import type {
   LovedOneTab,
 } from "@/features/dashboard/types/loved-one";
 import { uploadFile } from "@/features/uploads/services/upload-service";
+import { appToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
 const TABS: { id: LovedOneTab; label: string }[] = [
@@ -878,7 +879,6 @@ export function LovedOneProfileView({
   const [editOpen, setEditOpen] = useState(false);
   const [editSection, setEditSection] =
     useState<LovedOneEditSection>("overview");
-  const [toast, setToast] = useState<string | null>(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
 
@@ -897,11 +897,6 @@ export function LovedOneProfileView({
     () => `/careseeker?recipient=${profile.id}`,
     [profile.id],
   );
-
-  function showToast(message: string) {
-    setToast(message);
-    window.setTimeout(() => setToast(null), 2200);
-  }
 
   async function handleAvatarSelected(file: File | undefined) {
     if (!file) return;
@@ -922,7 +917,7 @@ export function LovedOneProfileView({
       await updateCareRecipient(id, { photoUrl: uploaded.url });
       setProfile((current) => ({ ...current, avatarUrl: uploaded.url }));
       void refreshRecipients();
-      showToast("Photo updated");
+      appToast.success("Photo updated");
     } catch (err) {
       setAvatarError(
         err instanceof Error ? err.message : "Photo upload failed.",
@@ -1234,22 +1229,13 @@ export function LovedOneProfileView({
                   }
                 : current.caregiverNotes,
             }));
-            showToast(`${profile.firstName}'s details updated`);
+            appToast.success(`${profile.firstName}'s details updated`);
           } catch {
-            showToast("Could not save changes. Please try again.");
+            appToast.error("Could not save changes. Please try again.");
             throw new Error("save failed");
           }
         }}
       />
-
-      {toast ? (
-        <div
-          role="status"
-          className="fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-navy px-4 py-2 text-sm font-medium text-white shadow-lg"
-        >
-          {toast}
-        </div>
-      ) : null}
     </CareseekerShell>
   );
 }

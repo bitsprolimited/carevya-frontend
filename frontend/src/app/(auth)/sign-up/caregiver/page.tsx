@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-/** Caregiver signup is not ready yet — send users back to get-started. */
+/** Deep link into caregiver signup on get-started. */
 export default function CaregiverSignupRedirectPage() {
-  redirect("/get-started");
+  redirect("/get-started?auth=signup&role=caregiver");
 }

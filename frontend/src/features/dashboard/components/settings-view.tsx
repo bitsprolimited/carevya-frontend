@@ -11,7 +11,7 @@ import { AccountSecuritySection } from "@/features/dashboard/components/account-
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { DeleteAccountModal } from "@/features/dashboard/components/delete-account-modal";
-import { cn } from "@/lib/utils";
+import { appToast } from "@/lib/toast";
 
 type Channel = "inApp" | "email" | "sms";
 
@@ -60,7 +60,6 @@ export function SettingsView() {
   const [shareHealth, setShareHealth] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
 
   function setChannel(rowId: string, channel: Channel, value: boolean) {
     setRows((current) =>
@@ -70,11 +69,6 @@ export function SettingsView() {
           : row,
       ),
     );
-  }
-
-  function showToast(message: string) {
-    setToast(message);
-    window.setTimeout(() => setToast(null), 2200);
   }
 
   return (
@@ -201,7 +195,7 @@ export function SettingsView() {
                 type="button"
                 variant="secondary"
                 className="h-9 rounded-full px-4 text-xs"
-                onClick={() => showToast("Download requested")}
+                onClick={() => appToast.message("Download requested")}
               >
                 Request download
               </Button>
@@ -226,7 +220,7 @@ export function SettingsView() {
           </div>
         </section>
 
-        <AccountSecuritySection onToast={showToast} />
+        <AccountSecuritySection />
 
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           <section className="rounded-2xl border border-[#C8EBD9] bg-[#E9F9F1] p-5">
@@ -268,16 +262,6 @@ export function SettingsView() {
         }}
       />
 
-      {toast ? (
-        <div
-          role="status"
-          className={cn(
-            "fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-navy px-4 py-2 text-sm font-medium text-white shadow-lg",
-          )}
-        >
-          {toast}
-        </div>
-      ) : null}
     </CareseekerShell>
   );
 }

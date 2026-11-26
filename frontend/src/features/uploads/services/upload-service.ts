@@ -1,6 +1,14 @@
 import { backendFetch } from "@/lib/backend-api";
 
-export type UploadKind = "photo" | "nin" | "issue_attachment";
+export type UploadKind =
+  | "photo"
+  | "nin"
+  | "issue_attachment"
+  | "nin_id_front"
+  | "nin_id_back"
+  | "id_selfie"
+  | "proof_of_address"
+  | "certificate";
 
 export type UploadResult = {
   url: string;

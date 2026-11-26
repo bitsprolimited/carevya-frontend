@@ -23,7 +23,13 @@ export function GetStartedView() {
     const auth = searchParams.get("auth");
     if (!isAuthView(auth)) return;
 
-    openModal(auth);
+    const roleParam = searchParams.get("role");
+    const role =
+      auth === "signup" && roleParam === "caregiver"
+        ? ("caregiver" as const)
+        : ("care_seeker" as const);
+
+    openModal(auth, auth === "signup" ? { role } : undefined);
     router.replace("/get-started", { scroll: false });
   }, [openModal, router, searchParams]);
 
@@ -51,9 +57,7 @@ export function GetStartedView() {
           title="I'm a Caregiver"
           description="I'm looking for dignified caregiving work, companion care, or household healthcare roles."
           ctaLabel="Sign up as Caregiver"
-          onClick={() => {
-            window.alert("Caregiver signup is coming soon.");
-          }}
+          onClick={() => openModal("signup", { role: "caregiver" })}
         />
       </div>
 

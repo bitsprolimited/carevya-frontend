@@ -10,6 +10,7 @@ import { useAuthModalStore } from "@/features/auth/hooks/use-auth-modal-store";
 export function AuthModal() {
   const isOpen = useAuthModalStore((state) => state.isOpen);
   const view = useAuthModalStore((state) => state.view);
+  const signupRole = useAuthModalStore((state) => state.signupRole);
   const closeModal = useAuthModalStore((state) => state.closeModal);
   const setView = useAuthModalStore((state) => state.setView);
 
@@ -43,7 +44,8 @@ export function AuthModal() {
       ) : null}
       {!verifyEmail && view === "signup" ? (
         <SignupFlow
-          key="auth-signup-modal"
+          key={`auth-signup-modal-${signupRole}`}
+          role={signupRole}
           onClose={handleClose}
           onLogin={() => setView("login")}
         />

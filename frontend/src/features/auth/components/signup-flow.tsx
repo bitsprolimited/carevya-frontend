@@ -30,8 +30,10 @@ import {
   getPasswordChecks,
   sendEmailVerificationOtp,
   signInWithEmail,
+  signUpCaregiver,
   signUpfamily,
   verifyEmailOtp,
+  type SignupRole,
 } from "@/features/auth/services/auth-service";
 
 type SignupStep = "signup" | "verify" | "success";
@@ -89,6 +91,7 @@ function SuccessBurstIcon() {
 type SignupFlowProps = {
   onLogin?: () => void;
   onClose?: () => void;
+  role?: SignupRole;
   /**
    * Open directly on the verification step for this email, e.g. when a user
    * with an unverified account tries to log in. A fresh code is sent on mount.
@@ -96,7 +99,17 @@ type SignupFlowProps = {
   verifyEmail?: string;
 };
 
-export function SignupFlow({ onLogin, onClose, verifyEmail }: SignupFlowProps) {
+export function SignupFlow({
+  onLogin,
+  onClose,
+  role = "care_seeker",
+  verifyEmail,
+}: SignupFlowProps) {
+  const isCaregiver = role === "caregiver";
+  const onboardingHref = isCaregiver
+    ? "/caregiver/onboarding"
+    : "/careseeker/care-profile";
+  const dashboardHref = isCaregiver ? "/caregiver" : "/careseeker";
   const [step, setStep] = useState<SignupStep>(
     verifyEmail ? "verify" : "signup",
   );
@@ -177,7 +190,7 @@ export function SignupFlow({ onLogin, onClose, verifyEmail }: SignupFlowProps) {
 
     setSubmitting(true);
     try {
-      const result = await signUpfamily({
+      const result = await (isCaregiver ? signUpCaregiver : signUpfamily)({
         fullName: fullName.trim(),
         email: email.trim(),
         phone: phone.trim(),
@@ -718,10 +731,10 @@ export function SignupFlow({ onLogin, onClose, verifyEmail }: SignupFlowProps) {
 
           <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-navy/60">
             Welcome to CareVYA
-            {getFirstName(fullName) ? `, ${getFirstName(fullName)}` : ""}. Next,
-            tell us about
-            the person who needs care so we can match you with the right
-            caregivers.
+            {getFirstName(fullName) ? `, ${getFirstName(fullName)}` : ""}.{" "}
+            {isCaregiver
+              ? "Next, set up your caregiver profile so families can find and book you."
+              : "Next, tell us about the person who needs care so we can match you with the right caregivers."}
           </p>
 
           <div className="mt-6 flex items-start gap-2.5 rounded-xl border border-[#E2E8F0] bg-white px-3.5 py-3 text-left text-xs leading-relaxed text-navy/60">
@@ -730,27 +743,30 @@ export function SignupFlow({ onLogin, onClose, verifyEmail }: SignupFlowProps) {
               aria-hidden
             />
             <p>
-              Setting up a care profile takes about 3 minutes. You can save and
-              finish later at any time.
+              {isCaregiver
+                ? "Setting up your caregiver profile takes about 10 minutes. You can save and finish later at any time."
+                : "Setting up a care profile takes about 3 minutes. You can save and finish later at any time."}
             </p>
           </div>
 
           {signedIn ? (
             <>
               <Link
-                href="/careseeker/care-profile"
+                href={onboardingHref}
                 className="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand-blue px-4 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-brand-blue-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                Set Up Care Profile
+                {isCaregiver ? "Set Up Caregiver Profile" : "Set Up Care Profile"}
                 <ArrowRight className="size-4" aria-hidden />
               </Link>
 
-              <Link
-                href="/careseeker"
-                className="mt-4 inline-block text-sm font-medium text-brand-blue hover:text-brand-blue-hover"
-              >
-                Skip &amp; Go to Dashboard
-              </Link>
+              {!isCaregiver ? (
+                <Link
+                  href={dashboardHref}
+                  className="mt-4 inline-block text-sm font-medium text-brand-blue hover:text-brand-blue-hover"
+                >
+                  Skip &amp; Go to Dashboard
+                </Link>
+              ) : null}
             </>
           ) : (
             <Button

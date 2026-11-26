@@ -12,6 +12,7 @@ import {
 } from "@/features/auth/services/auth-service";
 import { InlineListSkeleton } from "@/features/dashboard/components/dashboard-skeleton";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { appToast } from "@/lib/toast";
 
 type SessionRow = {
   token: string;
@@ -27,11 +28,7 @@ type AccountRow = {
   accountId?: string;
 };
 
-export function AccountSecuritySection({
-  onToast,
-}: {
-  onToast?: (message: string) => void;
-}) {
+export function AccountSecuritySection() {
   const hydrated = useHydrated();
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [accounts, setAccounts] = useState<AccountRow[]>([]);
@@ -142,7 +139,7 @@ export function AccountSecuritySection({
                         setError(result.message);
                         return;
                       }
-                      onToast?.("Session revoked");
+                      appToast.success("Session revoked");
                       await refresh();
                     })();
                   }}
@@ -165,7 +162,7 @@ export function AccountSecuritySection({
                   setError(result.message);
                   return;
                 }
-                onToast?.("Other sessions revoked");
+                appToast.success("Other sessions revoked");
                 await refresh();
               })();
             }}
@@ -209,7 +206,7 @@ export function AccountSecuritySection({
                         setError(result.message);
                         return;
                       }
-                      onToast?.("Account unlinked");
+                      appToast.success("Account unlinked");
                       await refresh();
                     })();
                   }}
@@ -228,7 +225,7 @@ export function AccountSecuritySection({
               const result = await linkSocialAccount({ provider: "google" });
               if (!result.success) {
                 setError(result.message);
-                onToast?.(result.message);
+                appToast.message(result.message);
               }
             })();
           }}

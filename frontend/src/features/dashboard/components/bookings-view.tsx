@@ -16,6 +16,7 @@ import { MessageCaregiverModal } from "@/features/dashboard/components/message-c
 import { getCaregiverProfile } from "@/features/dashboard/data/caregiver-profiles";
 import { useBookingsStore } from "@/features/dashboard/hooks/use-bookings-store";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { appToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
 type TabFilter = "all" | "pending" | "accepted" | "declined";
@@ -46,8 +47,6 @@ export function BookingsView() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messageOpen, setMessageOpen] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-
   useEffect(() => {
     if (!hydrated) return;
     void loadRecipients();
@@ -94,11 +93,6 @@ export function BookingsView() {
   const showDeclinedNote =
     tab === "declined" ||
     (tab === "all" && visible.some((item) => item.status === "declined"));
-
-  function showToast(message: string) {
-    setToast(message);
-    window.setTimeout(() => setToast(null), 2200);
-  }
 
   const tabs: { id: TabFilter; label: string; count: number }[] = [
     { id: "all", label: "All", count: counts.all },
@@ -383,26 +377,26 @@ export function BookingsView() {
               },
             ],
           });
-          showToast("New time accepted");
+          appToast.success("New time accepted");
         }}
         onCancel={() => {
           if (!selected) return;
           removeBooking(selected.id);
           setSelectedId(null);
-          showToast(
+          appToast.message(
             selected.status === "confirmed"
               ? "Booking cancelled"
               : "Request cancelled",
           );
         }}
-        onReport={() => showToast("Issue reported")}
+        onReport={() => appToast.message("Issue reported")}
       />
 
       <CareReviewModal
         open={reviewOpen}
         onClose={() => setReviewOpen(false)}
         booking={selected}
-        onSubmitted={() => showToast("Thanks for your review")}
+        onSubmitted={() => appToast.success("Thanks for your review")}
       />
 
       {selectedProfile ? (
@@ -412,15 +406,6 @@ export function BookingsView() {
           caregiver={selectedProfile}
           recipientId={recipientId ?? undefined}
         />
-      ) : null}
-
-      {toast ? (
-        <div
-          role="status"
-          className="fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-navy px-4 py-2 text-sm font-medium text-white shadow-lg"
-        >
-          {toast}
-        </div>
       ) : null}
     </CareseekerShell>
   );

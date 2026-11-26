@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeft,
   BadgeCheck,
   CheckCheck,
   Paperclip,
@@ -19,23 +20,28 @@ import { ChatThreadMenu } from "@/features/dashboard/components/chat-thread-menu
 import { MessageCaregiverModal } from "@/features/dashboard/components/message-caregiver-modal";
 import { MessagesEmptyState } from "@/features/dashboard/components/messages-empty-state";
 import { getCaregiverProfile } from "@/features/dashboard/data/caregiver-profiles";
+import { mockMessageThreads } from "@/features/dashboard/data/mock-messages";
 import type { MessageThread } from "@/features/dashboard/types/messages";
+import { appToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
 export function MessagesView({
-  initialEmpty = true,
+  initialEmpty = false,
 }: {
   initialEmpty?: boolean;
 }) {
-  const [threads, setThreads] = useState<MessageThread[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(null);
-  void initialEmpty;
+  const [threads, setThreads] = useState<MessageThread[]>(() =>
+    initialEmpty ? [] : mockMessageThreads,
+  );
+  const [activeId, setActiveId] = useState<string | null>(() =>
+    initialEmpty ? null : (mockMessageThreads[0]?.id ?? null),
+  );
+  const [mobilePane, setMobilePane] = useState<"list" | "chat">("list");
   const [listFilter, setListFilter] = useState<"all" | "unread">("all");
   const [listQuery, setListQuery] = useState("");
   const [draft, setDraft] = useState("");
   const [bookOpen, setBookOpen] = useState(false);
   const [messageOpen, setMessageOpen] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
 
   const unreadTotal = threads.reduce(
     (sum, thread) => sum + thread.unreadCount,
@@ -58,19 +64,17 @@ export function MessagesView({
   }, [threads, listFilter, listQuery]);
 
   const activeThread =
-    threads.find((thread) => thread.id === activeId) ?? visibleThreads[0] ?? null;
+    threads.find((thread) => thread.id === activeId) ??
+    visibleThreads[0] ??
+    null;
 
   const bookingProfile = activeThread
     ? getCaregiverProfile(activeThread.caregiverId)
     : null;
 
-  function showToast(message: string) {
-    setToast(message);
-    window.setTimeout(() => setToast(null), 2200);
-  }
-
   function selectThread(id: string) {
     setActiveId(id);
+    setMobilePane("chat");
     setThreads((current) =>
       current.map((thread) =>
         thread.id === id ? { ...thread, unreadCount: 0 } : thread,
@@ -116,10 +120,11 @@ export function MessagesView({
       const next = current.filter((thread) => thread.id !== id);
       if (activeId === id) {
         setActiveId(next[0]?.id ?? null);
+        setMobilePane("list");
       }
       return next;
     });
-    showToast("Chat deleted");
+    appToast.message("Chat deleted");
   }
 
   return (
@@ -137,7 +142,12 @@ export function MessagesView({
           </div>
         ) : (
           <div className="mt-6 grid min-h-0 flex-1 gap-4 lg:grid-cols-[22rem_minmax(0,1fr)] xl:grid-cols-[24rem_minmax(0,1fr)]">
-            <section className="flex min-h-[28rem] flex-col rounded-2xl border border-[#E8EEF5] bg-white shadow-sm">
+            <section
+              className={cn(
+                "min-h-[28rem] flex-col rounded-2xl border border-[#E8EEF5] bg-white shadow-sm",
+                mobilePane === "list" ? "flex" : "hidden lg:flex",
+              )}
+            >
               <div className="flex items-center justify-between gap-3 border-b border-[#E8EEF5] px-4 py-3.5">
                 <h2 className="text-base font-bold text-navy">My messages</h2>
                 <button
@@ -152,7 +162,10 @@ export function MessagesView({
 
               <div className="space-y-3 px-4 py-3">
                 <label className="flex h-10 items-center gap-2 rounded-full bg-[#F3F6FB] px-3">
-                  <Search className="size-4 shrink-0 text-navy/40" aria-hidden />
+                  <Search
+                    className="size-4 shrink-0 text-navy/40"
+                    aria-hidden
+                  />
                   <input
                     type="search"
                     value={listQuery}
@@ -213,9 +226,7 @@ export function MessagesView({
                           onClick={() => selectThread(thread.id)}
                           className={cn(
                             "flex w-full items-start gap-3 rounded-2xl px-3 py-3 text-left transition-colors",
-                            active
-                              ? "bg-[#EAF2FF]"
-                              : "hover:bg-[#F8FAFC]",
+                            active ? "bg-[#EAF2FF]" : "hover:bg-[#F8FAFC]",
                           )}
                         >
                           <span className="relative mt-0.5 size-11 shrink-0 overflow-hidden rounded-full bg-surface-soft">
@@ -228,19 +239,26 @@ export function MessagesView({
                             />
                           </span>
                           <span className="min-w-0 flex-1">
-                            <span className="flex items-center gap-1.5">
-                              <span className="truncate text-sm font-bold text-navy">
-                                {thread.caregiverName}
+                            <span className="flex items-start justify-between gap-2">
+                              <span className="flex min-w-0 items-center gap-1.5">
+                                <span className="truncate text-sm font-bold text-navy">
+                                  {thread.caregiverName}
+                                </span>
+                                {thread.verified ? (
+                                  <BadgeCheck
+                                    className="size-3.5 shrink-0 fill-emerald text-white"
+                                    aria-label="Verified"
+                                  />
+                                ) : null}
+                                {thread.pinned ? (
+                                  <span className="text-[0.625rem] font-semibold text-brand-blue">
+                                    Pinned
+                                  </span>
+                                ) : null}
                               </span>
-                              {thread.verified ? (
-                                <BadgeCheck
-                                  className="size-3.5 shrink-0 fill-emerald text-white"
-                                  aria-label="Verified"
-                                />
-                              ) : null}
-                              {thread.pinned ? (
-                                <span className="text-[0.625rem] font-semibold text-brand-blue">
-                                  Pinned
+                              {thread.unreadCount > 0 ? (
+                                <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald text-[0.625rem] font-bold text-white">
+                                  {thread.unreadCount}
                                 </span>
                               ) : null}
                             </span>
@@ -251,11 +269,6 @@ export function MessagesView({
                               {thread.timeLabel}
                             </span>
                           </span>
-                          {thread.unreadCount > 0 ? (
-                            <span className="mt-1 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald text-[0.625rem] font-bold text-white">
-                              {thread.unreadCount}
-                            </span>
-                          ) : null}
                         </button>
                       </li>
                     );
@@ -264,11 +277,24 @@ export function MessagesView({
               </ul>
             </section>
 
-            <section className="flex min-h-[28rem] flex-col overflow-hidden rounded-2xl border border-[#E8EEF5] bg-white shadow-sm">
+            <section
+              className={cn(
+                "min-h-[28rem] flex-col overflow-hidden rounded-2xl border border-[#E8EEF5] bg-white shadow-sm",
+                mobilePane === "chat" ? "flex" : "hidden lg:flex",
+              )}
+            >
               {activeThread ? (
                 <>
                   <div className="flex flex-wrap items-center gap-3 border-b border-[#E8EEF5] px-4 py-3">
-                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                    <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+                      <button
+                        type="button"
+                        aria-label="Back to conversations"
+                        onClick={() => setMobilePane("list")}
+                        className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-navy/60 hover:bg-surface-soft hover:text-navy lg:hidden"
+                      >
+                        <ArrowLeft className="size-4" aria-hidden />
+                      </button>
                       <span className="relative size-11 shrink-0 overflow-hidden rounded-full bg-surface-soft">
                         <Image
                           src={activeThread.avatarUrl}
@@ -321,29 +347,34 @@ export function MessagesView({
                                 : thread,
                             ),
                           );
-                          showToast(
-                            activeThread.pinned ? "Chat unpinned" : "Chat pinned",
+                          appToast.message(
+                            activeThread.pinned
+                              ? "Chat unpinned"
+                              : "Chat pinned",
                           );
                         }}
                         onBlock={() =>
-                          showToast(`${activeThread.caregiverFirstName} blocked`)
+                          appToast.message(
+                            `${activeThread.caregiverFirstName} blocked`,
+                          )
                         }
                         onReport={() =>
-                          showToast(
+                          appToast.message(
                             `Report submitted for ${activeThread.caregiverFirstName}`,
                           )
                         }
                         onDelete={() => deleteThread(activeThread.id)}
                       />
-                      <Button
-                        type="button"
-                        size="sm"
-                        className="ml-1 rounded-full px-4"
-                        onClick={() => setBookOpen(true)}
-                        disabled={!bookingProfile}
-                      >
-                        Book {activeThread.caregiverFirstName}
-                      </Button>
+                      {bookingProfile ? (
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="ml-1 hidden rounded-full px-4 sm:inline-flex"
+                          onClick={() => setBookOpen(true)}
+                        >
+                          Book {activeThread.caregiverFirstName}
+                        </Button>
+                      ) : null}
                     </div>
                   </div>
 
@@ -368,14 +399,14 @@ export function MessagesView({
                               "max-w-[min(100%,24rem)] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed shadow-sm",
                               outgoing
                                 ? "rounded-br-md bg-brand-blue text-white"
-                                : "rounded-bl-md bg-navy text-white",
+                                : "rounded-bl-md bg-[#E8EEF5] text-navy",
                             )}
                           >
                             <p>{message.body}</p>
                             <p
                               className={cn(
                                 "mt-1.5 text-[0.625rem]",
-                                outgoing ? "text-white/75" : "text-white/60",
+                                outgoing ? "text-white/75" : "text-navy/45",
                               )}
                             >
                               {message.timeLabel}
@@ -451,15 +482,6 @@ export function MessagesView({
             caregiver={bookingProfile}
           />
         </>
-      ) : null}
-
-      {toast ? (
-        <div
-          role="status"
-          className="fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-navy px-4 py-2 text-sm font-medium text-white shadow-lg"
-        >
-          {toast}
-        </div>
       ) : null}
     </CareseekerShell>
   );

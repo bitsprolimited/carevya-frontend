@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { CareseekerShell } from "@/features/dashboard/components/careseeker-shell";
 import { CareseekerTopbar } from "@/features/dashboard/components/careseeker-topbar";
 import { ReportIssueModal } from "@/features/dashboard/components/report-issue-modal";
+import { appToast } from "@/lib/toast";
 import { cn } from "@/lib/utils";
 
 const FAQS = [
@@ -110,12 +111,6 @@ function SupportIllustration() {
 export function HelpSupportView() {
   const [openFaq, setOpenFaq] = useState<string | null>("pay");
   const [reportOpen, setReportOpen] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-
-  function showToast(message: string) {
-    setToast(message);
-    window.setTimeout(() => setToast(null), 2400);
-  }
 
   return (
     <CareseekerShell>
@@ -224,17 +219,10 @@ export function HelpSupportView() {
       <ReportIssueModal
         open={reportOpen}
         onClose={() => setReportOpen(false)}
-        onSubmitted={() => showToast("Report submitted — we’ll follow up soon")}
+        onSubmitted={() =>
+          appToast.success("Report submitted — we’ll follow up soon")
+        }
       />
-
-      {toast ? (
-        <div
-          role="status"
-          className="fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-navy px-4 py-2 text-sm font-medium text-white shadow-lg"
-        >
-          {toast}
-        </div>
-      ) : null}
     </CareseekerShell>
   );
 }
